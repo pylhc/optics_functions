@@ -22,7 +22,7 @@ def calc_fjklm(df: pd.DataFrame,
                m: int,
                tune_x: float,
                tune_y: float,
-               mask: None) -> pd.DataFrame:
+               mask=None) -> pd.DataFrame:
     """Calculates the resonance driving term Fjklm. Low level function, needs a DataFrame with beta
     functions, phases and magnet strengths and, separately, the tunes. Four integers `j,k,l,m` define
     which RDT should be calculated.
