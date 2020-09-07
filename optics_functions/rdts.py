@@ -12,7 +12,7 @@ TWOPI_I = 2.0j * pi
 
 
 def phadv(phases, i, tune):
-    return np.append(phases[i] - phases[:i] - tune, phases[i] - (phases[i:]))
+    return pd.concat([(phases[i] - phases[:i] - tune)[:-1], phases[i] - phases[i:]])
 
 
 def calc_fjklm(df: pd.DataFrame,
@@ -64,16 +64,16 @@ def calc_fjklm(df: pd.DataFrame,
     muy = df["MUY"].values
 
     if mask is None:
-        index = range(len(df.index))
-    else:
-        index = np.arange(len(df.index))[mask]
+        mask = df.index
 
-    f = np.empty(len(index), dtype=complex)
-    for idx,i in enumerate(index):
+    #f = np.empty(len(index), dtype=complex)
+    f = pd.Series(index=mask, dtype=complex)
+    #for idx,i in enumerate(index):
+    for idx in mask:
         summand = (
             0.0j + k1sl*sqrt(np.power(betx, j+k) * np.power(bety, l+m))
-            * exp(TWOPI_I * ((j-k)*phadv(mux, i, tune_x) +
-                             (l-m)*phadv(muy, i, tune_y)))
+            * exp(TWOPI_I * ((j-k)*phadv(mux, idx, tune_x) +
+                             (l-m)*phadv(muy, idx, tune_y)))
         )
         f[idx] = (-np.sum(summand) / (factorial(j) * factorial(k) * factorial(l) * factorial(m) * 2**n *
                                       (1.0 - exp(-TWOPI_I * ((j-k)*tune_x + (l-m)*tune_y)))))

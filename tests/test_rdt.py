@@ -19,12 +19,13 @@ def _test_coupl_rdts(reference: str):
     """
     if reference not in ["m", "o"]:
         raise RuntimeError("reference must be one of ['m', 'o']")
+    optics_class = tfs.read_tfs(f"tests/data/rdts_{reference}c.tfs", index="NAME")
 
-    df = tfs.read_tfs("tests/data/twiss.tfs")
-    f1001 = rdts.calc_fjklm(df, 1, 0, 0, 1, 0.28, 0.31)
-    f1010 = rdts.calc_fjklm(df, 1, 0, 1, 0, 0.28, 0.31)
+    df = tfs.read_tfs("tests/data/twiss.tfs", index="NAME")
+    index = df.index.intersection(optics_class.index)
+    f1001 = rdts.calc_fjklm(df, 1, 0, 0, 1, 0.28, 0.31, index)
+    f1010 = rdts.calc_fjklm(df, 1, 0, 1, 0, 0.28, 0.31, index)
 
-    optics_class = tfs.read_tfs(f"tests/data/rdts_{reference}c.tfs")
     if reference == 'm':
         rtol = 2.0e-2
         atol = 1.0e-2
@@ -39,7 +40,7 @@ def _test_coupl_rdts(reference: str):
         if np.abs(diff[i]) > 0.02:
             print(f"{i}: diff = {diff}")
 
-    assert(np.allclose(swap*optics_class["F1001R"].values, np.real(f1001), rtol=rtol, atol=atol))
-    assert(np.allclose(optics_class["F1001I"].values, np.imag(f1001), rtol=rtol, atol=atol))
-    assert(np.allclose(swap*optics_class["F1010R"].values, np.real(f1010), rtol=rtol, atol=atol))
-    assert(np.allclose(optics_class["F1010I"].values, np.imag(f1010), rtol=rtol, atol=atol))
+    assert(np.allclose(swap*optics_class["F1001R"], np.real(f1001), rtol=rtol, atol=atol))
+    assert(np.allclose(optics_class["F1001I"], np.imag(f1001), rtol=rtol, atol=atol))
+    assert(np.allclose(swap*optics_class["F1010R"], np.real(f1010), rtol=rtol, atol=atol))
+    assert(np.allclose(optics_class["F1010I"], np.imag(f1010), rtol=rtol, atol=atol))
