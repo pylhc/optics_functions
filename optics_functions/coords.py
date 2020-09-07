@@ -41,10 +41,10 @@ def h_from_z(zxp, zxm, zyp, zym, fterms: pd.DataFrame, order: int) -> pd.DataFra
     if order > 1:
         hxp -= 1.0 * zxp * np.abs(fterms["1010"])
 
-    df = pd.DataFrame()
-    df["HXP"] = hxp
+    #df = pd.DataFrame()
+    #df["HXP"] = hxp
 
-    return df
+    return hxp
 
 
 def driven_courant_snyder(free_cs, ampl, nat_tunes, drv_tunes, phases, s_ac, plane):
@@ -52,7 +52,7 @@ def driven_courant_snyder(free_cs, ampl, nat_tunes, drv_tunes, phases, s_ac, pla
     Qplus = nat_tunes[_plane] + drv_tunes[_plane]
     Qminus = nat_tunes[_plane] - drv_tunes[_plane]
 
-    phadv = rdts.phadv(phases, s_ac, nat_tunes[_plane])[free_cs.index]
+    phadv = rdts.phadv(phases, s_ac, 0)[free_cs.index]
 
     return (free_cs
             + ampl / (4.0 * np.sin(np.pi * Qminus)) * np.exp(-2.0j*np.pi*(phadv + Qminus))
