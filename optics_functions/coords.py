@@ -4,6 +4,7 @@ Coordinate transformations
 
 import pandas as pd
 import numpy as np
+from optics_functions import rdts
 
 FACTOR = 0.5
 
@@ -11,13 +12,12 @@ def cmplx_courant_snyder(df: pd.DataFrame,
                          plane: str) -> pd.DataFrame:
     if plane not in ['X', 'Y']:
         raise RuntimeError("`plane` must be one of `'X'`, `'Y'`")
-    new_df = pd.DataFrame()
     sqrt_b = np.sqrt(df[f"BET{plane}"])
     a = df[f"ALF{plane}"]
-    new_df[f'H{plane}'] = df[plane] / sqrt_b
-    new_df[f'HP{plane}'] = new_df[f'H{plane}'] * a + sqrt_b * df[f"P{plane}"]
+    x = df[plane] / sqrt_b
+    px = x * a + sqrt_b * df[f"P{plane}"]
 
-    return new_df
+    return x + 1.0j*px
 
 
 def h_from_z(zxp, zxm, zyp, zym, fterms: pd.DataFrame, order: int) -> pd.DataFrame:
@@ -45,6 +45,18 @@ def h_from_z(zxp, zxm, zyp, zym, fterms: pd.DataFrame, order: int) -> pd.DataFra
     df["HXP"] = hxp
 
     return df
+
+
+def driven_courant_snyder(free_cs, ampl, nat_tunes, drv_tunes, phases, s_ac, plane):
+    _plane = 0 if plane == 'X' else 1
+    Qplus = nat_tunes[_plane] + drv_tunes[_plane]
+    Qminus = nat_tunes[_plane] - drv_tunes[_plane]
+
+    phadv = rdts.phadv(phases, s_ac, nat_tunes[_plane])[free_cs.index]
+
+    return (free_cs
+            + ampl / (4.0 * np.sin(np.pi * Qminus)) * np.exp(-2.0j*np.pi*(phadv + Qminus))
+            - ampl / (4.0 * np.sin(np.pi * Qplus)) * np.exp(-2.0j*np.pi*(phadv - Qplus)))
 
 
 def assemble_fterms(nonzero_values: dict, max_order: int) -> pd.DataFrame:
