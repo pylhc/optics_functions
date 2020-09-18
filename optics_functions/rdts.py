@@ -22,6 +22,7 @@ def calc_fjklm(df: pd.DataFrame,
                m: int,
                tune_x: float,
                tune_y: float,
+               inplace: bool = False,
                mask=None) -> pd.DataFrame:
     """Calculates the resonance driving term Fjklm. Low level function, needs a DataFrame with beta
     functions, phases and magnet strengths and, separately, the tunes. Four integers `j,k,l,m` define
@@ -57,18 +58,16 @@ def calc_fjklm(df: pd.DataFrame,
         pd.DataFrame: a dataframe populated with the requested RDTs
     """
     n = j+k+l+m
-    k1sl = df["K1SL"].values
-    betx = df["BETX"].values
-    bety = df["BETY"].values
-    mux = df["MUX"].values
-    muy = df["MUY"].values
+    k1sl = df["K1SL"]
+    betx = df["BETX"]
+    bety = df["BETY"]
+    mux = df["MUX"]
+    muy = df["MUY"]
 
     if mask is None:
         mask = df.index
 
-    #f = np.empty(len(index), dtype=complex)
     f = pd.Series(index=mask, dtype=complex)
-    #for idx,i in enumerate(index):
     for idx in mask:
         summand = (
             0.0j + k1sl*sqrt(np.power(betx, j+k) * np.power(bety, l+m))
@@ -77,4 +76,7 @@ def calc_fjklm(df: pd.DataFrame,
         )
         f[idx] = (-np.sum(summand) / (factorial(j) * factorial(k) * factorial(l) * factorial(m) * 2**n *
                                       (1.0 - exp(-TWOPI_I * ((j-k)*tune_x + (l-m)*tune_y)))))
+    if inplace:
+        df[f"F{j}{k}{l}{m}"] = f
+        return df
     return f
