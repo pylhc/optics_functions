@@ -23,8 +23,8 @@ def _test_coupl_rdts(reference: str):
 
     df = tfs.read_tfs("tests/data/twiss.tfs", index="NAME")
     index = df.index.intersection(optics_class.index)
-    f1001 = rdts.calc_fjklm(df, 1, 0, 0, 1, 0.28, 0.31, index)
-    f1010 = rdts.calc_fjklm(df, 1, 0, 1, 0, 0.28, 0.31, index)
+    f1001 = rdts.calc_fjklm(df, 1, 0, 0, 1, 0.28, 0.31, mask=index)
+    f1010 = rdts.calc_fjklm(df, 1, 0, 1, 0, 0.28, 0.31, mask=index)
 
     if reference == 'm':
         rtol = 2.0e-2
