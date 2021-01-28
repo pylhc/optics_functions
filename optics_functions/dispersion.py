@@ -3,136 +3,117 @@ Dispersion
 ----------
 
 Functions to calculate the (linear) dispersion.
-
-TODO: Clean this mess up
 """
+import logging
 
-def calc_linear_dispersion(self):
+import numpy as np
+import pandas as pd
+from tfs import TfsDataFrame
+
+from optics_functions.constants import TUNE, DISPERSION, X, Y, BETA, PLANES
+from optics_functions.utils import get_all_phase_advances, timeit, tau
+
+LOG = logging.getLogger(__name__)
+
+
+def linear_dispersion(df: TfsDataFrame, qx: float = None, qy: float = None,
+                      feeddown: int = 0, save_memory=False):
     """ Calculate the Linear Disperion.
 
     Eq. 24 in [#FranchiAnalyticformulasrapid2017]_
     """
-    self._check_k_columns(["K0L", "K0SL", "K1SL"])
-    tw = self.twiss_df
-    phs_adv = self.get_phase_adv()
-    res = self._results_df
-    coeff_fun = self._linear_dispersion_coeff
-    sum_fun = self._linear_dispersion_sum
-
     # Calculate
     LOG.debug("Calculate Linear Dispersion")
-    with timeit(lambda t: LOG.debug("  Time needed: {:f}".format(t))):
+    with timeit("Linear Dispersion Calculation", print_fun=LOG.debug):
+
+        df_res = TfsDataFrame(index=df.index)
+        if qx is None:
+            qx = df.headers[f"{TUNE}1"]
+
+        if qy is None:
+            qy = df.headers[f"{TUNE}2"]
+
+        if not save_memory:
+            phase_advances = get_all_phase_advances(df)  # might be huge!
+        else:
+            raise NotImplementedError  # TODO
+
+        if feeddown:
+            raise NotImplementedError  # TODO
+
         # sources
-        k0_mask = tw['K0L'] != 0
-        k0s_mask = tw['K0SL'] != 0
-        k1s_mask = tw['K1SL'] != 0
+        k0_mask = df['K0L'] != 0
+        k0s_mask = df['K0SL'] != 0
+        k1s_mask = df['K1SL'] != 0
 
         mx_mask = k0_mask | k1s_mask  # magnets contributing to Dx,j (-> Dy,m)
         my_mask = k0s_mask | k1s_mask  # magnets contributing to Dy,j (-> Dx,m)
 
         if not any(mx_mask | my_mask):
-            LOG.warning("  No linear dispersion contributions found. Values will be zero.")
-            res['DX'] = 0.
-            res['DY'] = 0.
-            self._log_added('DX', 'DY')
+            LOG.warning("No linear dispersion contributions found. Values will be zero.")
+            df_res[f'{DISPERSION}{X}'] = 0.
+            df_res[f'{DISPERSION}{Y}'] = 0.
             return
 
         # create temporary DataFrame for magnets with coefficients already in place
-        df = tfs.TfsDataFrame(index=tw.index).join(
-            coeff_fun(tw.loc[:, 'BETX'], tw.Q1)).join(
-            coeff_fun(tw.loc[:, 'BETY'], tw.Q2))
-        df.columns = ['COEFFX', 'COEFFY']
+        coeff = "COEFF"
+        df_temp = TfsDataFrame(index=df.index).join(
+            dispersion_coeff(df.loc[:, f'{BETA}{X}'], qx)).join(
+            dispersion_coeff(df.loc[:, f'{BETA}{Y}'], qy))
+        df_temp.columns = [f'{coeff}{X}', f'{coeff}{Y}']
 
-        LOG.debug("  Calculate uncoupled linear dispersion")
-        df.loc[my_mask, 'DX'] = df.loc[my_mask, 'COEFFX'] * \
-                                sum_fun(tw.loc[mx_mask, 'K0L'],
-                                        0,
-                                        0,
-                                        tw.loc[mx_mask, 'BETX'],
-                                        tau(phs_adv['X'].loc[mx_mask, my_mask], tw.Q1)
-                                        ).transpose()
-        df.loc[mx_mask, 'DY'] = df.loc[mx_mask, 'COEFFY'] * \
-                                sum_fun(-tw.loc[my_mask, 'K0SL'],  # MINUS!
-                                        0,
-                                        0,
-                                        tw.loc[my_mask, 'BETY'],
-                                        tau(phs_adv['Y'].loc[my_mask, mx_mask], tw.Q2)
-                                        ).transpose()
+        LOG.debug("Calculate uncoupled linear dispersion")
+        df_temp.loc[my_mask, f'{DISPERSION}{X}'] = (
+                df_temp.loc[my_mask, f'{coeff}{X}'] *
+                dispersion_sum(df.loc[mx_mask, 'K0L'],
+                               0,
+                               0,
+                               df.loc[mx_mask, f'{BETA}{X}'],
+                               tau(phase_advances[X].loc[mx_mask, my_mask], qx)).transpose()
+        )
+        df_temp.loc[mx_mask, f'{DISPERSION}{Y}'] = (
+                df_temp.loc[mx_mask, f'{coeff}{Y}'] *
+                dispersion_sum(-df.loc[my_mask, 'K0SL'],  # MINUS!
+                               0,
+                               0,
+                               df.loc[my_mask, f'{BETA}{Y}'],
+                               tau(phase_advances[Y].loc[my_mask, mx_mask], qy)).transpose()
+        )
 
         LOG.debug("  Calculate full linear dispersion values")
-        res.loc[:, 'DX'] = df.loc[:, 'COEFFX'] * \
-                           sum_fun(tw.loc[mx_mask, 'K0L'],
-                                   tw.loc[mx_mask, 'K1SL'],
-                                   df.loc[mx_mask, 'DY'],
-                                   tw.loc[mx_mask, 'BETX'],
-                                   tau(phs_adv['X'].loc[mx_mask, :], tw.Q1)
-                                   ).transpose()
-        res.loc[:, 'DY'] = df.loc[:, 'COEFFY'] * \
-                           sum_fun(-tw.loc[my_mask, 'K0SL'],  # MINUS!
-                                   tw.loc[my_mask, 'K1SL'],
-                                   df.loc[my_mask, 'DX'],
-                                   tw.loc[my_mask, 'BETY'],
-                                   tau(phs_adv['Y'].loc[my_mask, :], tw.Q2)
-                                   ).transpose()
+        df_res.loc[:, f'{DISPERSION}{X}'] = (
+                df_temp.loc[:, f'{coeff}{X}'] *
+                dispersion_sum(df.loc[mx_mask, 'K0L'],
+                               df.loc[mx_mask, 'K1SL'],
+                               df_temp.loc[mx_mask, f'{DISPERSION}{Y}'],
+                               df.loc[mx_mask, f'{BETA}{X}'],
+                               tau(phase_advances[X].loc[mx_mask, :], qx)).transpose()
+        )
+        df_res.loc[:, f'{DISPERSION}{Y}'] = (
+                df.loc[:, f'{coeff}{Y}'] *
+                dispersion_sum(-df.loc[my_mask, 'K0SL'],  # MINUS!
+                               df.loc[my_mask, 'K1SL'],
+                               df_temp.loc[my_mask, f'{DISPERSION}{X}'],
+                               df.loc[my_mask, f'{BETA}{Y}'],
+                               tau(phase_advances[Y].loc[my_mask, :], qy)).transpose()
+        )
 
-    LOG.debug("  Average linear dispersion Dx: {:g}".format(
-        np.mean(res['DX'])))
-    LOG.debug("  Average linear dispersion Dy: {:g}".format(
-        np.mean(res['DY'])))
-    self._log_added('DX', 'DY')
+    for p in PLANES:
+        LOG.debug(f"Average linear dispersion D{p}: {df_res[f'{DISPERSION}{p}'].mean():g}")
 
-def get_linear_dispersion(self):
-    """ Return the Linear Dispersion.
 
-    Available after calc_linear_dispersion!
-    """
-    if "DX" not in self._results_df or "DY" not in self._results_df:
-        self.calc_linear_dispersion()
-    return self._results_df.loc[:, ["S", "DX", "DY"]]
+# Helper -----------------------------------------------------------------------
 
-def plot_linear_dispersion(self, combined=True):
-    """ Plot the Linear Dispersion.
-
-    Available after calc_linear_dispersion!
-
-    Args:
-        combined (bool): If 'True' plots x and y into the same axes.
-    """
-    LOG.debug("Plotting Linear Dispersion")
-    lin_disp = self.get_linear_dispersion().dropna()
-    title = 'Linear Dispersion'
-    pstyle.set_style(self._plot_options.style, self._plot_options.manual)
-
-    if combined:
-        ax_dx = lin_disp.plot(x='S')
-        ax_dx.set_title(title)
-        pstyle.set_yaxis_label('dispersion', 'x,y', ax_dx)
-        ax_dy = ax_dx
-    else:
-        ax_dx = lin_disp.plot(x='S', y='DX')
-        ax_dx.set_title(title)
-        pstyle.set_yaxis_label('dispersion', 'x', ax_dx)
-
-        ax_dy = lin_disp.plot(x='S', y='DY')
-        ax_dy.set_title(title)
-        pstyle.set_yaxis_label('dispersion', 'y', ax_dy)
-
-    for ax in (ax_dx, ax_dy):
-        self._nice_axes(ax)
-        ax.legend()
-
-# helpers
-@staticmethod
-def _linear_dispersion_coeff(beta, q):
+def dispersion_coeff(beta, q):
     """ Helper to calculate the coefficient """
     return np.sqrt(beta) / (2 * np.sin(np.pi * q))
 
-@staticmethod
-def _linear_dispersion_sum(k, j, d, beta, tau):
+
+def dispersion_sum(k, j, d, beta, tau):
     """ Helper to calculate the sum """
     # k, j, d , beta = columns -> convert to Series -> broadcasted
     # tau = Matrix as Frame
     calc_column = (k + j * d) * np.sqrt(beta)
     if isinstance(calc_column, pd.DataFrame):
-        calc_column = calc_column.squeeze()
+        calc_column = calc_column.squeeze()  # convert single_column DF to Series
     return np.cos(2 * np.pi * tau).mul(calc_column, axis='index').sum(axis='index')

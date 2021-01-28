@@ -12,14 +12,17 @@ PLANES = ("X", "Y")
 PLANE_TO_NUM = dict(X=1, Y=2)
 PLANE_TO_HV = dict(X="H", Y="V")
 
-# Columns ----------------------------------------------------------------------
-
+# Columns & Headers ------------------------------------------------------------
+NAME = "NAME"
+S = "S"
 ALPHA = "ALF"
 BETA = "BET"
 GAMMA = "GAMMA"
 AMPLITUDE = 'AMP'
 PHASE = 'PHASE'
 PHASE_ADV = 'MU'
+DISPERSION = "D"
+CHROM_TERM = "CHROM"
 
 X, Y = PLANES
 
@@ -28,3 +31,8 @@ TUNE = 'Q'
 # Column Pre- and Suffixes ---
 REAL = 'REAL'
 IMAG = 'IMAG'
+DELTA = "DELTA"
+DELTA_ORBIT = "D"  # MAD-X
+
+# Headers ---
+CHROMATICITY = f"D{TUNE}"

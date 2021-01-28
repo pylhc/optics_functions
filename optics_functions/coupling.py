@@ -11,6 +11,7 @@ from tfs import TfsDataFrame
 import logging
 
 from optics_functions.constants import ALPHA, BETA, GAMMA, X, Y
+from optics_functions.rdt import rdts
 from optics_functions.utils import split_complex_columns, timeit
 import numpy as np
 
@@ -20,7 +21,7 @@ COUPLING_RDTS = ('F1001', 'F1010')
 LOG = logging.getLogger(__name__)
 
 
-def get_coupling_from_rdts(df: TfsDataFrame, qx: float = None, qy: float = None, feeddown: int = 0, real: bool = False):
+def coupling_from_rdts(df: TfsDataFrame, qx: float = None, qy: float = None, feeddown: int = 0, real: bool = False):
     """ Returns the coupling term.
 
     .. warning::
@@ -36,7 +37,7 @@ def get_coupling_from_rdts(df: TfsDataFrame, qx: float = None, qy: float = None,
         real (bool): Split complex columns into two real-valued columns.
 
     """
-    df_res = get_rdts(df, COUPLING_RDTS, qx=qx, qy=qy, feeddown=feeddown)
+    df_res = rdts(df, COUPLING_RDTS, qx=qx, qy=qy, feeddown=feeddown)
     for rdt in COUPLING_RDTS:
         df_res.loc[:, rdt].real *= -1  # definition
 
@@ -46,13 +47,13 @@ def get_coupling_from_rdts(df: TfsDataFrame, qx: float = None, qy: float = None,
     return df_res
 
 
-def get_coupling_from_cmatrix(df: TfsDataFrame, real=False, output: Sequence[str] = ("rdts", "gamma", "cmatrix")):
+def coupling_from_cmatrix(df: TfsDataFrame, real=False, output: Sequence[str] = ("rdts", "gamma", "cmatrix")):
         """ Calculates C matrix and Coupling and Gamma from it.
         See [#CalagaBetatroncouplingMerging2005]_
         """
         LOG.debug("Calculating CMatrix.")
         df_res = TfsDataFrame()
-        with timeit("CMatrix calculation"):
+        with timeit("CMatrix calculation", print_fun=LOG.debug):
             j = np.array([[0., 1.], [-1., 0.]])
             rs = np.reshape(df["R11", "R12", "R21", "R22"].to_numpy(), (len(df), 2, 2))
             cs = np.einsum("ij,kjn,no->kio", -j, np.transpose(rs, axes=(0, 2, 1)), j)

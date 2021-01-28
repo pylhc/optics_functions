@@ -21,10 +21,10 @@ import pandas as pd
 LOG = logging.getLogger(__name__)
 
 
-def get_rdts(df: TfsDataFrame, rdts: Sequence[str],
-              qx: float = None, qy: float = None, feeddown: int = 0,
-              real: bool = False, save_memory=True,
-              h_terms: bool = False):
+def rdts(df: TfsDataFrame, rdts: Sequence[str],
+         qx: float = None, qy: float = None, feeddown: int = 0,
+         real: bool = False, save_memory=False,
+         h_terms: bool = False):
     """ Calculates the Resonance Driving Terms.
 
     Eq. A8 in [#FranchiAnalyticformulasrapid2017]_
@@ -42,7 +42,7 @@ def get_rdts(df: TfsDataFrame, rdts: Sequence[str],
         h_terms (bool): Add the hamiltonian terms to the result dataframe.
     """
     LOG.debug(f"Calculating RDTs: {seq2str(rdts):s}.")
-    with timeit("RDT calculation"):
+    with timeit("RDT calculation", print_fun=LOG.debug):
         df_res = TfsDataFrame()
         if qx is None:
             qx = df.headers[f"{TUNE}1"]
@@ -64,7 +64,7 @@ def get_rdts(df: TfsDataFrame, rdts: Sequence[str],
             if conj_rdt in df_res:
                 df_res[rdt] = np.conjugate(df_res[conj_rdt])
             else:
-                with timeit(f"calculating {rdt}"):
+                with timeit(f"calculating {rdt}", print_fun=LOG.debug):
                     n = j + k + l + m
                     jk, lm = j + k, l + m
 
@@ -177,9 +177,9 @@ def generator(orders, normal=True, skew=True, complex_conj=True):
     for x in itertools.product(range(max(orders) + 1), repeat=4):
         order = sum(x)
         if ((order in orders)  # check for order
-                and not (x[0] == x[1] and x[2] == x[3])  # rdt index rule
-                and ((skew and sum(x[2:4]) % 2) or (normal and not sum(x[2:4]) % 2))  # skew or normal
-                and (complex_conj or not((x[1], x[0], x[3], x[2]) in permut[order]))  # filter conj
+            and not (x[0] == x[1] and x[2] == x[3])  # rdt index rule
+            and ((skew and sum(x[2:4]) % 2) or (normal and not sum(x[2:4]) % 2))  # skew or normal
+            and (complex_conj or not((x[1], x[0], x[3], x[2]) in permut[order]))  # filter conj
         ):
             permut[order].append(x)
     return permut

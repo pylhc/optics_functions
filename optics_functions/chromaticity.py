@@ -1,156 +1,117 @@
 """
 Chromaticity
-----------
+------------
 
 Functions to calculate chromaticity and chromatic beating.
-
-TODO: Clean this mess up
 """
+import numpy as np
+import logging
+
+from tfs import TfsDataFrame
+
+from optics_functions.constants import PLANES, DISPERSION, X, Y, BETA, CHROM_TERM, CHROMATICITY, DELTA, TUNE
+from optics_functions.dispersion import linear_dispersion
+from optics_functions.utils import timeit, get_all_phase_advances, tau
+
+LOG = logging.getLogger(__name__)
 
 
-def calc_linear_chromaticity(self):
+def linear_chromaticity(df: TfsDataFrame, qx: float = None, qy: float = None,
+                        feeddown: int = 0, save_memory=False):
     """ Calculate the Linear Chromaticity
 
     Eq. 31 in [#FranchiAnalyticformulasrapid2017]_
     """
-    res = self._results_df
-
-    if 'CHROMX' not in res:
-        self._calc_chromatic_term()
-
     LOG.debug("Calculating Linear Chromaticity")
-    with timeit(lambda t: LOG.debug("  Time needed: {:f}".format(t))):
-        DQ1 = - 1/(4 * np.pi) * res['CHROMX'].dropna().sum(axis="index")
-        DQ2 = 1/(4 * np.pi) * res['CHROMY'].dropna().sum(axis="index")
+    with timeit("Linear Chromaticity calculations", print_fun=LOG.debug):
+        chromatic_colums = [f"{CHROM_TERM}{p}" for p in PLANES]
+        chromaticity_headers = [f"{CHROMATICITY}{p}" for p in (1, 2)]  # TODO: X, Y??
 
-    self._results_df.DQ1 = DQ1
-    self._results_df.DQ2 = DQ2
-    LOG.debug("  Q'x: {:f}".format(DQ1))
-    LOG.debug("  Q'y: {:f}".format(DQ2))
+        if any(c not in df.columns for c in chromatic_colums):
+            df_res = calc_chromatic_term(df, qx=qx, qy=qy, feeddown=feeddown, save_memory=save_memory)
+        else:
+            LOG.info("Chromatic Terms found in DataFrame. Using these.")
+            df_res = df[chromatic_colums]
 
-    self._log_added('DQ1', 'DQ2')
+        for sign_, column, header in zip((-1, 1), chromatic_colums, chromaticity_headers):
+            df_res.headers[header] = sign_/(4 * np.pi) * df_res[column].sum(axis="index")
 
-def get_linear_chromaticity(self):
-    """ Return the Linear Chromaticity
+        LOG.debug(f"Q'x: {df_res[chromaticity_headers[0]]:g}")
+        LOG.debug(f"Q'y: {df_res[chromaticity_headers[1]]:g}")
 
-    Available after calc_linear_chromaticity
-    """
-    try:
-        return self._results_df.DQ1, self._results_df.DQ2
-    except AttributeError:
-        self.calc_linear_chromaticity()
-        return self._results_df.DQ1, self._results_df.DQ2
 
-################################
-#     Chromatic Beating
-################################
-
-def calc_chromatic_beating(self):
+def chromatic_beating(df: TfsDataFrame, qx: float = None, qy: float = None,
+                      feeddown: int = 0, save_memory=False):
     """ Calculate the Chromatic Beating
 
     Eq. 36 in [#FranchiAnalyticformulasrapid2017]_
     """
-    tw = self.twiss_df
-    res = self._results_df
-    phs_adv = self.get_phase_adv()
+    with timeit("Chromatic Beating calculations", print_fun=LOG.debug):
+        chromatic_colums = [f"{CHROM_TERM}{p}" for p in PLANES]
+        if qx is None:
+            qx = df.headers[f"{TUNE}1"]
 
-    if 'CHROMX' not in res:
-        self._calc_chromatic_term()
+        if qy is None:
+            qy = df.headers[f"{TUNE}2"]
 
-    LOG.debug("Calculating Chromatic Beating")
-    with timeit(lambda t: LOG.debug("  Time needed: {:f}".format(t))):
-        chromx = res['CHROMX'].dropna()
-        chromy = res['CHROMY'].dropna()
-        res['DBEATX'] = self._chromatic_beating(
-            chromx,
-            tau(phs_adv['X'].loc[chromx.index, :], tw.Q1),
-            tw.Q1).transpose() - 1
-        res['DBEATY'] = - self._chromatic_beating(
-            chromy,
-            tau(phs_adv['Y'].loc[chromy.index, :], tw.Q2),
-            tw.Q2).transpose() - 1
+        if any(c not in df.columns for c in chromatic_colums):
+            df_res = calc_chromatic_term(df, qx=qx, qy=qy, feeddown=feeddown, save_memory=save_memory)
+        else:
+            LOG.info("Chromatic Terms found in DataFrame. Using these.")
+            df_res = df[chromatic_colums]
 
-    LOG.debug("  Pk2Pk chromatic beating DBEATX: {:g}".format(
-        res['DBEATX'].max() - res['DBEATX'].min()))
-    LOG.debug("  Pk2Pk chromatic beating DBEATY: {:g}".format(
-        res['DBEATY'].max() - res['DBEATY'].min()))
-    self._log_added('DBEATX', 'DBEATY')
+        if not save_memory:
+            phase_advances = get_all_phase_advances(df)  # might be huge!
+        else:
+            raise NotImplementedError  # TODO
 
-def get_chromatic_beating(self):
-    """ Return the Chromatic Beating
+        mask = (df_res[f'{CHROM_TERM}{X}'] != 0) | (df_res[f'{CHROM_TERM}{Y}'] != 0)
 
-     Available after calc_chromatic_beating
-     """
-    if "DBEATX" not in self._results_df or "DBEATY" not in self._results_df:
-        self.calc_chromatic_beating()
-    return self._results_df.loc[:, ["S", "DBEATX", "DBEATY"]]
+        for sign_, plane, tune in zip((1, -1), PLANES, (qx, qy)):
+            df_res.loc[mask, f'{DELTA}{CHROM_TERM}{plane}'] = sign_ * _chromatic_beating(
+                df_res.loc[mask, f'{CHROM_TERM}{plane}'],
+                tau(phase_advances[plane].loc[mask, :], tune),
+                tune).transpose() - 1
 
-def plot_chromatic_beating(self, combined=True):
-    """ Plot the Chromatic Beating
+    for plane in PLANES:
+        values = df_res[f'{DELTA}{CHROM_TERM}{plane}']
+        LOG.debug(f"Pk2Pk chromatic beating in {plane:s}: {values.max()-values.min():g}")
+    return df_res
 
-    Available after calc_chromatic_beating
 
-    Args:
-        combined (bool): If 'True' plots x and y into the same axes.
-    """
-    LOG.debug("Plotting Chromatic Beating")
-    chrom_beat = self.get_chromatic_beating().dropna()
-    title = 'Chromatic Beating'
-    pstyle.set_style(self._plot_options.style, self._plot_options.manual)
-
-    if combined:
-        ax_dx = chrom_beat.plot(x='S')
-        ax_dx.set_title(title)
-        pstyle.small_title(ax_dx)
-        pstyle.set_name(title, ax_dx)
-        pstyle.set_yaxis_label('dbetabeat', 'x,y', ax_dx)
-        ax_dy = ax_dx
-    else:
-        ax_dx = chrom_beat.plot(x='S', y='DBEATX')
-        ax_dx.set_title(title)
-        pstyle.small_title(ax_dx)
-        pstyle.set_name(title, ax_dx)
-        pstyle.set_yaxis_label('dbetabeat', 'x', ax_dx)
-
-        ax_dy = chrom_beat.plot(x='S', y='DBEATY')
-        ax_dy.set_title(title)
-        pstyle.small_title(ax_dy)
-        pstyle.set_name(title, ax_dy)
-        pstyle.set_yaxis_label('dbetabeat', 'y', ax_dy)
-
-    for ax in (ax_dx, ax_dy):
-        self._nice_axes(ax)
-        ax.legend()
-
-@staticmethod
 def _chromatic_beating(chrom_term, tau, q):
-    return 1 / (2 * np.sin(2 * np.pi * q)) * \
-           np.cos(4 * np.pi * tau).mul(chrom_term, axis='index').sum(axis='index')
+    """ Chromatic Beating helper function. """
+    return (1 / (2 * np.sin(2 * np.pi * q)) *
+            np.cos(4 * np.pi * tau).mul(chrom_term, axis='index').sum(axis='index')
+            )
 
 
-    def _calc_chromatic_term(self):
-        """ Calculates the chromatic term which is common to all chromatic equations """
-        LOG.debug("Calculating Chromatic Term.")
-        self._check_k_columns(["K1L", "K2L", "K2SL"])
-        res = self._results_df
-        tw = self.twiss_df
+def calc_chromatic_term(df: TfsDataFrame, qx: float = None, qy: float = None,
+                        feeddown: int = 0, save_memory=False):
+    """ Calculates the chromatic term which is common to all chromatic equations """
+    LOG.debug("Calculating Chromatic Term.")
+    with timeit("Chromatic Term calculation", print_fun=LOG.debug):
+        df_res = TfsDataFrame(0, index=df.index, columns=[f'{CHROM_TERM}{X}', f'{CHROM_TERM}{Y}'])
 
-        with timeit(lambda t: LOG.debug("  Time needed: {:f}".format(t))):
-            mask = (tw['K1L'] != 0) | (tw['K2L'] != 0) | (tw['K2SL'] != 0)
-            if "DX" in tw and "DY" in tw:
-                LOG.debug("Dispersion values found in model. Used for chromatic calculations")
-                sum_term = tw.loc[mask, 'K1L'] - \
-                           (tw.loc[mask, 'K2L'] * tw.loc[mask, 'DX']) + \
-                           (tw.loc[mask, 'K2SL'] * tw.loc[mask, 'DY'])
-            else:
-                LOG.info("Dispersion values NOT found in model. Using analytic values.")
-                if "DX" not in res or "DY" not in res:
-                    self.calc_linear_dispersion()
-                sum_term = tw.loc[mask, 'K1L'] - \
-                           (tw.loc[mask, 'K2L'] * res.loc[mask, 'DX']) + \
-                           (tw.loc[mask, 'K2SL'] * res.loc[mask, 'DY'])
+        if feeddown:
+            raise NotImplementedError  # TODO
+        mask = (df['K1L'] != 0) | (df['K2L'] != 0) | (df['K2SL'] != 0)
 
-            res['CHROMX'] = sum_term * tw.loc[mask, 'BETX']
-            res['CHROMY'] = sum_term * tw.loc[mask, 'BETY']
+        disp_columns = [f"{DISPERSION}{X}", f"{DISPERSION}{Y}"]
+        if any(c not in df.columns for c in disp_columns):
+            LOG.info("Dispersion values not found in twiss DataFrame. Calculating analytic values.")
+            df_disp = linear_dispersion(df, qx=qx, qy=qy, feeddown=feeddown, save_memory=save_memory)
+            df_res.loc[:, disp_columns] = df_disp
+        else:
+            df_disp = df.loc[:, disp_columns]
 
-        LOG.debug("Chromatic Term Calculated.")
+        sum_term = (
+                df.loc[mask, 'K1L'] -
+                (df.loc[mask, 'K2L'] * df_disp.loc[mask, f'{DISPERSION}{X}']) +
+                (df.loc[mask, 'K2SL'] * df_disp.loc[mask, f'{DISPERSION}{Y}'])
+        )
+
+        for p in PLANES:
+            df_res.loc[mask, f'{CHROM_TERM}{p}'] = sum_term * df.loc[mask, f'{BETA}{p}']
+        return df_res
+
