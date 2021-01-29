@@ -3,6 +3,15 @@ Dispersion
 ----------
 
 Functions to calculate the (linear) dispersion.
+
+.. rubric:: References
+
+.. [#FranchiAnalyticformulasrapid2017]
+    A. Franchi et al.,
+    'Analytic formulas for the rapid evaluation of the orbit response matrix
+    and chromatic functions from lattice parameters in circular accelerators'
+    https://arxiv.org/abs/1711.06589
+
 """
 import logging
 
@@ -17,10 +26,21 @@ LOG = logging.getLogger(__name__)
 
 
 def linear_dispersion(df: TfsDataFrame, qx: float = None, qy: float = None,
-                      feeddown: int = 0, save_memory=False):
+                      feeddown: int = 0, save_memory=False) -> TfsDataFrame:
     """ Calculate the Linear Disperion.
 
     Eq. 24 in [#FranchiAnalyticformulasrapid2017]_
+    Args:
+        df (TfsDataFrame): Twiss Dataframe
+        qx (float): Tune in X-Plane (if not given df.Q1 is assumed present)
+        qy (float): Tune in Y-Plane (if not given df.Q2 is assumed present)
+        feeddown (int): Levels of feed-down to include.
+        save_memory (bool): Loop over elements when calculating phase-advances.
+                            Might be slower for small number of elements, but
+                            allows for large (e.g. sliced) optics.
+
+    Returns:
+        TfsDataFrame with dispersion columns.
     """
     # Calculate
     LOG.debug("Calculate Linear Dispersion")
@@ -58,44 +78,44 @@ def linear_dispersion(df: TfsDataFrame, qx: float = None, qy: float = None,
         # create temporary DataFrame for magnets with coefficients already in place
         coeff = "COEFF"
         df_temp = TfsDataFrame(index=df.index).join(
-            dispersion_coeff(df.loc[:, f'{BETA}{X}'], qx)).join(
-            dispersion_coeff(df.loc[:, f'{BETA}{Y}'], qy))
+            _dispersion_coeff(df.loc[:, f'{BETA}{X}'], qx)).join(
+            _dispersion_coeff(df.loc[:, f'{BETA}{Y}'], qy))
         df_temp.columns = [f'{coeff}{X}', f'{coeff}{Y}']
 
         LOG.debug("Calculate uncoupled linear dispersion")
         df_temp.loc[my_mask, f'{DISPERSION}{X}'] = (
                 df_temp.loc[my_mask, f'{coeff}{X}'] *
-                dispersion_sum(df.loc[mx_mask, 'K0L'],
-                               0,
-                               0,
-                               df.loc[mx_mask, f'{BETA}{X}'],
-                               tau(phase_advances[X].loc[mx_mask, my_mask], qx)).transpose()
+                _dispersion_sum(df.loc[mx_mask, 'K0L'],
+                                0,
+                                0,
+                                df.loc[mx_mask, f'{BETA}{X}'],
+                                tau(phase_advances[X].loc[mx_mask, my_mask], qx)).transpose()
         )
         df_temp.loc[mx_mask, f'{DISPERSION}{Y}'] = (
                 df_temp.loc[mx_mask, f'{coeff}{Y}'] *
-                dispersion_sum(-df.loc[my_mask, 'K0SL'],  # MINUS!
-                               0,
-                               0,
-                               df.loc[my_mask, f'{BETA}{Y}'],
-                               tau(phase_advances[Y].loc[my_mask, mx_mask], qy)).transpose()
+                _dispersion_sum(-df.loc[my_mask, 'K0SL'],  # MINUS!
+                                0,
+                                0,
+                                df.loc[my_mask, f'{BETA}{Y}'],
+                                tau(phase_advances[Y].loc[my_mask, mx_mask], qy)).transpose()
         )
 
         LOG.debug("  Calculate full linear dispersion values")
         df_res.loc[:, f'{DISPERSION}{X}'] = (
                 df_temp.loc[:, f'{coeff}{X}'] *
-                dispersion_sum(df.loc[mx_mask, 'K0L'],
-                               df.loc[mx_mask, 'K1SL'],
-                               df_temp.loc[mx_mask, f'{DISPERSION}{Y}'],
-                               df.loc[mx_mask, f'{BETA}{X}'],
-                               tau(phase_advances[X].loc[mx_mask, :], qx)).transpose()
+                _dispersion_sum(df.loc[mx_mask, 'K0L'],
+                                df.loc[mx_mask, 'K1SL'],
+                                df_temp.loc[mx_mask, f'{DISPERSION}{Y}'],
+                                df.loc[mx_mask, f'{BETA}{X}'],
+                                tau(phase_advances[X].loc[mx_mask, :], qx)).transpose()
         )
         df_res.loc[:, f'{DISPERSION}{Y}'] = (
                 df.loc[:, f'{coeff}{Y}'] *
-                dispersion_sum(-df.loc[my_mask, 'K0SL'],  # MINUS!
-                               df.loc[my_mask, 'K1SL'],
-                               df_temp.loc[my_mask, f'{DISPERSION}{X}'],
-                               df.loc[my_mask, f'{BETA}{Y}'],
-                               tau(phase_advances[Y].loc[my_mask, :], qy)).transpose()
+                _dispersion_sum(-df.loc[my_mask, 'K0SL'],  # MINUS!
+                                df.loc[my_mask, 'K1SL'],
+                                df_temp.loc[my_mask, f'{DISPERSION}{X}'],
+                                df.loc[my_mask, f'{BETA}{Y}'],
+                                tau(phase_advances[Y].loc[my_mask, :], qy)).transpose()
         )
 
     for p in PLANES:
@@ -104,12 +124,12 @@ def linear_dispersion(df: TfsDataFrame, qx: float = None, qy: float = None,
 
 # Helper -----------------------------------------------------------------------
 
-def dispersion_coeff(beta, q):
+def _dispersion_coeff(beta, q):
     """ Helper to calculate the coefficient """
     return np.sqrt(beta) / (2 * np.sin(np.pi * q))
 
 
-def dispersion_sum(k, j, d, beta, tau):
+def _dispersion_sum(k, j, d, beta, tau):
     """ Helper to calculate the sum """
     # k, j, d , beta = columns -> convert to Series -> broadcasted
     # tau = Matrix as Frame

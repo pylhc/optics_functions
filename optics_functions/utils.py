@@ -3,12 +3,22 @@ Utilities
 ---------
 
 Reusable utilities that might be needed in multiple optics functions.
+
+
+.. rubric:: References
+
+.. [#FranchiAnalyticformulasrapid2017]
+    A. Franchi et al.,
+    'Analytic formulas for the rapid evaluation of the orbit response matrix
+    and chromatic functions from lattice parameters in circular accelerators'
+    https://arxiv.org/abs/1711.06589
+
 """
 import logging
 import string
 from contextlib import contextmanager
 from time import time
-from typing import Sequence
+from typing import Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -24,7 +34,7 @@ D = DELTA_ORBIT
 
 def prepare_twiss_dataframe(beam: int,
                             df_optics: TfsDataFrame, df_errors: TfsDataFrame = None,
-                            max_order: int = 16, join: str = "inner"):
+                            max_order: int = 16, join: str = "inner") -> TfsDataFrame:
     """ Prepare dataframe to use with the optics functions.
 
     - Adapt Beam 4 signs.
@@ -98,7 +108,7 @@ def split_complex_columns(df: TfsDataFrame, columns: Sequence[str],
     return df
 
 
-def switch_signs_for_beam4(df_optics: TfsDataFrame, df_errors: TfsDataFrame):
+def switch_signs_for_beam4(df_optics: TfsDataFrame, df_errors: TfsDataFrame) -> Tuple[TfsDataFrame, TfsDataFrame]:
     """ Switch the signs for Beam 4 optics.
     This is due to the switch in direction for this beam and
     (anti-) symmetry after a rotation of 180deg around the y-axis of magnets,
@@ -122,23 +132,23 @@ def switch_signs_for_beam4(df_optics: TfsDataFrame, df_errors: TfsDataFrame):
 # Phase Advance Functions ------------------------------------------------------
 
 
-def get_all_phase_advances(twiss_df):
+def get_all_phase_advances(df: TfsDataFrame) -> dict:
     """
     Calculate phase advances between all elements.
     Will result in a elements x elements matrix, that might be very large!
 
     Returns:
-        Matrices similar to DPhi(i,j) = Phi(j) - Phi(i)
+        Dictionary with DataFrame matrices similar to DPhi(i,j) = Phi(j) - Phi(i)
     """
     LOG.debug("Calculating Phase Advances:")
     phase_advance_dict = dict.fromkeys(PLANES)
     with timeit("Phase Advance calculations"):
         for plane in PLANES:
-            phases_mdl = twiss_df.loc[twiss_df.index, f"{PHASE_ADV}{plane}"]
+            phases_mdl = df.loc[df.index, f"{PHASE_ADV}{plane}"]
             # Same convention as in [1]: DAdv(i,j) = Phi(j) - Phi(i)
             phase_advances = pd.DataFrame((phases_mdl[None, :] - phases_mdl[:, None]),
-                                          index=twiss_df.index,
-                                          columns=twiss_df.index)
+                                          index=df.index,
+                                          columns=df.index)
             # Do not calculate dphi and tau here.
             # only slices of phase_advances as otherwise super slow
             phase_advance_dict[plane] = phase_advances

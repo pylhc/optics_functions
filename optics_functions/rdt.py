@@ -4,9 +4,17 @@ Resonance Driving Terms
 
 Calculations of Resonance Driving Terms.
 
+.. rubric:: References
+
+.. [#FranchiAnalyticformulasrapid2017]
+    A. Franchi et al.,
+    'Analytic formulas for the rapid evaluation of the orbit response matrix
+    and chromatic functions from lattice parameters in circular accelerators'
+    https://arxiv.org/abs/1711.06589
+
 """
 import itertools
-from typing import Tuple, Sequence
+from typing import Tuple, Sequence, List
 
 from tfs import TfsDataFrame
 import logging
@@ -24,7 +32,7 @@ LOG = logging.getLogger(__name__)
 def rdts(df: TfsDataFrame, rdts: Sequence[str],
          qx: float = None, qy: float = None, feeddown: int = 0,
          real: bool = False, save_memory=False,
-         h_terms: bool = False):
+         h_terms: bool = False) -> TfsDataFrame:
     """ Calculates the Resonance Driving Terms.
 
     Eq. A8 in [#FranchiAnalyticformulasrapid2017]_
@@ -40,6 +48,9 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
                             Might be slower for small number of elements, but
                             allows for large (e.g. sliced) optics.
         h_terms (bool): Add the hamiltonian terms to the result dataframe.
+
+    Returns:
+        New TfsDataFrame with RDT columns.
     """
     LOG.debug(f"Calculating RDTs: {seq2str(rdts):s}.")
     with timeit("RDT calculation", print_fun=LOG.debug):
@@ -145,7 +156,7 @@ def calc_ac_dipole_driving_terms(self, order_or_terms, spectral_line, plane, ac_
 
 # RDT Definition Generation Functions ------------------------------------------
 
-def get_all_to_order(n):
+def get_all_to_order(n: int) -> List[str]:
     """ Returns list of all valid RDTs of order 2 to n """
     if n <= 1:
         raise ValueError("'n' must be greater 1 for resonance driving terms.")
@@ -154,7 +165,7 @@ def get_all_to_order(n):
     return list(sorted(permut, key=sum))
 
 
-def generator(orders, normal=True, skew=True, complex_conj=True):
+def generator(orders: Sequence[int], normal=True, skew=True, complex_conj=True) -> dict:
     """ Generates lists of RDT-4-tuples sorted into a dictionary by order.
 
     Args:
@@ -191,7 +202,7 @@ def jklm2str(j: int, k: int, l: int, m: int) -> str:
     return f"F{j:d}{k:d}{l:d}{m:d}"
 
 
-def str2jklm(rdt: str) -> Tuple[int:]:
+def str2jklm(rdt: str) -> Tuple[int, ...]:
     return tuple(int(i) for i in rdt[1:])
 
 

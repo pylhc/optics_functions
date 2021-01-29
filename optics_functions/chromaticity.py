@@ -3,6 +3,15 @@ Chromaticity
 ------------
 
 Functions to calculate chromaticity and chromatic beating.
+
+.. rubric:: References
+
+.. [#FranchiAnalyticformulasrapid2017]
+    A. Franchi et al.,
+    'Analytic formulas for the rapid evaluation of the orbit response matrix
+    and chromatic functions from lattice parameters in circular accelerators'
+    https://arxiv.org/abs/1711.06589
+
 """
 import numpy as np
 import logging
@@ -17,10 +26,22 @@ LOG = logging.getLogger(__name__)
 
 
 def linear_chromaticity(df: TfsDataFrame, qx: float = None, qy: float = None,
-                        feeddown: int = 0, save_memory=False):
+                        feeddown: int = 0, save_memory=False) -> TfsDataFrame:
     """ Calculate the Linear Chromaticity
 
     Eq. 31 in [#FranchiAnalyticformulasrapid2017]_
+
+    Args:
+        df (TfsDataFrame): Twiss Dataframe
+        qx (float): Tune in X-Plane (if not given df.Q1 is assumed present)
+        qy (float): Tune in Y-Plane (if not given df.Q2 is assumed present)
+        feeddown (int): Levels of feed-down to include.
+        save_memory (bool): Loop over elements when calculating phase-advances.
+                            Might be slower for small number of elements, but
+                            allows for large (e.g. sliced) optics.
+
+    Returns:
+        TfsDataFrame with chromatic term columns and chromaticity in the headers.
     """
     LOG.debug("Calculating Linear Chromaticity")
     with timeit("Linear Chromaticity calculations", print_fun=LOG.debug):
@@ -41,10 +62,22 @@ def linear_chromaticity(df: TfsDataFrame, qx: float = None, qy: float = None,
 
 
 def chromatic_beating(df: TfsDataFrame, qx: float = None, qy: float = None,
-                      feeddown: int = 0, save_memory=False):
+                      feeddown: int = 0, save_memory=False) -> TfsDataFrame:
     """ Calculate the Chromatic Beating
 
     Eq. 36 in [#FranchiAnalyticformulasrapid2017]_
+
+    Args:
+        df (TfsDataFrame): Twiss Dataframe
+        qx (float): Tune in X-Plane (if not given df.Q1 is assumed present)
+        qy (float): Tune in Y-Plane (if not given df.Q2 is assumed present)
+        feeddown (int): Levels of feed-down to include.
+        save_memory (bool): Loop over elements when calculating phase-advances.
+                            Might be slower for small number of elements, but
+                            allows for large (e.g. sliced) optics.
+
+    Returns:
+        TfsDataFrame with chromatic term and chromaticity columns.
     """
     with timeit("Chromatic Beating calculations", print_fun=LOG.debug):
         chromatic_colums = [f"{CHROM_TERM}{p}" for p in PLANES]
@@ -87,8 +120,18 @@ def _chromatic_beating(chrom_term, tau, q):
 
 
 def calc_chromatic_term(df: TfsDataFrame, qx: float = None, qy: float = None,
-                        feeddown: int = 0, save_memory=False):
-    """ Calculates the chromatic term which is common to all chromatic equations """
+                        feeddown: int = 0, save_memory=False) -> TfsDataFrame:
+    """ Calculates the chromatic term which is common to all chromatic equations
+
+    Args:
+        df (TfsDataFrame): Twiss Dataframe
+        qx (float): Tune in X-Plane (if not given df.Q1 is assumed present)
+        qy (float): Tune in Y-Plane (if not given df.Q2 is assumed present)
+        feeddown (int): Levels of feed-down to include.
+        save_memory (bool): Loop over elements when calculating phase-advances.
+                            Might be slower for small number of elements, but
+                            allows for large (e.g. sliced) optics.
+    """
     LOG.debug("Calculating Chromatic Term.")
     with timeit("Chromatic Term calculation", print_fun=LOG.debug):
         df_res = TfsDataFrame(0, index=df.index, columns=[f'{CHROM_TERM}{X}', f'{CHROM_TERM}{Y}'])
@@ -114,4 +157,3 @@ def calc_chromatic_term(df: TfsDataFrame, qx: float = None, qy: float = None,
         for p in PLANES:
             df_res.loc[mask, f'{CHROM_TERM}{p}'] = sum_term * df.loc[mask, f'{BETA}{p}']
         return df_res
-
