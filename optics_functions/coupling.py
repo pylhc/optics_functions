@@ -168,15 +168,17 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, 
         qy = df.headers[f"{TUNE}2"]
     qx, qy = qx % 1, qy % 1
 
-    df_res = TfsDataFrame(index=df.index)
-    df_res[f"{DELTA}{TUNE}{MINIMUM}"] = method_map[method.lower()](df, qx, qy)
+    dqmin = f"{DELTA}{TUNE}{MINIMUM}"
+    df_res = TfsDataFrame(index=df.index, columns=[dqmin])
+    df_res[dqmin] = method_map[method.lower()](df, qx, qy).abs()
 
+    LOG.info(f"|C-| = {df_res[dqmin].mean()}")
     return df_res
 
 
 def _cta_franchi(df, qx, qy):
     """ Closest tune approach calculated by Eq. (1) in [#PerssonImprovedControlBetatronCoupling]_ . """
-    return 4 * ((qx - qy) * df['F1001']).abs()
+    return 4 * (qx - qy) * df['F1001']
 
 
 def _cta_persson_alt(df, qx, qy):

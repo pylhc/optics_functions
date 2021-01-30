@@ -18,7 +18,7 @@ import logging
 import string
 from contextlib import contextmanager
 from time import time
-from typing import Sequence, Tuple
+from typing import Sequence, Tuple, Iterable
 
 import numpy as np
 import pandas as pd
@@ -33,7 +33,7 @@ D = DELTA_ORBIT
 
 
 def prepare_twiss_dataframe(beam: int,
-                            df_optics: TfsDataFrame, df_errors: TfsDataFrame = None,
+                            df_twiss: TfsDataFrame, df_errors: pd.DataFrame = None,
                             max_order: int = 16, join: str = "inner") -> TfsDataFrame:
     """ Prepare dataframe to use with the optics functions.
 
@@ -43,8 +43,8 @@ def prepare_twiss_dataframe(beam: int,
 
     Args:
         beam (int): Beam that is being used. 1,2 or 4. Only 4 has an effect.
-        df_optics (TfsDataFrame): Twiss-optics DataFrame
-        df_errors (TfsDataFrame): Twiss-errors DataFrame (optional)
+        df_twiss (TfsDataFrame): Twiss-optics DataFrame
+        df_errors (DataFrame): Twiss-errors DataFrame (optional)
         max_order (int): Maximum field order to be still included (1==Dipole)
         join (str): How to join elements of optics and errors. "inner" or "outer".
 
@@ -52,41 +52,41 @@ def prepare_twiss_dataframe(beam: int,
         TfsDataFrame with necessary columns added. If a merge happened, only the
         neccessary columns are present.
     """
-    df_optics, df_errors = df_optics.copy(), df_errors.copy()  # As data is moved around
+    df_twiss, df_errors = df_twiss.copy(), df_errors.copy()  # As data is moved around
     if beam == 4:
-        df_optics, df_errors = switch_signs_for_beam4(df_optics, df_errors)
+        df_twiss, df_errors = switch_signs_for_beam4(df_twiss, df_errors)
 
-    if NAME in df_optics.columns:
-        df_optics = df_optics.set_index(NAME)
+    df_twiss = set_name_index(df_twiss, 'twiss')
+
     k_columns = [f"K{n}{s}L" for n in range(max_order) for s in ('S', '')]
     orbit_columns = list(PLANES)
     if df_errors is None:
-        return add_missing_columns(df_optics, k_columns + orbit_columns)
+        return add_missing_columns(df_twiss, k_columns + orbit_columns)
 
     # Merge Dataframes
-    if NAME in df_errors.columns:
-        df_errors = df_errors.set_index(NAME)
-    index = df_optics.index.join(df_errors.index, how=join)
-    df = TfsDataFrame(index=index, headers=df_optics.headers.copy())
+    df_errors = set_name_index(df_errors, 'error')
+    index = df_twiss.index.join(df_errors.index, how=join)
+    df = TfsDataFrame(index=index, headers=df_twiss.headers.copy())
     if join == "inner":
-        df[S] = df_optics[S]
+        df[S] = df_twiss[S]
     else:
-        # Merge S column and set zeros where elements are missing
-        for df_self, df_other in ((df_optics, df_errors), (df_errors, df_optics)):
-            df[df_self.index, S] = df_self[S]
-            df_self.loc[df_other.index.difference(df_self.index), :] = 0
+        # Merge S column and set zeros in dfs for addition, where elements are missing
+        for df_self, df_other in ((df_twiss, df_errors), (df_errors, df_twiss)):
+            df.loc[df_self.index, S] = df_self[S]
+            for new_indx in df_other.index.difference(df_self.index):
+                df_self.loc[new_indx, :] = 0
         df = df.sort_values(by=S)
 
-    df_optics = add_missing_columns(df_optics, k_columns + list(PLANES))
+    df_twiss = add_missing_columns(df_twiss, k_columns + list(PLANES))
     df_errors = add_missing_columns(df_errors, k_columns + [f"{D}{X}", f"{D}{Y}"])
-    df_errors.rename(columns={f"{D}{p}": p for p in PLANES})
+    df_errors = df_errors.rename(columns={f"{D}{p}": p for p in PLANES})
 
     add_columns = k_columns + orbit_columns
-    df.loc[:, add_columns] = df_optics[add_columns] + df_errors[add_columns]
+    df.loc[:, add_columns] = df_twiss[add_columns] + df_errors[add_columns]
     return df
 
 
-def split_complex_columns(df: TfsDataFrame, columns: Sequence[str],
+def split_complex_columns(df: pd.DataFrame, columns: Sequence[str],
                           drop: bool = True) -> TfsDataFrame:
     """ Splits the given complex columns into two real-values columns containing the
     real and imaginary parts of the original columns.
@@ -99,6 +99,7 @@ def split_complex_columns(df: TfsDataFrame, columns: Sequence[str],
     Returns:
         Original TfsDataFrame with added columns.
     """
+    df = df.copy()
     for column in columns:
         df[f"{column}{REAL}"] = np.real(df[column])
         df[f"{column}{IMAG}"] = np.imag(df[column])
@@ -108,7 +109,7 @@ def split_complex_columns(df: TfsDataFrame, columns: Sequence[str],
     return df
 
 
-def switch_signs_for_beam4(df_optics: TfsDataFrame, df_errors: TfsDataFrame) -> Tuple[TfsDataFrame, TfsDataFrame]:
+def switch_signs_for_beam4(df_twiss: pd.DataFrame, df_errors: pd.DataFrame = None) -> Tuple[TfsDataFrame, TfsDataFrame]:
     """ Switch the signs for Beam 4 optics.
     This is due to the switch in direction for this beam and
     (anti-) symmetry after a rotation of 180deg around the y-axis of magnets,
@@ -116,23 +117,24 @@ def switch_signs_for_beam4(df_optics: TfsDataFrame, df_errors: TfsDataFrame) -> 
     but in the errors they do (otherwise it would compensate).
     Magnet orders that show anti-symmetry are: a1 (K0SL), b2 (K1L), a3 (K2SL), b4 (K3L) etc.
     Also the sign for (delta) X is switched back to have the same orientation as beam2."""
-    LOG.debug(f"Beam 4 input found. Switching signs for X and K(S)L values when needed.")
-    df_optics[X] = -df_optics[X]
+    LOG.debug(f"Switching signs for X and K(S)L values when needed, to match Beam 4 to Beam 2.")
+    df_twiss, df_errors = df_twiss.copy(), df_errors.copy()
+    df_twiss[X] = -df_twiss[X]
 
-    if df_errors:
+    if df_errors is not None:
         df_errors[f"{D}{X}"] = -df_errors[f"{D}{X}"]
         max_order = df_errors.columns.str.extract(r"^K(\d+)S?L$", expand=False).dropna().astype(int).max()
         for order in range(max_order+1):
             name = f"K{order:d}{'' if order % 2 else 'S'}L"  # odd -> '', even -> S
             if name in df_errors.columns:
                 df_errors[name] = -df_errors[name]
-    return df_optics, df_errors
+    return df_twiss, df_errors
 
 
 # Phase Advance Functions ------------------------------------------------------
 
 
-def get_all_phase_advances(df: TfsDataFrame) -> dict:
+def get_all_phase_advances(df: pd.DataFrame) -> dict:
     """
     Calculate phase advances between all elements.
     Will result in a elements x elements matrix, that might be very large!
@@ -144,14 +146,14 @@ def get_all_phase_advances(df: TfsDataFrame) -> dict:
     phase_advance_dict = dict.fromkeys(PLANES)
     with timeit("Phase Advance calculations"):
         for plane in PLANES:
-            phases_mdl = df.loc[df.index, f"{PHASE_ADV}{plane}"]
+            phases_mdl = df[f"{PHASE_ADV}{plane}"].to_numpy()
             # Same convention as in [1]: DAdv(i,j) = Phi(j) - Phi(i)
-            phase_advances = pd.DataFrame((phases_mdl[None, :] - phases_mdl[:, None]),
-                                          index=df.index,
-                                          columns=df.index)
             # Do not calculate dphi and tau here.
             # only slices of phase_advances as otherwise super slow
-            phase_advance_dict[plane] = phase_advances
+            phase_advance_dict[plane] = pd.DataFrame(
+                (phases_mdl[None, :] - phases_mdl[:, None]),
+                index=df.index,
+                columns=df.index)
     return phase_advance_dict
 
 
@@ -191,8 +193,8 @@ def dphi_at_element(df, element, qx, qy):
     phase_advance_dict = dict.fromkeys(PLANES)
     for tune, plane in zip((qx, qy), PLANES):
         phases = df[f"{PHASE_ADV}{plane}"]
-        phase_advance_dict[plane] = pd.concat([(phases[element] - phases[:element])[:-1],  #  only until element
-                                               (phases[element] - phases[element:]+tune)])
+        phase_advance_dict[plane] = pd.concat([(phases[element] - phases.loc[:element])[:-1],  #  only until element
+                                               (phases[element] - phases.loc[element:]+tune)])
     return phase_advance_dict
 
 
@@ -228,9 +230,22 @@ def get_format_keys(format_str: str):
 
 # Other ------------------------------------------------------------------------
 
-def seq2str(sequence: Sequence):
+def seq2str(sequence: Iterable) -> str:
+    """ Converts an Iterable to string of it's comma separated elements. """
     return ", ".join(str(item) for item in sequence)
 
 
-def i_pow(n):
-    return 1j**(n % 4)   # more exact and quicker with modulo
+def i_pow(n: int) -> complex:
+    """ Calculates i**n in a quick and exact way. """
+    return 1j**(n % 4)
+
+
+def set_name_index(df: pd.DataFrame, df_name='') -> pd.DataFrame:
+    """ Sets the NAME column as index if present and checks for string index. """
+    if NAME in df.columns:
+        df = df.set_index(NAME)
+
+    if not all(isinstance(indx, str) for indx in df.index):
+        raise TypeError(f"Index of the {df_name} Dataframe should be string (i.e. from {NAME})")
+
+    return df

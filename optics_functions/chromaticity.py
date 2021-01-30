@@ -49,7 +49,7 @@ def linear_chromaticity(df: TfsDataFrame, qx: float = None, qy: float = None,
         chromaticity_headers = [f"{CHROMATICITY}{p}" for p in (1, 2)]  # TODO: X, Y??
 
         if any(c not in df.columns for c in chromatic_colums):
-            df_res = calc_chromatic_term(df, qx=qx, qy=qy, feeddown=feeddown, save_memory=save_memory)
+            df_res = chromatic_term(df, qx=qx, qy=qy, feeddown=feeddown, save_memory=save_memory)
         else:
             LOG.info("Chromatic Terms found in DataFrame. Using these.")
             df_res = df[chromatic_colums]
@@ -88,7 +88,7 @@ def chromatic_beating(df: TfsDataFrame, qx: float = None, qy: float = None,
             qy = df.headers[f"{TUNE}2"]
 
         if any(c not in df.columns for c in chromatic_colums):
-            df_res = calc_chromatic_term(df, qx=qx, qy=qy, feeddown=feeddown, save_memory=save_memory)
+            df_res = chromatic_term(df, qx=qx, qy=qy, feeddown=feeddown, save_memory=save_memory)
         else:
             LOG.info("Chromatic Terms found in DataFrame. Using these.")
             df_res = df[chromatic_colums]
@@ -119,8 +119,8 @@ def _chromatic_beating(chrom_term, tau, q):
             )
 
 
-def calc_chromatic_term(df: TfsDataFrame, qx: float = None, qy: float = None,
-                        feeddown: int = 0, save_memory=False) -> TfsDataFrame:
+def chromatic_term(df: TfsDataFrame, qx: float = None, qy: float = None,
+                   feeddown: int = 0, save_memory=False) -> TfsDataFrame:
     """ Calculates the chromatic term which is common to all chromatic equations
 
     Args:
