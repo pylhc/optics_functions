@@ -10,8 +10,9 @@ It runs on `ubuntu-latest` and our lowest supported Python version, `Python 3.6`
 
 ### Testing Suite
 
-Tests are ensured in the `tests` workflow, which triggers on all pushes.
-It runs on a matrix of all available operating systems for all supported Python versions (currently `3.6`, `3.7`, `3.8` and `3.9`).
+Tests are ensured in the `basic_tests` and `extended_tests` workflows.
+The former runs our most simple tests on all pushes except those to `master`, and the latter runs the entire testing suite for all commits related to a `pull request`.
+Both run on a matrix of all available operating systems for all supported Python versions (currently `3.7` and `3.8`).
 
 ### Test Coverage
 

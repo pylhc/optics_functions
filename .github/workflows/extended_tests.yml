@@ -1,12 +1,11 @@
-# Runs all tests not flagged as "extended" with a pytest marker
-name: Tests
+# Runs all tests
+name: Extended Tests
 
 defaults:
   run:
     shell: bash
 
-on:  [push]  # Runs on all push events to any branch
-
+on:  [pull_request]  # Runs on any push related to a pull request
 
 jobs:
   tests:
@@ -15,13 +14,13 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-16.04, ubuntu-18.04, ubuntu-20.04, macos-latest, windows-latest]
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8]
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -34,7 +33,7 @@ jobs:
         id: cache
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}
 
       - name: Ensure cache is healthy
         if: steps.cache.outputs.cache-hit == 'true'
@@ -48,5 +47,5 @@ jobs:
       - name: Install package
         run: pip install '.[test]'
 
-      - name: Run basic tests
+      - name: Run all tests
         run: python -m pytest
