@@ -61,7 +61,7 @@ def coupling_from_rdts(df: TfsDataFrame, qx: float = None, qy: float = None, fee
     """
     df_res = rdts(df, COUPLING_RDTS, qx=qx, qy=qy, feeddown=feeddown)
     for rdt in COUPLING_RDTS:
-        df_res.loc[:, rdt].real *= -1  # definition
+        df_res.loc[:, rdt].to_numpy().real *= -1  # definition, also: sets value in dataframe
 
     if real:
         df_res = split_complex_columns(df_res, COUPLING_RDTS)
@@ -83,23 +83,23 @@ def coupling_from_cmatrix(df: TfsDataFrame, real=False, output: Sequence[str] = 
         New TfsDataFrame with columns as specified in 'output'.
     """
     LOG.debug("Calculating CMatrix.")
-    df_res = TfsDataFrame()
+    df_res = TfsDataFrame(index=df.index)
     with timeit("CMatrix calculation", print_fun=LOG.debug):
         j = np.array([[0., 1.], [-1., 0.]])
-        rs = np.reshape(df["R11", "R12", "R21", "R22"].to_numpy(), (len(df), 2, 2))
+        rs = np.reshape(df[["R11", "R12", "R21", "R22"]].to_numpy(), (len(df), 2, 2))
         cs = np.einsum("ij,kjn,no->kio", -j, np.transpose(rs, axes=(0, 2, 1)), j)
         cs = np.einsum("k,kij->kij", (1 / np.sqrt(1 + np.linalg.det(rs))), cs)
 
-        g11a = 1 / np.sqrt(df.loc[:, f"{BETA}{X}"])
+        g11a = 1 / np.sqrt(df[f"{BETA}{X}"])
         g12a = np.zeros(len(df))
-        g21a = df.loc[:, f"{ALPHA}{X}"] / np.sqrt(df.loc[:, f"{BETA}{X}"])
-        g22a = np.sqrt(df.loc[:, f"{BETA}{X}"])
+        g21a = df[f"{ALPHA}{X}"] / np.sqrt(df[f"{BETA}{X}"])
+        g22a = np.sqrt(df[f"{BETA}{X}"])
         gas = np.reshape(np.array([g11a, g12a, g21a, g22a]).T, (len(df), 2, 2))
 
-        ig11b = np.sqrt(df.loc[:, f"{BETA}{Y}"])
+        ig11b = np.sqrt(df[f"{BETA}{Y}"])
         ig12b = np.zeros(len(df))
-        ig21b = -df.loc[:, f"{ALPHA}{Y}"] / np.sqrt(df.loc[:, f"{BETA}{Y}"])
-        ig22b = 1. / np.sqrt(df.loc[:, f"{BETA}{Y}"])
+        ig21b = -df[f"{ALPHA}{Y}"] / np.sqrt(df[f"{BETA}{Y}"])
+        ig22b = 1. / np.sqrt(df[f"{BETA}{Y}"])
         igbs = np.reshape(np.array([ig11b, ig12b, ig21b, ig22b]).T, (len(df), 2, 2))
 
         cs = np.einsum("kij,kjl,kln->kin", gas, cs, igbs)
@@ -110,8 +110,8 @@ def coupling_from_cmatrix(df: TfsDataFrame, real=False, output: Sequence[str] = 
                                   (cs[:, 0, 1] - cs[:, 1, 0])) / 4 / gammas
         df_res.loc[:, "F1010"] = ((cs[:, 0, 0] - cs[:, 1, 1]) * 1j +
                                   (-cs[:, 0, 1]) - cs[:, 1, 0]) / 4 / gammas
-        LOG.debug(f"Average coupling amplitude |F1001|: {df['F1001'].abs().mean():g}")
-        LOG.debug(f"Average coupling amplitude |F1010|: {df['F1010'].abs().mean():g}")
+        LOG.debug(f"Average coupling amplitude |F1001|: {df_res['F1001'].abs().mean():g}")
+        LOG.debug(f"Average coupling amplitude |F1010|: {df_res['F1010'].abs().mean():g}")
 
         if real:
             df_res = split_complex_columns(df_res, COUPLING_RDTS)

@@ -1,7 +1,8 @@
 import string
-import unittest
 from pathlib import Path
 
+import numpy as np
+import pandas as pd
 import pytest
 import tfs
 
@@ -10,9 +11,6 @@ from optics_functions.utils import (add_missing_columns, dphi,
                                     get_all_phase_advances, tau, seq2str, i_pow,
                                     prepare_twiss_dataframe, switch_signs_for_beam4,
                                     get_format_keys, dphi_at_element, split_complex_columns)
-
-import pandas as pd
-import numpy as np
 
 INPUT = Path(__file__).parent.parent / "inputs"
 

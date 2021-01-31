@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 def rdts(df: TfsDataFrame, rdts: Sequence[str],
          qx: float = None, qy: float = None, feeddown: int = 0,
          real: bool = False, save_memory=False,
-         h_terms: bool = False) -> TfsDataFrame:
+         hamiltionian_terms: bool = False) -> TfsDataFrame:
     """ Calculates the Resonance Driving Terms.
 
     Eq. A8 in [#FranchiAnalyticformulasrapid2017]_
@@ -47,7 +47,7 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
         save_memory (bool): Loop over elements when calculating phase-advances.
                             Might be slower for small number of elements, but
                             allows for large (e.g. sliced) optics.
-        h_terms (bool): Add the hamiltonian terms to the result dataframe.
+        hamiltionian_terms (bool): Add the hamiltonian terms to the result dataframe.
 
     Returns:
         New TfsDataFrame with RDT columns.
@@ -100,12 +100,12 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
                     if not len(sources):
                         LOG.warning(f"No sources found for {rdt}. RDT will be zero.")
                         df_res[rdt] = 0j
-                        if h_terms:
+                        if hamiltionian_terms:
                             df_res[f2h(rdt)] = 0j
                         continue
 
-                    k_real = np.real(i_pow(lm)*k_complex.loc[sources, :])  # equivalent to Omega-function in paper, see Eq.(A11)
-                    h_terms = -k_real * betax.loc[sources, :] * betay.loc[sources, :]
+                    k_real = np.real(i_pow(lm)*k_complex.loc[sources])  # equivalent to Omega-function in paper, see Eq.(A11)
+                    h_terms = -k_real * betax.loc[sources] * betay.loc[sources]
 
                     if save_memory:
                         # do loop over elements to not have elements x elements Matrix in memory
@@ -118,16 +118,16 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
                         phx = dphi(phase_advances['X'].loc[sources, :], qx)
                         phy = dphi(phase_advances['Y'].loc[sources, :], qy)
                         phase_term = ((j-k) * phx + (l-m) * phy).applymap(lambda p: np.exp(PI2I*p))
-                        h_jklm = phase_term.multiply(h_terms, axis="index").sum(axis=0).transpose() * denom_h
+                        h_jklm = phase_term.multiply(hamiltionian_terms, axis="index").sum(axis=0).transpose() * denom_h
 
                     df_res[rdt] = h_jklm * denom_f
                     LOG.debug(f"Average RDT amplitude |{rdt:s}|: {df_res[rdt].abs().mean():g}")
 
-                    if h_terms:
+                    if hamiltionian_terms:
                         df_res[f2h(rdt)] = h_jklm
     if real:
         terms = list(rdts)
-        if h_terms:
+        if hamiltionian_terms:
             terms += [f2h(rdt) for rdt in rdts]
         df_res = split_complex_columns(df, terms)
     return df_res
