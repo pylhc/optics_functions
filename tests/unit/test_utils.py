@@ -73,10 +73,10 @@ def test_get_all_phaseadvances():
     df = phase_df(n, qx=qx, qy=qy)
     phs_adv = get_all_phase_advances(df)
     assert len(phs_adv) == 2
-    for q, adv in zip((qx, qy), phs_adv.values()):
+    for q, adv, col in zip((qx, qy), phs_adv.values(), df.columns):
         assert adv.shape == (n, n)
         assert not (adv + adv.T).any().any()
-        assert adv.loc[0, n-1] == q
+        assert (adv.iloc[0, :] == df[col]).all()
 
 
 @pytest.mark.basic
@@ -165,7 +165,9 @@ def test_prepare_twiss_dataframe_inner():
     n_kmax_prepare = 5
     df_twiss, _ = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
     _, df_errors_1 = get_twiss_and_error_df(n_index+3, n_kmax, n_valmax)
-    df = prepare_twiss_dataframe(beam=1, df_twiss=df_twiss, df_errors=df_errors_1.iloc[3:, :],
+    df = prepare_twiss_dataframe(beam=1,
+                                 df_twiss=df_twiss,
+                                 df_errors=df_errors_1.iloc[3:, :],
                                  max_order=n_kmax_prepare, join="inner")
 
     k_columns = df.columns[df.columns.str.match(r"^K\d+S?L")]
@@ -184,7 +186,9 @@ def test_prepare_twiss_dataframe_outer():
     n_kmax_prepare = 16
     _, df_errors = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
     df_twiss_1, _ = get_twiss_and_error_df(n_index, n_kmax+2, n_valmax)
-    df = prepare_twiss_dataframe(beam=1, df_twiss=df_twiss_1.iloc[3:, :], df_errors=df_errors.iloc[:-3, :],
+    df = prepare_twiss_dataframe(beam=1,
+                                 df_twiss=df_twiss_1.iloc[3:, :],
+                                 df_errors=df_errors.iloc[:-3, :],
                                  max_order=n_kmax_prepare, join="outer")
 
     k_columns = df.columns[df.columns.str.match(r"^K\d+S?L")]
@@ -195,6 +199,16 @@ def test_prepare_twiss_dataframe_outer():
 
     assert df.headers == df_twiss_1.headers
     assert not df.isna().any().any()
+
+
+@pytest.mark.extended
+def test_prepare_twiss_dataframe_no_error():
+    n_index, n_kmax, n_valmax = 5, 3, 10
+    df_twiss, _ = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
+    df = prepare_twiss_dataframe(beam=1,
+                                 df_twiss=df_twiss,
+                                 max_order=n_kmax)
+    assert df_twiss.equals(df)
 
 
 @pytest.mark.extended
@@ -276,8 +290,8 @@ def get_twiss_and_error_df(n_index, n_kmax, n_valmax):
 def phase_df(n, qx, qy):
     phx, phy = f"{PHASE_ADV}{X}", f"{PHASE_ADV}{Y}"
     df = pd.DataFrame(columns=[phx, phy])
-    df[phx] = np.linspace(0, qx, n)
-    df[phy] = np.linspace(0, qy, n)
+    df[phx] = np.linspace(0, qx, n+1)[:n]
+    df[phy] = np.linspace(0, qy, n+1)[:n]
     return df
 
 

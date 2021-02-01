@@ -54,7 +54,7 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
     """
     LOG.debug(f"Calculating RDTs: {seq2str(rdts):s}.")
     with timeit("RDT calculation", print_fun=LOG.debug):
-        df_res = TfsDataFrame()
+        df_res = TfsDataFrame(index=df.index)
         if qx is None:
             qx = df.headers[f"{TUNE}1"]
 
@@ -117,8 +117,8 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
                     else:
                         phx = dphi(phase_advances['X'].loc[sources, :], qx)
                         phy = dphi(phase_advances['Y'].loc[sources, :], qy)
-                        phase_term = ((j-k) * phx + (l-m) * phy).applymap(lambda p: np.exp(PI2I*p))
-                        h_jklm = phase_term.multiply(hamiltionian_terms, axis="index").sum(axis=0).transpose() * denom_h
+                        phase_term = np.exp(PI2I * ((j-k) * phx + (l-m) * phy))
+                        h_jklm = phase_term.multiply(h_terms, axis="index").sum(axis="index").transpose() * denom_h
 
                     df_res[rdt] = h_jklm * denom_f
                     LOG.debug(f"Average RDT amplitude |{rdt:s}|: {df_res[rdt].abs().mean():g}")
@@ -156,8 +156,8 @@ def calc_ac_dipole_driving_terms(self, order_or_terms, spectral_line, plane, ac_
 
 # RDT Definition Generation Functions ------------------------------------------
 
-def get_all_to_order(n: int) -> List[str]:
-    """ Returns list of all valid RDTs of order 2 to n """
+def get_all_to_order(n: int) -> List[Tuple[int, int, int, int]]:
+    """ Returns list of all valid RDT jklm-tuple of order 2 to n """
     if n <= 1:
         raise ValueError("'n' must be greater 1 for resonance driving terms.")
     permut = [x for x in itertools.product(range(n + 1), repeat=4)

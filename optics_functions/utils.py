@@ -52,7 +52,7 @@ def prepare_twiss_dataframe(beam: int,
         TfsDataFrame with necessary columns added. If a merge happened, only the
         neccessary columns are present.
     """
-    df_twiss, df_errors = df_twiss.copy(), df_errors.copy()  # As data is moved around
+    df_twiss = df_twiss.copy()  # As data is moved around
     if beam == 4:
         df_twiss, df_errors = switch_signs_for_beam4(df_twiss, df_errors)
 
@@ -64,6 +64,7 @@ def prepare_twiss_dataframe(beam: int,
         return add_missing_columns(df_twiss, k_columns + orbit_columns)
 
     # Merge Dataframes
+    df_errors = df_errors.copy()
     df_errors = set_name_index(df_errors, 'error')
     index = df_twiss.index.join(df_errors.index, how=join)
     df = TfsDataFrame(index=index, headers=df_twiss.headers.copy())
