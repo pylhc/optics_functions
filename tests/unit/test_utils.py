@@ -171,7 +171,7 @@ def test_prepare_twiss_dataframe_inner():
                                  max_order=n_kmax_prepare, join="inner")
 
     k_columns = df.columns[df.columns.str.match(r"^K\d+S?L")]
-    assert len(k_columns) == n_kmax_prepare * 2
+    assert len(k_columns) == n_kmax * 2
 
     assert len(df.index) == n_index-3
     assert all(df[S] == df_twiss.loc[df.index, S])

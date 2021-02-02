@@ -136,8 +136,11 @@ def get_all_phase_advances(df: pd.DataFrame) -> dict:
     Calculate phase advances between all elements.
     Will result in a elements x elements matrix, that might be very large!
 
+    Args:
+        df (DataFrame): DataFrame with phase advance columns (MUX, MUY)
+
     Returns:
-        Dictionary with DataFrame matrices similar to DPhi(i,j) = Phi(j) - Phi(i)
+        Dictionary with DataFrame matrices similar to dmu(i,j) = mu(j) - mu(i)
     """
     LOG.debug("Calculating Phase Advances:")
     phase_advance_dict = dict.fromkeys(PLANES)
@@ -154,27 +157,33 @@ def get_all_phase_advances(df: pd.DataFrame) -> dict:
     return phase_advance_dict
 
 
-def dphi(data, q):
+def dphi(data: np.ndarray, q: float) -> np.ndarray:
     """ Return dphi from phase advances in data, see Eq. 8 in [FranchiAnalyticFormulas2017]_
 
     Args:
         data (DataFrame, Series): Phase-Advance data.
         q: Tune
+
+    Returns:
+        dphi's in matrix of shape of data
     """
     return data + np.where(data <= 0, q, 0)  # '<=' seems to be what MAD-X does
 
 
-def tau(data, q):
+def tau(data: np.ndarray, q: float) -> np.ndarray:
     """ Return tau from phase advances in data, see Eq. 16 in [FranchiAnalyticFormulas2017]_
 
     Args:
-        data (DataFrame, Series): Phase-Advance data.
+        data (DataFrame, Series, Array): Phase-Advance data.
         q: Tune
+
+    Returns:
+        tau's in matrix of shape of data
     """
     return data + np.where(data <= 0, q / 2, -q / 2)  # '<=' seems to be what MAD-X does
 
 
-def dphi_at_element(df, element, qx, qy):
+def dphi_at_element(df: pd.DataFrame, element: str, qx: float, qy: float) -> dict:
     """ Return dphis for both planes at the given element.
     See Eq. 8 in [FranchiAnalyticFormulas2017]_
 
@@ -195,8 +204,8 @@ def dphi_at_element(df, element, qx, qy):
     return phase_advance_dict
 
 
-def add_missing_columns(df, columns):
-    """ Check if K_columns are in df and add them all zero if not."""
+def add_missing_columns(df: pd.DataFrame, columns: Iterable) -> pd.DataFrame:
+    """ Check if `columns` are in `df` and add them all zero if not."""
     for c in columns:
         if c not in df.columns:
             LOG.debug(f"Added {c:s} with all zero to data-frame.")
@@ -208,7 +217,14 @@ def add_missing_columns(df, columns):
 
 @contextmanager
 def timeit(text: str = "Time used {:.3f}s", print_fun=LOG.debug):
-    """ Timing Helper with logging/printing output. """
+    """ Timing context with logging/printing output.
+
+    Args:
+        text (str): Text to print. If it contains an unnamed format key, this
+                    is filled with the time. Otherwise `text` is assumed to be
+                    description of what is happening in this context.
+        print_fun (function): Function used to print the final text.
+    """
     start_time = time()
     try:
         yield
@@ -220,7 +236,7 @@ def timeit(text: str = "Time used {:.3f}s", print_fun=LOG.debug):
             print_fun(f"Time used for {text}: {time_used:.3f}s")
 
 
-def get_format_keys(format_str: str):
+def get_format_keys(format_str: str) -> list:
     """ Get keys from format string. Unnamed placeholders are returned as empty strings."""
     return [t[1] for t in string.Formatter().parse(format_str) if t[1] is not None]
 

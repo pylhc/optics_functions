@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import tfs
 
-from optics_functions.constants import PHASE_ADV, X, Y, BETA, S, TUNE, NAME
+from optics_functions.constants import PHASE_ADV, X, Y, BETA, S, TUNE, NAME, REAL, IMAG
 from optics_functions.rdt import rdts, generator, get_all_to_order, str2jklm, jklm2str
 from optics_functions.utils import prepare_twiss_dataframe
 
@@ -187,12 +187,32 @@ def test_rdts_normal_dodecapole_to_octupole_feeddown():
 
 
 @pytest.mark.extended
-def test_sextupole_bump():
-    input_dir = INPUT / "sextupole_bump"
-    df_twiss = tfs.read(input_dir / "ptc_twiss.lhc.b1.sextupole_bump.tfs", index=NAME)
-    df_ptc_rdt = tfs.read(input_dir / "ptc_rdt.lhc.b1.sextupole_bump.tfs", index=NAME)
-    df_rdt = rdts(df_twiss, ["F2001", "F3000", "F4000", "F3001"])
-    pass
+def test_coupling_bump_sextupole_rdts():
+    input_dir = INPUT / "coupling_bump"
+    df_twiss = tfs.read(input_dir / "twiss.lhc.b1.coupling_bump.tfs", index=NAME)
+    df_ptc_rdt = tfs.read(input_dir / "ptc_rdt.lhc.b1.coupling_bump.tfs", index=NAME)
+    df_twiss = prepare_twiss_dataframe(beam=1, df_twiss=df_twiss)
+    rdt_names = ["F1002", "F3000"]
+    df_rdt = rdts(df_twiss, rdt_names)
+
+    for rdt in rdt_names:
+        rdt_ptc = df_ptc_rdt[f"{rdt}{REAL}"] + 1j*df_ptc_rdt[f"{rdt}{IMAG}"]
+        assert arrays_are_close_almost_everywhere(df_rdt[rdt], rdt_ptc, rtol=1e-2, percentile=0.9)
+
+
+@pytest.mark.extended
+def test_error_optics_rdts():
+    input_dir = INPUT / "twiss_optics"
+    df_twiss = tfs.read(input_dir / "twiss.lhc.b1.unsliced.tfs", index=NAME)
+    df_errors = tfs.read(input_dir / "errors.lhc.b1.unsliced.tfs", index=NAME)
+    df_ptc_rdt = tfs.read(input_dir / "ptc_rdt.lhc.b1.unsliced.tfs", index=NAME)
+    df_twiss = prepare_twiss_dataframe(beam=1, df_twiss=df_twiss, df_errors=df_errors)
+    rdt_names = ["F1002", "F3000", "F2001", "F0003", "F4000"]
+    df_rdt = rdts(df_twiss, rdt_names, feeddown=2)
+
+    # from tests.unit.debug_helper import plot_rdts_vs_ptc
+    # plot_rdts_vs_ptc(df_rdt, df_ptc_rdt, df_twiss, rdt_names)
+
 
 # Helper -----------------------------------------------------------------------
 
@@ -230,6 +250,13 @@ def is_even(n: int):
     return not bool(n % 2)
 
 
+def arrays_are_close_almost_everywhere(array1, array2, rtol=1e-2, atol=None, percentile=0.9):
+    if atol is None:
+        atol = rtol * np.mean(np.abs(array2))
+    return sum(np.isclose(np.abs(array1), np.abs(array2), rtol=rtol, atol=0) |
+               np.isclose(np.abs(array1), np.abs(array2), rtol=0, atol=atol)) > percentile*len(array1)
+
+
 if __name__ == '__main__':
     import logging, sys
     logging.basicConfig(
@@ -237,4 +264,5 @@ if __name__ == '__main__':
         level=logging.DEBUG,
         format="%(levelname)7s | %(message)s | %(name)s"
     )
-    test_sextupole_bump()
+    # test_error_optics_rdts()
+    test_coupling_bump_sextupole_rdts()
