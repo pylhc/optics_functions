@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import tfs
 
-from optics_functions.constants import PHASE_ADV, X, Y, BETA, S, TUNE
+from optics_functions.constants import PHASE_ADV, X, Y, BETA, S, TUNE, NAME
 from optics_functions.rdt import rdts, generator, get_all_to_order, str2jklm, jklm2str
 from optics_functions.utils import prepare_twiss_dataframe
 
@@ -186,6 +186,14 @@ def test_rdts_normal_dodecapole_to_octupole_feeddown():
     assert all(df_rdts["F1003"] == 0.5*df_rdts_comp["F1003"])
 
 
+@pytest.mark.extended
+def test_sextupole_bump():
+    input_dir = INPUT / "sextupole_bump"
+    df_twiss = tfs.read(input_dir / "ptc_twiss.lhc.b1.sextupole_bump.tfs", index=NAME)
+    df_ptc_rdt = tfs.read(input_dir / "ptc_rdt.lhc.b1.sextupole_bump.tfs", index=NAME)
+    df_rdt = rdts(df_twiss, ["F2001", "F3000", "F4000", "F3001"])
+    pass
+
 # Helper -----------------------------------------------------------------------
 
 
@@ -229,4 +237,4 @@ if __name__ == '__main__':
         level=logging.DEBUG,
         format="%(levelname)7s | %(message)s | %(name)s"
     )
-    test_rdts_normal_dodecapole_to_octupole_feeddown()
+    test_sextupole_bump()

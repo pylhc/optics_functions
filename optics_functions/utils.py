@@ -1,17 +1,8 @@
 """
 Utilities
----------
+*********
 
 Reusable utilities that might be needed in multiple optics functions.
-
-
-.. rubric:: References
-
-.. [#FranchiAnalyticformulasrapid2017]
-    A. Franchi et al.,
-    'Analytic formulas for the rapid evaluation of the orbit response matrix
-    and chromatic functions from lattice parameters in circular accelerators'
-    https://arxiv.org/abs/1711.06589
 
 """
 import logging
@@ -67,10 +58,10 @@ def prepare_twiss_dataframe(beam: int,
     df_errors = df_errors.copy()
     df_errors = set_name_index(df_errors, 'error')
     index = df_twiss.index.join(df_errors.index, how=join)
-    df = TfsDataFrame(index=index, headers=df_twiss.headers.copy())
-    if join == "inner":
-        df[S] = df_twiss[S]
+    if not (set(index) - set(df_twiss.index)):
+        df = df_twiss.loc[index, :]
     else:
+        df = TfsDataFrame(index=index, headers=df_twiss.headers.copy())
         # Merge S column and set zeros in dfs for addition, where elements are missing
         for df_self, df_other in ((df_twiss, df_errors), (df_errors, df_twiss)):
             df.loc[df_self.index, S] = df_self[S]
@@ -84,6 +75,11 @@ def prepare_twiss_dataframe(beam: int,
 
     add_columns = k_columns + orbit_columns
     df.loc[:, add_columns] = df_twiss[add_columns] + df_errors[add_columns]
+
+    for name, df_old in (('twiss', df_twiss), ("errors", df_errors)):
+        dropped_columns = set(df_old.columns) - set(df.columns)
+        if dropped_columns:
+            LOG.warning(f"The following {name}-columns were dropped on merge: {seq2str(dropped_columns)}")
     return df
 
 
@@ -159,7 +155,7 @@ def get_all_phase_advances(df: pd.DataFrame) -> dict:
 
 
 def dphi(data, q):
-    """ Return dphi from phase advances in data, see Eq. 8 in [#FranchiAnalyticformulasrapid2017]_
+    """ Return dphi from phase advances in data, see Eq. 8 in [FranchiAnalyticFormulas2017]_
 
     Args:
         data (DataFrame, Series): Phase-Advance data.
@@ -169,7 +165,7 @@ def dphi(data, q):
 
 
 def tau(data, q):
-    """ Return tau from phase advances in data, see Eq. 16 in [#FranchiAnalyticformulasrapid2017]_
+    """ Return tau from phase advances in data, see Eq. 16 in [FranchiAnalyticFormulas2017]_
 
     Args:
         data (DataFrame, Series): Phase-Advance data.
@@ -180,7 +176,7 @@ def tau(data, q):
 
 def dphi_at_element(df, element, qx, qy):
     """ Return dphis for both planes at the given element.
-    See Eq. 8 in [#FranchiAnalyticformulasrapid2017]_
+    See Eq. 8 in [FranchiAnalyticFormulas2017]_
 
     Args:
         df (DataFrame): DataFrame containing the Phase-Advance columns for both planes.

@@ -1,16 +1,8 @@
 """
 Chromaticity
-------------
+************
 
 Functions to calculate chromaticity and chromatic beating.
-
-.. rubric:: References
-
-.. [#FranchiAnalyticformulasrapid2017]
-    A. Franchi et al.,
-    'Analytic formulas for the rapid evaluation of the orbit response matrix
-    and chromatic functions from lattice parameters in circular accelerators'
-    https://arxiv.org/abs/1711.06589
 
 """
 import numpy as np
@@ -29,7 +21,7 @@ def linear_chromaticity(df: TfsDataFrame, qx: float = None, qy: float = None,
                         feeddown: int = 0, save_memory=False) -> TfsDataFrame:
     """ Calculate the Linear Chromaticity
 
-    Eq. 31 in [#FranchiAnalyticformulasrapid2017]_
+    Eq. 31 in [FranchiAnalyticFormulas2017]_
 
     Args:
         df (TfsDataFrame): Twiss Dataframe
@@ -65,7 +57,7 @@ def chromatic_beating(df: TfsDataFrame, qx: float = None, qy: float = None,
                       feeddown: int = 0, save_memory=False) -> TfsDataFrame:
     """ Calculate the Chromatic Beating
 
-    Eq. 36 in [#FranchiAnalyticformulasrapid2017]_
+    Eq. 36 in [FranchiAnalyticFormulas2017]_
 
     Args:
         df (TfsDataFrame): Twiss Dataframe

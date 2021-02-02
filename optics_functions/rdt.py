@@ -1,16 +1,8 @@
 """
 Resonance Driving Terms
------------------------
+***********************
 
 Calculations of Resonance Driving Terms.
-
-.. rubric:: References
-
-.. [#FranchiAnalyticformulasrapid2017]
-    A. Franchi et al.,
-    'Analytic formulas for the rapid evaluation of the orbit response matrix
-    and chromatic functions from lattice parameters in circular accelerators'
-    https://arxiv.org/abs/1711.06589
 
 """
 import itertools
@@ -35,7 +27,7 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
          hamiltionian_terms: bool = False) -> TfsDataFrame:
     """ Calculates the Resonance Driving Terms.
 
-    Eq. A8 in [#FranchiAnalyticformulasrapid2017]_
+    Eq. A8 in [FranchiAnalyticFormulas2017]_
 
     Args:
         df (TfsDataFrame): Twiss Dataframe

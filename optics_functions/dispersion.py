@@ -1,16 +1,8 @@
 """
 Dispersion
-----------
+**********
 
 Functions to calculate the (linear) dispersion.
-
-.. rubric:: References
-
-.. [#FranchiAnalyticformulasrapid2017]
-    A. Franchi et al.,
-    'Analytic formulas for the rapid evaluation of the orbit response matrix
-    and chromatic functions from lattice parameters in circular accelerators'
-    https://arxiv.org/abs/1711.06589
 
 """
 import logging
@@ -29,7 +21,7 @@ def linear_dispersion(df: TfsDataFrame, qx: float = None, qy: float = None,
                       feeddown: int = 0, save_memory=False) -> TfsDataFrame:
     """ Calculate the Linear Disperion.
 
-    Eq. 24 in [#FranchiAnalyticformulasrapid2017]_
+    Eq. 24 in [FranchiAnalyticFormulas2017]_
     Args:
         df (TfsDataFrame): Twiss Dataframe
         qx (float): Tune in X-Plane (if not given df.Q1 is assumed present)

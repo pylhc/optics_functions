@@ -1,26 +1,8 @@
 """
 Coupling
---------
+********
 
 Functions to calculate coupling from twiss dataframes.
-
-.. rubric:: References
-
-.. [#FranchiAnalyticformulasrapid2017]
-    A. Franchi et al.,
-    'Analytic formulas for the rapid evaluation of the orbit response matrix
-    and chromatic functions from lattice parameters in circular accelerators'
-    https://arxiv.org/abs/1711.06589
-.. [#CalagaBetatroncouplingMerging2005]
-    R. Calaga et al.,
-    'Betatron coupling: Merging Hamiltonian and matrix approaches'
-    Phys. Rev. ST Accel. Beams 8, 034001 (2005).
-    https://journals.aps.org/prab/pdf/10.1103/PhysRevSTAB.8.034001
-.. [#PerssonImprovedControlBetatronCoupling]_
-    T. Persson et al.,
-   'Improved control of the betatron coupling in the Large Hadron Collider'
-    Phys. Rev. ST Accel. Beams 17, 051004 (2014).
-    http://cds.cern.ch/record/2135848/files/PhysRevSTAB.17.051004.pdf
 
 """
 import logging
@@ -45,8 +27,8 @@ def coupling_from_rdts(df: TfsDataFrame, qx: float = None, qy: float = None, fee
 
     .. warning::
         This function changes sign of the real part of the RDTs compared to
-        [#FranchiAnalyticformulasrapid2017]_ to be consistent with the RDT
-        calculations from [#CalagaBetatroncouplingMerging2005]_ .
+        [FranchiAnalyticFormulas2017]_ to be consistent with the RDT
+        calculations from [CalagaBetatronCoupling2005]_ .
 
 
     Args:
@@ -71,7 +53,7 @@ def coupling_from_rdts(df: TfsDataFrame, qx: float = None, qy: float = None, fee
 
 def coupling_from_cmatrix(df: TfsDataFrame, real=False, output: Sequence[str] = ("rdts", "gamma", "cmatrix")):
     """ Calculates C matrix and Coupling and Gamma from it.
-    See [#CalagaBetatroncouplingMerging2005]_
+    See [CalagaBetatronCoupling2005]_
 
     Args:
         df (TfsDataFrame): Twiss Dataframe
@@ -139,10 +121,10 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, 
     If F1010 is also present it is used, otherwise assumed 0.
 
     The closest tune approach is calculated by means of
-    Eq. (27) in [#CalagaBetatroncouplingMerging2005]_ ('calaga')
+    Eq. (27) in [CalagaBetatronCoupling2005]_ ('calaga')
     by default, or approximated by
-    Eq. (1) in [#PerssonImprovedControlBetatronCoupling]_ ('franchi')
-    or Eq. (2) in [#PerssonImprovedControlBetatronCoupling]_ ('persson')
+    Eq. (1) in [PerssonImprovedControlCoupling2014]_ ('franchi')
+    or Eq. (2) in [PerssonImprovedControlCoupling2014]_ ('persson')
     or the latter without the exp(i(Qx-Qy)s/R) term ('persson_alt').
 
     Args:
@@ -177,26 +159,26 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, 
 
 
 def _cta_franchi(df, qx, qy):
-    """ Closest tune approach calculated by Eq. (1) in [#PerssonImprovedControlBetatronCoupling]_ . """
+    """ Closest tune approach calculated by Eq. (1) in [PerssonImprovedControlCoupling2014]_ . """
     return 4 * (qx - qy) * df['F1001']
 
 
 def _cta_persson_alt(df, qx, qy):
-    """ Closest tune approach calculated by Eq. (2) in [#PerssonImprovedControlBetatronCoupling]_ .
+    """ Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ .
 
     The exp(i(Qx-Qy)s/R) term is omitted. """
     return 4 * (qx - qy) * df['F1001'] * np.exp(-1j*(df[f"{PHASE_ADV}{X}"]-df[f"{PHASE_ADV}{Y}"]))
 
 
 def _cta_persson(df, qx, qy):
-    """ Closest tune approach calculated by Eq. (2) in [#PerssonImprovedControlBetatronCoupling]_ . """
+    """ Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ . """
     return 4 * (qx - qy) * df['F1001'] * np.exp(1j *
            ((qx - qy) * df[S] / df.headers[LENGTH]) - (df[f"{PHASE_ADV}{X}"]-df[f"{PHASE_ADV}{Y}"])
            )
 
 
 def _cta_calaga(df, qx, qy):
-    """ Closest tune approach calculated by Eq. (27) in [#CalagaBetatroncouplingMerging2005]_ .
+    """ Closest tune approach calculated by Eq. (27) in [CalagaBetatronCoupling2005]_ .
 
     If F1010 is not given, it is assumed to be zero.
     """

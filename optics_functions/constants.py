@@ -1,6 +1,6 @@
 """
 Constants
----------
+*********
 
 Constants for the optics functions.
 """
