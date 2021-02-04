@@ -5,9 +5,14 @@ from matplotlib import pyplot as plt  # not in requirements
 import numpy as np
 from optics_functions.constants import S, REAL, IMAG
 
+import logging, sys
 
 def plot_rdts_vs_ptc(df_rdt, df_ptc_rdt, df_twiss, rdt_names):
     for rdt in rdt_names:
+        if f"{rdt}{REAL}" not in df_ptc_rdt.columns:
+            df_ptc_rdt[f"{rdt}{REAL}"] = 0
+            df_ptc_rdt[f"{rdt}{IMAG}"] = 0
+
         fig, axs = plt.subplots(3, 1)
         axs[0].plot(df_twiss[S], df_ptc_rdt[f"{rdt}{REAL}"], color="C0", label="PTC")
         axs[0].plot(df_twiss[S], np.real(df_rdt[f"{rdt}"]), color="C1", label="Analytical")
@@ -42,3 +47,11 @@ def plot_rdts_vs(df_rdt1, label1, df_rdt2,  label2, df_twiss, rdt_names):
         axs[2].set_ylabel(f"abs {rdt}")
         axs[2].set_xlabel(f"Location [m]")
     plt.show()
+
+
+def enable_logging(level=logging.DEBUG):
+    logging.basicConfig(
+        stream=sys.stdout,
+        level=level,
+        format="%(levelname)7s | %(message)s | %(name)s"
+    )

@@ -111,6 +111,41 @@ def coupling_from_cmatrix(df: TfsDataFrame, real=False, output: Sequence[str] = 
     return df_res
 
 
+def coupling_from_r_matrix(model):
+    """ Returns the coupling Resonance driving terms F1001 and F1010.
+    Warnings:
+        Changes sign of the real part of the RDTs compared to [#FranchiAnalyticformulasrapid2017]_
+        to be consistent with the RDT calculations from [#CalagaBetatroncouplingMerging2005]_.
+    Args:
+        model:  Model to be used by Coupling calculation from C-matrix
+    """
+    res = model.loc[:, ["S"]]
+    nbpms = model.index.size
+    denom = 4 * model.loc[:, "BETX"].to_numpy() * model.loc[:, "BETY"].to_numpy()
+    gas, rs, igbs = np.zeros((nbpms, 2, 2)), np.zeros((nbpms, 2, 2)), np.zeros((nbpms, 2, 2))
+
+    gas[:, 0, 0] = 1
+    gas[:, 1, 0] = model.loc[:, "ALFX"]
+    gas[:, 1, 1] = model.loc[:, "BETX"]
+
+    rs[:, 0, 0] = model.loc[:, "R22"]
+    rs[:, 0, 1] = -model.loc[:, "R21"]
+    rs[:, 1, 0] = -model.loc[:, "R12"]
+    rs[:, 1, 1] = model.loc[:, "R11"]
+
+    igbs[:, 0, 0] = model.loc[:, "BETY"]
+    igbs[:, 1, 0] = -model.loc[:, "ALFY"]
+    igbs[:, 1, 1] = 1
+
+    cs = np.einsum("kij,kjl,kln->kin", gas, rs, igbs)
+    cs2 = np.einsum("ki,kij->kj", np.ones((nbpms, 2)) * np.array([1j, -1]), cs)
+    res["F1001"] = (cs2[:, 0] - 1j * cs2[:, 1]) / denom
+    res["F1010"] = (cs2[:, 0] + 1j * cs2[:, 1]) / denom
+    print(f"  Average coupling amplitude |F1001|: {np.mean(np.abs(res.loc[:, 'F1001']))}")
+    print(f"  Average coupling amplitude |F1010|: {np.mean(np.abs(res.loc[:, 'F1010']))}")
+    return res
+
+
 def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, method: str = 'calaga'):
     """ Calculates the closest tune approach from coupling resonances.
 

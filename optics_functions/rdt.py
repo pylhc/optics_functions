@@ -23,7 +23,7 @@ LOG = logging.getLogger(__name__)
 
 def rdts(df: TfsDataFrame, rdts: Sequence[str],
          qx: float = None, qy: float = None, feeddown: int = 0,
-         real: bool = False, save_memory=False,
+         real: bool = False, loop_phases=False,
          hamiltionian_terms: bool = False) -> TfsDataFrame:
     """ Calculates the Resonance Driving Terms.
 
@@ -36,7 +36,7 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
         qy (float): Tune in Y-Plane (if not given df.Q2 is assumed present)
         feeddown (int): Levels of feed-down to include.
         real (bool): Split complex columns into two real-valued columns.
-        save_memory (bool): Loop over elements when calculating phase-advances.
+        loop_phases (bool): Loop over elements when calculating phase-advances.
                             Might be slower for small number of elements, but
                             allows for large (e.g. sliced) optics.
         hamiltionian_terms (bool): Add the hamiltonian terms to the result dataframe.
@@ -53,7 +53,7 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
         if qy is None:
             qy = df.headers[f"{TUNE}2"]
 
-        if not save_memory:
+        if not loop_phases:
             phase_advances = get_all_phase_advances(df)  # might be huge!
 
         for rdt in rdts:
@@ -88,7 +88,10 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
                         kl_iksl = df[f"K{n_mad:d}L"] + 1j * df[f"K{n_mad:d}SL"]
                         k_complex += (kl_iksl * (dx_idy**q)) / factorial(q)
 
-                    sources = df.index[k_complex != 0]  # other elements do not contribute to integral
+                    # real(i**lm * k+ij) is equivalent to Omega-function in paper, see Eq.(A11)
+                    # pd.Series is needed here, as np.real() returns numpy-array
+                    k_real = pd.Series(np.real(i_pow(lm)*k_complex), index=df.index)
+                    sources = df.index[k_real != 0]  # other elements do not contribute to integral, speedup summations
                     if not len(sources):
                         LOG.warning(f"No sources found for {rdt}. RDT will be zero.")
                         df_res[rdt] = 0j
@@ -96,15 +99,18 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
                             df_res[f2h(rdt)] = 0j
                         continue
 
-                    k_real = np.real(i_pow(lm)*k_complex.loc[sources])  # equivalent to Omega-function in paper, see Eq.(A11)
-                    h_terms = -k_real * betax.loc[sources] * betay.loc[sources]
+                    # calculate hamiltionian-numerator part
+                    h_terms = -k_real.loc[sources] * betax.loc[sources] * betay.loc[sources]
 
-                    if save_memory:
+                    if loop_phases:
                         # do loop over elements to not have elements x elements Matrix in memory
-                        h_jklm = pd.Series(index=df.index)
+                        h_jklm = pd.Series(index=df.index, dtype=complex)
                         for element in df.index:
-                            dphis = dphi_at_element(df, element, qx, qy)
-                            phase_term = np.exp(PI2I * ((j-k) * dphis[X] + (l-m) * dphis[Y]))
+                            # calculate dphi from all sources to the element
+                            # index-intersection keeps `element` at correct place in index
+                            sources_plus = df.index.intersection(sources.union([element]))
+                            dphis = dphi_at_element(df.loc[sources_plus, :], element, qx, qy)
+                            phase_term = np.exp(PI2I * ((j-k) * dphis[X].loc[sources] + (l-m) * dphis[Y].loc[sources]))
                             h_jklm[element] = (h_terms * phase_term).sum() * denom_h
                     else:
                         phx = dphi(phase_advances['X'].loc[sources, :], qx)
@@ -120,7 +126,7 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
     if real:
         terms = list(rdts)
         if hamiltionian_terms:
-            terms += [f2h(rdt) for rdt in rdts]
+            terms += [f2h(rdt) for rdt in rdts]  # F#### -> H####
         df_res = split_complex_columns(df, terms)
     return df_res
 

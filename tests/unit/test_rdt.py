@@ -8,7 +8,7 @@ import tfs
 
 from optics_functions.constants import PHASE_ADV, X, Y, BETA, S, TUNE, NAME, REAL, IMAG
 from optics_functions.rdt import rdts, generator, get_all_to_order, str2jklm, jklm2str
-from optics_functions.utils import prepare_twiss_dataframe
+from optics_functions.utils import prepare_twiss_dataframe, split_complex_columns
 
 INPUT = Path(__file__).parent.parent / "inputs"
 
@@ -69,41 +69,55 @@ def test_generator_vs_all_to_order():
 def test_rdts_normal_sextupole_bump():
     df = get_df(n=7)
     df = prepare_twiss_dataframe(beam=1, df_twiss=df)
-    df.loc["C", "K2L"] = 1
-    df.loc["F", "K2L"] = -1
+    df.loc["3", "K2L"] = 1
+    df.loc["5", "K2L"] = -1
 
     df_rdts = rdts(df, rdts=["F1002", "F2001"])
     df_diff, df_jump = get_absdiff_and_jumps(df_rdts)
     assert not df_jump["F2001"].any()
-    assert df_jump.loc[["C", "F"], "F1002"].all()
-    assert not df_jump.loc[df_jump.index.difference(["C", "F"]), "F1002"].any()
+    assert df_jump.loc[["3", "5"], "F1002"].all()
+    assert not df_jump.loc[df_jump.index.difference(["3", "5"]), "F1002"].any()
+
+
+@pytest.mark.basic
+def test_rdts_save_memory():
+    np.random.seed(2047294792)
+    n = 10
+    df = get_df(n=n)
+    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    df.loc[:, "K2L"] = np.random.rand(n)
+    df.loc[:, "K2SL"] = np.random.rand(n)
+
+    df_save = rdts(df, rdts=["F1002", "F2001"], loop_phases=True)
+    df_notsave = rdts(df, rdts=["F1002", "F2001"], loop_phases=False)
+    assert ((df_save - df_notsave).abs() < 1e-14).all().all()
 
 
 @pytest.mark.basic
 def test_rdts_skew_octupole_bump():
-    df = get_df(n=7)
+    df = get_df(n=8)
     df = prepare_twiss_dataframe(beam=1, df_twiss=df)
-    df.loc["C", "K3SL"] = 1
-    df.loc["F", "K3SL"] = -1
+    df.loc["3", "K3SL"] = 1
+    df.loc["5", "K3SL"] = -1
 
     df_rdts = rdts(df, rdts=["F4000", "F3001"])
     df_diff, df_jump = get_absdiff_and_jumps(df_rdts)
     assert not df_jump["F4000"].any()
-    assert df_jump.loc[["C", "F"], "F3001"].all()
-    assert not df_jump.loc[df_jump.index.difference(["C", "F"]), "F3001"].any()
+    assert df_jump.loc[["3", "5"], "F3001"].all()
+    assert not df_jump.loc[df_jump.index.difference(["3", "5"]), "F3001"].any()
 
 
 @pytest.mark.basic
 def test_rdts_normal_octuple_to_sextupole_feeddown():
-    df = get_df(n=7)
+    df = get_df(n=15)
     df = prepare_twiss_dataframe(beam=1, df_twiss=df)
     df_comp = df.copy()
 
-    df.loc["C", "K3L"] = 1
-    df.loc["F", "K3L"] = -1
+    df.loc["3", "K3L"] = 1
+    df.loc["5", "K3L"] = -1
 
-    df_comp.loc["C", ["K2L", "K2SL"]] = 1
-    df_comp.loc["F", ["K2L", "K2SL"]] = -1
+    df_comp.loc["3", ["K2L", "K2SL"]] = 1
+    df_comp.loc["5", ["K2L", "K2SL"]] = -1
 
     df_rdts = rdts(df, rdts=["F1002", "F2001"], feeddown=1)
     df_rdts_comp = rdts(df_comp, rdts=["F1002", "F2001"])
@@ -141,11 +155,11 @@ def test_rdts_normal_dodecapole_to_octupole_feeddown():
     df = prepare_twiss_dataframe(beam=1, df_twiss=df)
     df_comp = df.copy()
 
-    df.loc["C", "K5L"] = 1
-    df.loc["F", "K5L"] = -1
+    df.loc["3", "K5L"] = 1
+    df.loc["5", "K5L"] = -1
 
-    df_comp.loc["C", ["K3L", "K3SL"]] = 1
-    df_comp.loc["F", ["K3L", "K3SL"]] = -1
+    df_comp.loc["3", ["K3L", "K3SL"]] = 1
+    df_comp.loc["5", ["K3L", "K3SL"]] = -1
 
     df_rdts = rdts(df, rdts=["F1003", "F0004"], feeddown=2)
     df_rdts_comp = rdts(df_comp, rdts=["F1003", "F0004"])
@@ -200,20 +214,6 @@ def test_coupling_bump_sextupole_rdts():
         assert arrays_are_close_almost_everywhere(df_rdt[rdt], rdt_ptc, rtol=1e-2, percentile=0.9)
 
 
-@pytest.mark.extended
-def test_error_optics_rdts():
-    input_dir = INPUT / "twiss_optics"
-    df_twiss = tfs.read(input_dir / "twiss.lhc.b1.unsliced.tfs", index=NAME)
-    df_errors = tfs.read(input_dir / "errors.lhc.b1.unsliced.tfs", index=NAME)
-    df_ptc_rdt = tfs.read(input_dir / "ptc_rdt.lhc.b1.unsliced.tfs", index=NAME)
-    df_twiss = prepare_twiss_dataframe(beam=1, df_twiss=df_twiss, df_errors=df_errors)
-    rdt_names = ["F1002", "F3000", "F2001", "F0003", "F4000"]
-    df_rdt = rdts(df_twiss, rdt_names, feeddown=2)
-
-    # from tests.unit.debug_helper import plot_rdts_vs_ptc
-    # plot_rdts_vs_ptc(df_rdt, df_ptc_rdt, df_twiss, rdt_names)
-
-
 # Helper -----------------------------------------------------------------------
 
 
@@ -223,7 +223,7 @@ def get_df(n):
     phx, phy = f"{PHASE_ADV}{X}", f"{PHASE_ADV}{Y}"
     betax, betay = f"{BETA}{X}", f"{BETA}{Y}"
     df = tfs.TfsDataFrame(
-        index=list(string.ascii_uppercase[:n]),
+        index=[str(i) for i in range(n)],
         columns=[S, betax, betay, phx, phy],
         headers={f"{TUNE}1": qx, f"{TUNE}2": qy}
     )
@@ -255,14 +255,3 @@ def arrays_are_close_almost_everywhere(array1, array2, rtol=1e-2, atol=None, per
         atol = rtol * np.mean(np.abs(array2))
     return sum(np.isclose(np.abs(array1), np.abs(array2), rtol=rtol, atol=0) |
                np.isclose(np.abs(array1), np.abs(array2), rtol=0, atol=atol)) > percentile*len(array1)
-
-
-if __name__ == '__main__':
-    import logging, sys
-    logging.basicConfig(
-        stream=sys.stdout,
-        level=logging.DEBUG,
-        format="%(levelname)7s | %(message)s | %(name)s"
-    )
-    # test_error_optics_rdts()
-    test_coupling_bump_sextupole_rdts()
