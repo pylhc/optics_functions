@@ -12,7 +12,9 @@ from typing import Sequence
 import numpy as np
 from tfs import TfsDataFrame
 
-from optics_functions.constants import ALPHA, BETA, GAMMA, X, Y, TUNE, DELTA, MINIMUM, PI2, PHASE_ADV, S, LENGTH
+from optics_functions.constants import (ALPHA, BETA, GAMMA,
+                                        X, Y, TUNE, DELTA,
+                                        MINIMUM, PI2, PHASE_ADV, S, LENGTH)
 from optics_functions.rdt import rdts
 from optics_functions.utils import split_complex_columns, timeit
 
@@ -22,7 +24,9 @@ COUPLING_RDTS = ('F1001', 'F1010')
 LOG = logging.getLogger(__name__)
 
 
-def coupling_from_rdts(df: TfsDataFrame, qx: float = None, qy: float = None, feeddown: int = 0, real: bool = False):
+def coupling_from_rdts(df: TfsDataFrame,
+                       qx: float = None, qy: float = None,
+                       feeddown: int = 0, real: bool = False):
     """ Returns the coupling term.
 
     .. warning::
@@ -51,7 +55,8 @@ def coupling_from_rdts(df: TfsDataFrame, qx: float = None, qy: float = None, fee
     return df_res
 
 
-def coupling_from_cmatrix(df: TfsDataFrame, real=False, output: Sequence[str] = ("rdts", "gamma", "cmatrix")):
+def coupling_from_cmatrix(df: TfsDataFrame, real=False,
+                          output: Sequence[str] = ("rdts", "gamma", "cmatrix")):
     """ Calculates C matrix and Coupling and Gamma from it.
     See [CalagaBetatronCoupling2005]_
 

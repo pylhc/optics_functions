@@ -1,14 +1,13 @@
-import string
 from pathlib import Path
 
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
 import tfs
 
 from optics_functions.constants import PHASE_ADV, X, Y, BETA, S, TUNE, NAME, REAL, IMAG
 from optics_functions.rdt import rdts, generator, get_all_to_order, str2jklm, jklm2str
-from optics_functions.utils import prepare_twiss_dataframe, split_complex_columns
+from optics_functions.utils import prepare_twiss_dataframe
 
 INPUT = Path(__file__).parent.parent / "inputs"
 

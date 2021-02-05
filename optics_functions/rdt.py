@@ -6,17 +6,18 @@ Calculations of Resonance Driving Terms.
 
 """
 import itertools
+import logging
+from math import factorial
 from typing import Tuple, Sequence, List
 
+import numpy as np
+import pandas as pd
 from tfs import TfsDataFrame
-import logging
 
 from optics_functions.constants import PI2I, X, Y, BETA, TUNE
-from optics_functions.utils import seq2str, timeit, get_all_phase_advances, dphi_at_element, dphi, i_pow, \
-    split_complex_columns
-import numpy as np
-from math import factorial
-import pandas as pd
+from optics_functions.utils import (seq2str, timeit, get_all_phase_advances,
+                                    dphi_at_element, dphi, i_pow,
+                                    split_complex_columns)
 
 LOG = logging.getLogger(__name__)
 
