@@ -80,6 +80,46 @@ def test_rdts_normal_sextupole_bump():
 
 
 @pytest.mark.basic
+def test_wrong_rdt_names():
+    df = get_df(n=8)
+    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    with pytest.raises(ValueError):
+        calculate_rdts(df, rdts=["F10003", "F1002"])
+
+    with pytest.raises(ValueError):
+        calculate_rdts(df, rdts=["F102", "F1002"])
+
+    with pytest.raises(ValueError):
+        calculate_rdts(df, rdts=["M1003"])
+
+    with pytest.raises(ValueError):
+        calculate_rdts(df, rdts=["F1000"])
+
+
+@pytest.mark.basic
+def test_missing_columns():
+    df = get_df(n=8)
+    with pytest.raises(KeyError) as e:
+        calculate_rdts(df, rdts=["F1002"])
+    assert "K2L" in str(e.value)
+
+    df["K2L"] = 1
+    with pytest.raises(KeyError) as e:
+        calculate_rdts(df, rdts=["F1002", "F2001"])
+    assert "K2SL" in str(e.value)
+
+    df["K2SL"] = 1
+    with pytest.raises(KeyError) as e:
+        calculate_rdts(df, rdts=["F2001", "F1002"], feeddown=1)
+    assert "K3L" in str(e.value)
+
+    df = df.drop(columns=[f"{PHASE_ADV}{X}"])
+    with pytest.raises(KeyError) as e:
+        calculate_rdts(df, rdts=["F2001", "F1002"])
+    assert f"{PHASE_ADV}{X}" in str(e.value)
+
+
+@pytest.mark.basic
 def test_real_terms_and_hamiltonians():
     np.random.seed(2047294792)
     n=12
@@ -246,7 +286,7 @@ def get_df(n):
     betax, betay = f"{BETA}{X}", f"{BETA}{Y}"
     df = tfs.TfsDataFrame(
         index=[str(i) for i in range(n)],
-        columns=[S, betax, betay, phx, phy],
+        columns=[S, X, Y, betax, betay, phx, phy],
         headers={f"{TUNE}1": qx, f"{TUNE}2": qy}
     )
     df[S] = np.linspace(0, n, n)
@@ -254,6 +294,7 @@ def get_df(n):
     df[phy] = np.linspace(0, qy, n+1)[:n]
     df[betax] = 1
     df[betay] = 1
+    df[[X, Y]] = 0
     return df
 
 
