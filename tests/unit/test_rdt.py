@@ -74,6 +74,7 @@ def test_rdts_normal_sextupole_bump():
 
     df_rdts = rdts(df, rdts=["F1002", "F2001"])
     df_diff, df_jump = get_absdiff_and_jumps(df_rdts)
+    assert not df_rdts.isna().any().any()
     assert not df_jump["F2001"].any()
     assert df_jump.loc[["3", "5"], "F1002"].all()
     assert not df_jump.loc[df_jump.index.difference(["3", "5"]), "F1002"].any()
@@ -90,6 +91,7 @@ def test_rdts_save_memory():
 
     df_save = rdts(df, rdts=["F1002", "F2001"], loop_phases=True)
     df_notsave = rdts(df, rdts=["F1002", "F2001"], loop_phases=False)
+    assert not df_save.isna().any().any()
     assert ((df_save - df_notsave).abs() < 1e-14).all().all()
 
 
@@ -102,6 +104,7 @@ def test_rdts_skew_octupole_bump():
 
     df_rdts = rdts(df, rdts=["F4000", "F3001"])
     df_diff, df_jump = get_absdiff_and_jumps(df_rdts)
+    assert not df_rdts.isna().any().any()
     assert not df_jump["F4000"].any()
     assert df_jump.loc[["3", "5"], "F3001"].all()
     assert not df_jump.loc[df_jump.index.difference(["3", "5"]), "F3001"].any()

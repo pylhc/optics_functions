@@ -50,7 +50,7 @@ html:
 josch:
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) /home/jdilly/Software/Documentation/optics_functions-doc
 	@echo
-	@echo "Build finished. The HTML pages are in /home/jdilly/Software/Documentation/otpics_functions-doc."
+	@echo "Build finished. The HTML pages are in /home/jdilly/Software/Documentation/optics_functions-doc."
 
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml

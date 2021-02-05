@@ -67,31 +67,38 @@ def coupling_from_cmatrix(df: TfsDataFrame, real=False, output: Sequence[str] = 
     LOG.debug("Calculating CMatrix.")
     df_res = TfsDataFrame(index=df.index)
     with timeit("CMatrix calculation", print_fun=LOG.debug):
-        j = np.array([[0., 1.], [-1., 0.]])
-        rs = np.reshape(df[["R11", "R12", "R21", "R22"]].to_numpy(), (len(df), 2, 2))
-        cs = np.einsum("ij,kjn,no->kio", -j, np.transpose(rs, axes=(0, 2, 1)), j)
-        cs = np.einsum("k,kij->kij", (1 / np.sqrt(1 + np.linalg.det(rs))), cs)
+        n = len(df)
+        gx, r, igy = np.zeros((n, 2, 2)), np.zeros((n, 2, 2)), np.zeros((n, 2, 2))
 
-        g11a = 1 / np.sqrt(df[f"{BETA}{X}"])
-        g12a = np.zeros(len(df))
-        g21a = df[f"{ALPHA}{X}"] / np.sqrt(df[f"{BETA}{X}"])
-        g22a = np.sqrt(df[f"{BETA}{X}"])
-        gas = np.reshape(np.array([g11a, g12a, g21a, g22a]).T, (len(df), 2, 2))
+        # rs form after -J R^T J == inv(R)*det|R| == C
+        r[:, 0, 0] = df["R22"]
+        r[:, 0, 1] = -df["R12"]
+        r[:, 1, 0] = -df["R21"]
+        r[:, 1, 1] = df["R11"]
 
-        ig11b = np.sqrt(df[f"{BETA}{Y}"])
-        ig12b = np.zeros(len(df))
-        ig21b = -df[f"{ALPHA}{Y}"] / np.sqrt(df[f"{BETA}{Y}"])
-        ig22b = 1. / np.sqrt(df[f"{BETA}{Y}"])
-        igbs = np.reshape(np.array([ig11b, ig12b, ig21b, ig22b]).T, (len(df), 2, 2))
+        r *= 1 / np.sqrt(1 + np.linalg.det(r)[:, None, None])
 
-        cs = np.einsum("kij,kjl,kln->kin", gas, cs, igbs)
-        gammas = np.sqrt(1 - np.linalg.det(cs))
+        # Cbar = Gx * C * Gy^-1
+        sqrtbetax = np.sqrt(df[f"{BETA}{X}"])
+        sqrtbetay = np.sqrt(df[f"{BETA}{Y}"])
+
+        gx[:, 0, 0] = 1 / sqrtbetax
+        gx[:, 1, 0] = df[f"{ALPHA}{X}"] * gx[:, 0, 0]
+        gx[:, 1, 1] = sqrtbetax
+
+        igy[:, 1, 1] = 1 / sqrtbetay
+        igy[:, 1, 0] = -df[f"{ALPHA}{Y}"] * igy[:, 1, 1]
+        igy[:, 0, 0] = sqrtbetay
+
+        c = np.matmul(gx, np.matmul(r, igy))
+        gamma = np.sqrt(1 - np.linalg.det(c))
 
     if "rdts" in output:
-        df_res.loc[:, "F1001"] = ((cs[:, 0, 0] + cs[:, 1, 1]) * 1j +
-                                  (cs[:, 0, 1] - cs[:, 1, 0])) / 4 / gammas
-        df_res.loc[:, "F1010"] = ((cs[:, 0, 0] - cs[:, 1, 1]) * 1j +
-                                  (-cs[:, 0, 1]) - cs[:, 1, 0]) / 4 / gammas
+        denom = 1 / (4 * gamma)
+        df_res.loc[:, "F1001"] = ((c[:, 0, 0] + c[:, 1, 1]) * 1j +
+                                  (c[:, 0, 1] - c[:, 1, 0])) * denom
+        df_res.loc[:, "F1010"] = ((c[:, 0, 0] - c[:, 1, 1]) * 1j +
+                                  (-c[:, 0, 1]) - c[:, 1, 0]) * denom
         LOG.debug(f"Average coupling amplitude |F1001|: {df_res['F1001'].abs().mean():g}")
         LOG.debug(f"Average coupling amplitude |F1010|: {df_res['F1010'].abs().mean():g}")
 
@@ -99,51 +106,16 @@ def coupling_from_cmatrix(df: TfsDataFrame, real=False, output: Sequence[str] = 
             df_res = split_complex_columns(df_res, COUPLING_RDTS)
 
     if "cmatrix" in output:
-        df_res.loc[:, "C11"] = cs[:, 0, 0]
-        df_res.loc[:, "C12"] = cs[:, 0, 1]
-        df_res.loc[:, "C21"] = cs[:, 1, 0]
-        df_res.loc[:, "C22"] = cs[:, 1, 1]
+        df_res.loc[:, "C11"] = c[:, 0, 0]
+        df_res.loc[:, "C12"] = c[:, 0, 1]
+        df_res.loc[:, "C21"] = c[:, 1, 0]
+        df_res.loc[:, "C22"] = c[:, 1, 1]
 
     if "gamma" in output:
-        df_res.loc[:, GAMMA] = gammas
-        LOG.debug(f"Average gamma: {df[GAMMA].mean():g}")
+        df_res.loc[:, GAMMA] = gamma
+        LOG.debug(f"Average gamma: {df_res[GAMMA].mean():g}")
 
     return df_res
-
-
-def coupling_from_r_matrix(model):
-    """ Returns the coupling Resonance driving terms F1001 and F1010.
-    Warnings:
-        Changes sign of the real part of the RDTs compared to [#FranchiAnalyticformulasrapid2017]_
-        to be consistent with the RDT calculations from [#CalagaBetatroncouplingMerging2005]_.
-    Args:
-        model:  Model to be used by Coupling calculation from C-matrix
-    """
-    res = model.loc[:, ["S"]]
-    nbpms = model.index.size
-    denom = 4 * model.loc[:, "BETX"].to_numpy() * model.loc[:, "BETY"].to_numpy()
-    gas, rs, igbs = np.zeros((nbpms, 2, 2)), np.zeros((nbpms, 2, 2)), np.zeros((nbpms, 2, 2))
-
-    gas[:, 0, 0] = 1
-    gas[:, 1, 0] = model.loc[:, "ALFX"]
-    gas[:, 1, 1] = model.loc[:, "BETX"]
-
-    rs[:, 0, 0] = model.loc[:, "R22"]
-    rs[:, 0, 1] = -model.loc[:, "R21"]
-    rs[:, 1, 0] = -model.loc[:, "R12"]
-    rs[:, 1, 1] = model.loc[:, "R11"]
-
-    igbs[:, 0, 0] = model.loc[:, "BETY"]
-    igbs[:, 1, 0] = -model.loc[:, "ALFY"]
-    igbs[:, 1, 1] = 1
-
-    cs = np.einsum("kij,kjl,kln->kin", gas, rs, igbs)
-    cs2 = np.einsum("ki,kij->kj", np.ones((nbpms, 2)) * np.array([1j, -1]), cs)
-    res["F1001"] = (cs2[:, 0] - 1j * cs2[:, 1]) / denom
-    res["F1010"] = (cs2[:, 0] + 1j * cs2[:, 1]) / denom
-    print(f"  Average coupling amplitude |F1001|: {np.mean(np.abs(res.loc[:, 'F1001']))}")
-    print(f"  Average coupling amplitude |F1010|: {np.mean(np.abs(res.loc[:, 'F1010']))}")
-    return res
 
 
 def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, method: str = 'calaga'):
@@ -162,6 +134,10 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, 
     or Eq. (2) in [PerssonImprovedControlCoupling2014]_ ('persson')
     or the latter without the exp(i(Qx-Qy)s/R) term ('persson_alt').
 
+    For the 'persson' and 'persson_alt' methods, also MUX and MUY columns
+    are needed in the DataFrame as well as LENGTH (of the machine) and S column
+    for the 'persson' method.
+
     Args:
         df (TfsDataFrame): Twiss Dataframe, needs to have complex-valued F1001 column.
         qx (float): Tune in X-Plane (if not given df.Q1 is assumed present)
@@ -171,6 +147,7 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, 
 
     Returns:
         New DataFrame with closest tune approach (DELTAQMIN) column.
+        The value is real for 'calaga' and 'franchi' methods,
     """
     method_map = {
         'calaga': _cta_calaga,
@@ -187,15 +164,15 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, 
 
     dqmin = f"{DELTA}{TUNE}{MINIMUM}"
     df_res = TfsDataFrame(index=df.index, columns=[dqmin])
-    df_res[dqmin] = method_map[method.lower()](df, qx, qy).abs()
+    df_res[dqmin] = method_map[method.lower()](df, qx, qy)
 
-    LOG.info(f"|C-| = {df_res[dqmin].mean()}")
+    LOG.info(f"({method}) |C-| = {np.abs(df_res[dqmin].mean())}")
     return df_res
 
 
 def _cta_franchi(df, qx, qy):
     """ Closest tune approach calculated by Eq. (1) in [PerssonImprovedControlCoupling2014]_ . """
-    return 4 * (qx - qy) * df['F1001']
+    return 4 * (qx - qy) * df['F1001'].abs()
 
 
 def _cta_persson_alt(df, qx, qy):
@@ -208,8 +185,7 @@ def _cta_persson_alt(df, qx, qy):
 def _cta_persson(df, qx, qy):
     """ Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ . """
     return 4 * (qx - qy) * df['F1001'] * np.exp(1j *
-           ((qx - qy) * df[S] / df.headers[LENGTH]) - (df[f"{PHASE_ADV}{X}"]-df[f"{PHASE_ADV}{Y}"])
-           )
+           (((qx - qy) * df[S] / (df.headers[LENGTH]/PI2)) - (df[f"{PHASE_ADV}{X}"]-df[f"{PHASE_ADV}{Y}"])))
 
 
 def _cta_calaga(df, qx, qy):
@@ -221,7 +197,7 @@ def _cta_calaga(df, qx, qy):
     with suppress(KeyError):
         f_diff -= df["1010"].abs()**2
 
-    return ((np.cos(PI2*qx) - np.cos(PI2*qy)) / (np.pi*(np.cos(PI2*qx) + np.cos(PI2*qy)))
+    return ((np.cos(PI2*qx) - np.cos(PI2*qy)) / (np.pi*(np.sin(PI2*qx) + np.sin(PI2*qy)))
             * (4 * np.sqrt(f_diff) / (1 + 4*f_diff)))
 
 

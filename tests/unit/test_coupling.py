@@ -1,13 +1,13 @@
-import string
 from pathlib import Path
-from optics_functions.constants import NAME, S, ALPHA, Y, BETA, X
 
+import numpy as np
 import pytest
 import tfs
-from optics_functions.coupling import closest_tune_approach, coupling_from_rdts, coupling_from_cmatrix, COUPLING_RDTS
-from optics_functions.utils import prepare_twiss_dataframe
-import numpy as np
 
+from optics_functions.constants import NAME, S, ALPHA, Y, BETA, X, GAMMA
+from optics_functions.coupling import (closest_tune_approach, coupling_from_rdts,
+                                       coupling_from_cmatrix, COUPLING_RDTS)
+from optics_functions.utils import prepare_twiss_dataframe
 from tests.unit.test_rdt import arrays_are_close_almost_everywhere
 
 INPUT = Path(__file__).parent.parent / "inputs"
@@ -16,9 +16,10 @@ INPUT = Path(__file__).parent.parent / "inputs"
 @pytest.mark.basic
 def test_cmatrix():
     n = 5
-    df = tfs.TfsDataFrame(0, index=[str(i)  for i in range(n)],
+    df = tfs.TfsDataFrame(0, index=[str(i) for i in range(n)],
     columns=[f"{ALPHA}{X}", f"{ALPHA}{Y}", f"{BETA}{X}", f"{BETA}{Y}", "R11", "R12", "R21", "R22"])
-    r = np.rand(n)
+    np.random.seed(487423872)
+    r = np.random.rand(n)
     df[S] = np.linspace(0, n, n)
     df.loc[:, "R11"] = np.sin(r)
     df.loc[:, "R22"] = r
@@ -27,7 +28,35 @@ def test_cmatrix():
     df.loc[:, [f"{BETA}{X}", f"{BETA}{Y}"]] = 1
 
     df_res = coupling_from_cmatrix(df)
+    assert all(c in df_res.columns for c in ("F1001", "F1010", "C11", "C12", "C21", "C22", GAMMA))
+    assert not df_res.isna().any().any()
 
+    detC = (df_res["C11"]*df_res["C22"] - df_res["C12"]*df_res["C21"])
+    fsq_diff = np.abs(df_res["F1001"])**2 - np.abs(df_res["F1010"])**2
+    f_term = 1/(1+4*fsq_diff)
+    g_sq = df_res[GAMMA]**2
+    assert all(np.abs(detC + g_sq - 1) < 1e-15)
+    assert all(np.abs(detC / (4 * g_sq) - fsq_diff) < 1e-15)  # Eq. (13)
+    assert all(np.abs(detC + f_term - 1) < 1e-15)  # Eq. (13)
+    assert all(np.abs(g_sq - f_term) < 1e-15)  # Eq. (14)
+
+
+@pytest.mark.basic
+def test_closest_tune_approach():
+    beam = 1
+    df_twiss = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b{beam:d}.coupling_bump.tfs", index=NAME)
+    df = prepare_twiss_dataframe(beam=beam, df_twiss=df_twiss, max_order=7)
+    df_cmatrix = coupling_from_cmatrix(df)
+    df_twiss[list(COUPLING_RDTS)] = df_cmatrix[list(COUPLING_RDTS)]
+
+    res = dict().fromkeys(('calaga', 'franchi', 'persson', 'persson_alt'))
+    for method in res.keys():
+        cta = closest_tune_approach(df_twiss, method=method)
+        res[method] = np.abs(np.mean(cta))[0]
+        assert not cta.isna().any().any()
+        assert all(cta[df_cmatrix["F1001"] != 0] != 0)
+        assert all(np.abs(cta) >= 0)
+        assert err_rel(res[method], res['calaga']) < 1e-1  # ~7% for persson and persson_alt ...
 
 
 @pytest.mark.extended
@@ -42,44 +71,11 @@ def test_coupling_rdt_bump_cmatrix_compare():
     # plot_rdts_vs(df_rdts, "analytical", df_cmatrix, "cmatrix", df_twiss, ["F1001", "F1010"])
 
     for rdt in ("F1010", "F1001"):
-        assert arrays_are_close_almost_everywhere(df_rdts[rdt], df_cmatrix[rdt], rtol=1e-3, atol=1e-4, percentile=0.99)
+        assert arrays_are_close_almost_everywhere(df_rdts[rdt], df_cmatrix[rdt],
+                                                  rtol=1e-3, atol=1e-4, percentile=0.99)
 
 
-@pytest.mark.extended
-def test_coupling_rdt_bump_rmatrix_compare():
-    beam = 1
-    df_twiss = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b{beam:d}.coupling_bump.tfs", index=NAME)
-    df = prepare_twiss_dataframe(beam=beam, df_twiss=df_twiss, max_order=7)
-    df_cmatrix = coupling_from_cmatrix(df)
-    from optics_functions.coupling import coupling_from_r_matrix
-    df_rmatrix = coupling_from_r_matrix(df)
+# Helper -----------------------------------------------------------------------
 
-    from tests.unit.debug_helper import plot_rdts_vs
-    plot_rdts_vs(df_rmatrix, "rmatrix", df_cmatrix, "cmatrix", df_twiss, ["F1001", "F1010"])
-
-
-@pytest.mark.extended
-def test_cmatrix_feeddown():
-    beam = 1
-    # id_ = "flat_orbit_no_errors"
-    # id_ = "flat_orbit_with_errors"
-    id_ = "xing_no_errors"
-    # id_ = "xing_with_errors"
-    df_twiss = tfs.read(INPUT / "twiss_optics" / f"twiss.lhc.b{beam:d}.{id_}.tfs", index=NAME)
-    df_twiss[["X", "Y"]] *= 3.5e-5
-    df_errors = tfs.read(INPUT / "twiss_optics" / f"errors.lhc.b{beam:d}.unsliced.tfs", index=NAME)
-    df = prepare_twiss_dataframe(beam=beam, df_twiss=df_twiss, df_errors=df_errors, max_order=7)
-    # df = prepare_twiss_dataframe(beam=beam, df_twiss=df_twiss, max_order=7)
-    df_rdts = coupling_from_rdts(df, feeddown=1)
-    df_cmatrix = coupling_from_cmatrix(df)
-    # df_cta_rdts = closest_tune_approach(df_rdts)
-    # df_cta_cmatrix = closest_tune_approach(df_rdts)
-
-    from tests.unit.debug_helper import plot_rdts_vs
-    plot_rdts_vs(df_rdts, "analytical", df_cmatrix, "cmatrix", df_twiss, ["F1001", "F1010"])
-
-
-if __name__ == '__main__':
-    from tests.unit.debug_helper import enable_logging
-    enable_logging()
-    test_coupling_rdt_bump_rmatrix_compare()
+def err_rel(a, b):
+    return np.abs((a-b)/b)
