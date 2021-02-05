@@ -104,6 +104,27 @@ tfs.write("rdts.tfs",
 
 ```
 
+Appending Example:
+```python
+import logging
+import sys
+
+import tfs  # tfs-pandas
+
+from optics_functions.coupling import coupling_from_cmatrix, closest_tune_approach
+from optics_functions.utils import split_complex_columns
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
+
+# read MAD-X twiss output
+df_twiss = tfs.read("twiss.tfs", index="NAME")
+
+# calculate coupling from the cmatrix and append to original dataframe
+# output=['rdts'] is used to avoid the output of the gamma and C## columns.
+df_twiss[["F1001", "F1010"]] = coupling_from_cmatrix(df_twiss, output=['rdts'])
+
+```
+
 ## Quality checks
 
 - Unit and accuracy tests are run automatically through CI [Github Actions](https://github.com/pylhc/optics_functions/actions). See our workflows in this [readme](.github/workflows/README.md).
