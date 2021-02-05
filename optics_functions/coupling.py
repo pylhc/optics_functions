@@ -15,7 +15,7 @@ from tfs import TfsDataFrame
 from optics_functions.constants import (ALPHA, BETA, GAMMA,
                                         X, Y, TUNE, DELTA,
                                         MINIMUM, PI2, PHASE_ADV, S, LENGTH)
-from optics_functions.rdt import rdts
+from optics_functions.rdt import calculate_rdts
 from optics_functions.utils import split_complex_columns, timeit
 
 COUPLING_RDTS = ('F1001', 'F1010')
@@ -24,9 +24,7 @@ COUPLING_RDTS = ('F1001', 'F1010')
 LOG = logging.getLogger(__name__)
 
 
-def coupling_from_rdts(df: TfsDataFrame,
-                       qx: float = None, qy: float = None,
-                       feeddown: int = 0, real: bool = False):
+def coupling_from_rdts(df: TfsDataFrame, real: bool = False, **kwargs):
     """ Returns the coupling term.
 
     .. warning::
@@ -34,18 +32,19 @@ def coupling_from_rdts(df: TfsDataFrame,
         [FranchiAnalyticFormulas2017]_ to be consistent with the RDT
         calculations from [CalagaBetatronCoupling2005]_ .
 
-
     Args:
         df (TfsDataFrame): Twiss Dataframe
-        qx (float): Tune in X-Plane (if not given df.Q1 is assumed present)
-        qy (float): Tune in Y-Plane (if not given df.Q2 is assumed present)
-        feeddown (int): Levels of feed-down to include
         real (bool): Split complex columns into two real-valued columns.
+
+    Keyword Args:
+        **kwargs: Remaining arguments from :func:`~optics_functions.rdt.rdts`
+                  i.e. ``qx``, ``qy``, ``feeddown``, ``loop_phases``
+                  and ``hamiltionian_terms``
 
     Returns:
         New TfsDataFrame with Coupling Columns
     """
-    df_res = rdts(df, COUPLING_RDTS, qx=qx, qy=qy, feeddown=feeddown)
+    df_res = calculate_rdts(df, rdts=COUPLING_RDTS, **kwargs)
     for rdt in COUPLING_RDTS:
         df_res.loc[:, rdt].to_numpy().real *= -1  # definition, also: sets value in dataframe
 
@@ -104,8 +103,8 @@ def coupling_from_cmatrix(df: TfsDataFrame, real=False,
                                   (c[:, 0, 1] - c[:, 1, 0])) * denom
         df_res.loc[:, "F1010"] = ((c[:, 0, 0] - c[:, 1, 1]) * 1j +
                                   (-c[:, 0, 1]) - c[:, 1, 0]) * denom
-        LOG.debug(f"Average coupling amplitude |F1001|: {df_res['F1001'].abs().mean():g}")
-        LOG.debug(f"Average coupling amplitude |F1010|: {df_res['F1010'].abs().mean():g}")
+        LOG.info(f"Average coupling amplitude |F1001|: {df_res['F1001'].abs().mean():g}")
+        LOG.info(f"Average coupling amplitude |F1010|: {df_res['F1010'].abs().mean():g}")
 
         if real:
             df_res = split_complex_columns(df_res, COUPLING_RDTS)

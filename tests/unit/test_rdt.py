@@ -6,7 +6,7 @@ import pytest
 import tfs
 
 from optics_functions.constants import PHASE_ADV, X, Y, BETA, S, TUNE, NAME, REAL, IMAG
-from optics_functions.rdt import rdts, generator, get_all_to_order, str2jklm, jklm2str
+from optics_functions.rdt import calculate_rdts, generator, get_all_to_order, str2jklm, jklm2str
 from optics_functions.utils import prepare_twiss_dataframe
 
 INPUT = Path(__file__).parent.parent / "inputs"
@@ -71,7 +71,7 @@ def test_rdts_normal_sextupole_bump():
     df.loc["3", "K2L"] = 1
     df.loc["5", "K2L"] = -1
 
-    df_rdts = rdts(df, rdts=["F1002", "F2001"])
+    df_rdts = calculate_rdts(df, rdts=["F1002", "F2001"])
     df_diff, df_jump = get_absdiff_and_jumps(df_rdts)
     assert not df_rdts.isna().any().any()
     assert not df_jump["F2001"].any()
@@ -88,8 +88,8 @@ def test_rdts_save_memory():
     df.loc[:, "K2L"] = np.random.rand(n)
     df.loc[:, "K2SL"] = np.random.rand(n)
 
-    df_save = rdts(df, rdts=["F1002", "F2001"], loop_phases=True)
-    df_notsave = rdts(df, rdts=["F1002", "F2001"], loop_phases=False)
+    df_save = calculate_rdts(df, rdts=["F1002", "F2001"], loop_phases=True)
+    df_notsave = calculate_rdts(df, rdts=["F1002", "F2001"], loop_phases=False)
     assert not df_save.isna().any().any()
     assert ((df_save - df_notsave).abs() < 1e-14).all().all()
 
@@ -101,7 +101,7 @@ def test_rdts_skew_octupole_bump():
     df.loc["3", "K3SL"] = 1
     df.loc["5", "K3SL"] = -1
 
-    df_rdts = rdts(df, rdts=["F4000", "F3001"])
+    df_rdts = calculate_rdts(df, rdts=["F4000", "F3001"])
     df_diff, df_jump = get_absdiff_and_jumps(df_rdts)
     assert not df_rdts.isna().any().any()
     assert not df_jump["F4000"].any()
@@ -121,8 +121,8 @@ def test_rdts_normal_octuple_to_sextupole_feeddown():
     df_comp.loc["3", ["K2L", "K2SL"]] = 1
     df_comp.loc["5", ["K2L", "K2SL"]] = -1
 
-    df_rdts = rdts(df, rdts=["F1002", "F2001"], feeddown=1)
-    df_rdts_comp = rdts(df_comp, rdts=["F1002", "F2001"])
+    df_rdts = calculate_rdts(df, rdts=["F1002", "F2001"], feeddown=1)
+    df_rdts_comp = calculate_rdts(df_comp, rdts=["F1002", "F2001"])
 
     assert not df_rdts["F2001"].any()
     assert not df_rdts["F1002"].any()
@@ -130,7 +130,7 @@ def test_rdts_normal_octuple_to_sextupole_feeddown():
     # Feed-down K3L -> K2L
     df["X"] = 1
     df["Y"] = 0
-    df_rdts = rdts(df, rdts=["F1002", "F2001"], feeddown=1)
+    df_rdts = calculate_rdts(df, rdts=["F1002", "F2001"], feeddown=1)
     assert not df_rdts["F2001"].any()
     assert df_rdts["F1002"].all()
     assert all(df_rdts["F1002"] == df_rdts_comp["F1002"])
@@ -138,7 +138,7 @@ def test_rdts_normal_octuple_to_sextupole_feeddown():
     # Feed-down K3L -> K2SL
     df["X"] = 0
     df["Y"] = 1
-    df_rdts = rdts(df, rdts=["F1002", "F2001"], feeddown=1)
+    df_rdts = calculate_rdts(df, rdts=["F1002", "F2001"], feeddown=1)
     assert not df_rdts["F1002"].any()
     assert df_rdts["F2001"].all()
     assert all(df_rdts["F2001"] == df_rdts_comp["F2001"])
@@ -146,7 +146,7 @@ def test_rdts_normal_octuple_to_sextupole_feeddown():
     # Feed-down K3L -> K2L, K2SL
     df["X"] = 1
     df["Y"] = 1
-    df_rdts = rdts(df, rdts=["F1002", "F2001"], feeddown=1)
+    df_rdts = calculate_rdts(df, rdts=["F1002", "F2001"], feeddown=1)
     assert all(df_rdts["F1002"] == df_rdts_comp["F1002"])
     assert all(df_rdts["F2001"] == df_rdts_comp["F2001"])
 
@@ -163,8 +163,8 @@ def test_rdts_normal_dodecapole_to_octupole_feeddown():
     df_comp.loc["3", ["K3L", "K3SL"]] = 1
     df_comp.loc["5", ["K3L", "K3SL"]] = -1
 
-    df_rdts = rdts(df, rdts=["F1003", "F0004"], feeddown=2)
-    df_rdts_comp = rdts(df_comp, rdts=["F1003", "F0004"])
+    df_rdts = calculate_rdts(df, rdts=["F1003", "F0004"], feeddown=2)
+    df_rdts_comp = calculate_rdts(df_comp, rdts=["F1003", "F0004"])
 
     assert not df_rdts["F1003"].any()
     assert not df_rdts["F0004"].any()
@@ -173,7 +173,7 @@ def test_rdts_normal_dodecapole_to_octupole_feeddown():
     # Feed-down K5L -> K3L
     df["X"] = 1
     df["Y"] = 0
-    df_rdts = rdts(df, rdts=["F1003", "F0004"], feeddown=2)
+    df_rdts = calculate_rdts(df, rdts=["F1003", "F0004"], feeddown=2)
     assert not df_rdts["F1003"].any()
     assert df_rdts["F0004"].all()
     assert all(df_rdts["F0004"] == 0.5 * df_rdts_comp["F0004"])
@@ -181,7 +181,7 @@ def test_rdts_normal_dodecapole_to_octupole_feeddown():
     # Feed-down K5L -> K3L
     df["X"] = 0
     df["Y"] = 1
-    df_rdts = rdts(df, rdts=["F1003", "F0004"], feeddown=2)
+    df_rdts = calculate_rdts(df, rdts=["F1003", "F0004"], feeddown=2)
     assert not df_rdts["F1003"].any()
     assert df_rdts["F0004"].all()
     assert all(df_rdts["F0004"] == -0.5 * df_rdts_comp["F0004"])
@@ -189,7 +189,7 @@ def test_rdts_normal_dodecapole_to_octupole_feeddown():
     # Feed-down K5L -> K3SL
     df["X"] = 1
     df["Y"] = 1
-    df_rdts = rdts(df, rdts=["F1003", "F0004"], feeddown=2)
+    df_rdts = calculate_rdts(df, rdts=["F1003", "F0004"], feeddown=2)
     assert not df_rdts["F0004"].any()
     assert df_rdts["F1003"].all()
     assert all(df_rdts["F1003"] == df_rdts_comp["F1003"])
@@ -197,7 +197,7 @@ def test_rdts_normal_dodecapole_to_octupole_feeddown():
     # Feed-down K5L -> (x**2-y**2)/2 K3L , xy K3SL
     df["X"] = 1
     df["Y"] = 0.5
-    df_rdts = rdts(df, rdts=["F1003", "F0004"], feeddown=2)
+    df_rdts = calculate_rdts(df, rdts=["F1003", "F0004"], feeddown=2)
     assert all((df_rdts["F0004"] - 0.375*df_rdts_comp["F0004"]).abs() <= 1e-15)
     assert all(df_rdts["F1003"] == 0.5*df_rdts_comp["F1003"])
 
@@ -209,7 +209,7 @@ def test_coupling_bump_sextupole_rdts():
     df_ptc_rdt = tfs.read(input_dir / "ptc_rdt.lhc.b1.coupling_bump.tfs", index=NAME)
     df_twiss = prepare_twiss_dataframe(beam=1, df_twiss=df_twiss)
     rdt_names = ["F1002", "F3000"]
-    df_rdt = rdts(df_twiss, rdt_names)
+    df_rdt = calculate_rdts(df_twiss, rdt_names)
 
     for rdt in rdt_names:
         rdt_ptc = df_ptc_rdt[f"{rdt}{REAL}"] + 1j*df_ptc_rdt[f"{rdt}{IMAG}"]

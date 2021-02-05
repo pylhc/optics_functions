@@ -22,10 +22,10 @@ from optics_functions.utils import (seq2str, timeit, get_all_phase_advances,
 LOG = logging.getLogger(__name__)
 
 
-def rdts(df: TfsDataFrame, rdts: Sequence[str],
-         qx: float = None, qy: float = None, feeddown: int = 0,
-         real: bool = False, loop_phases=False,
-         hamiltionian_terms: bool = False) -> TfsDataFrame:
+def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
+                   qx: float = None, qy: float = None, feeddown: int = 0,
+                   real: bool = False, loop_phases=False,
+                   hamiltionian_terms: bool = False) -> TfsDataFrame:
     """ Calculates the Resonance Driving Terms.
 
     Eq. A8 in [FranchiAnalyticFormulas2017]_
@@ -45,7 +45,7 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
     Returns:
         New TfsDataFrame with RDT columns.
     """
-    LOG.debug(f"Calculating RDTs: {seq2str(rdts):s}.")
+    LOG.info(f"Calculating RDTs: {seq2str(rdts):s}.")
     with timeit("RDT calculation", print_fun=LOG.debug):
         df_res = TfsDataFrame(index=df.index)
         if qx is None:
@@ -120,7 +120,7 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
                         h_jklm = phase_term.multiply(h_terms, axis="index").sum(axis="index").transpose() * denom_h
 
                     df_res[rdt] = h_jklm * denom_f
-                    LOG.debug(f"Average RDT amplitude |{rdt:s}|: {df_res[rdt].abs().mean():g}")
+                    LOG.info(f"Average RDT amplitude |{rdt:s}|: {df_res[rdt].abs().mean():g}")
 
                     if hamiltionian_terms:
                         df_res[f2h(rdt)] = h_jklm
@@ -132,7 +132,7 @@ def rdts(df: TfsDataFrame, rdts: Sequence[str],
     return df_res
 
 
-def calc_ac_dipole_driving_terms(self, order_or_terms, spectral_line, plane, ac_tunes, acd_name):
+def get_ac_dipole_rdts(self, order_or_terms, spectral_line, plane, ac_tunes, acd_name):
     """ Calculates the Hamiltonian Terms under Forced Motion.
 
     Args:

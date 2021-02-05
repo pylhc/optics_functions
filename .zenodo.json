@@ -1,0 +1,15 @@
+{
+  "creators": [
+    {
+      "name": "OMC-Team",
+      "affiliation": "CERN"
+    },
+    {
+      "name": "Joschua Dilly",
+      "affiliation": "CERN",
+      "orcid": "0000-0001-7864-5448"
+    }
+  ],
+  "title": "optics_functions",
+  "description": "Calculate various beam optics functions from TFS-Dataframes."
+}
