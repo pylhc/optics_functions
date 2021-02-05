@@ -138,7 +138,7 @@ def test_prepare_twiss_dataframe():
     n_index, n_kmax, n_valmax = 5, 6, 10
     n_kmax_prepare = 16
     df_twiss, df_errors = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
-    df = prepare_twiss_dataframe(beam=1, df_twiss=df_twiss, df_errors=df_errors, max_order=n_kmax_prepare)
+    df = prepare_twiss_dataframe(df_twiss=df_twiss, df_errors=df_errors, max_order=n_kmax_prepare)
     assert all(df[S] == df_twiss[S])
     k_columns = df.columns[df.columns.str.match(r"^K\d+S?L")]
     assert len(k_columns) == n_kmax_prepare * 2
@@ -165,10 +165,8 @@ def test_prepare_twiss_dataframe_inner():
     n_kmax_prepare = 5
     df_twiss, _ = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
     _, df_errors_1 = get_twiss_and_error_df(n_index+3, n_kmax, n_valmax)
-    df = prepare_twiss_dataframe(beam=1,
-                                 df_twiss=df_twiss,
-                                 df_errors=df_errors_1.iloc[3:, :],
-                                 max_order=n_kmax_prepare, join="inner")
+    df = prepare_twiss_dataframe(df_twiss=df_twiss, df_errors=df_errors_1.iloc[3:, :], max_order=n_kmax_prepare,
+                                 join="inner")
 
     k_columns = df.columns[df.columns.str.match(r"^K\d+S?L")]
     assert len(k_columns) == n_kmax * 2
@@ -186,9 +184,7 @@ def test_prepare_twiss_dataframe_outer():
     n_kmax_prepare = 16
     _, df_errors = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
     df_twiss_1, _ = get_twiss_and_error_df(n_index, n_kmax+2, n_valmax)
-    df = prepare_twiss_dataframe(beam=1,
-                                 df_twiss=df_twiss_1.iloc[3:, :],
-                                 df_errors=df_errors.iloc[:-3, :],
+    df = prepare_twiss_dataframe(df_twiss=df_twiss_1.iloc[3:, :], df_errors=df_errors.iloc[:-3, :],
                                  max_order=n_kmax_prepare, join="outer")
 
     k_columns = df.columns[df.columns.str.match(r"^K\d+S?L")]
@@ -205,9 +201,7 @@ def test_prepare_twiss_dataframe_outer():
 def test_prepare_twiss_dataframe_no_error():
     n_index, n_kmax, n_valmax = 5, 3, 10
     df_twiss, _ = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
-    df = prepare_twiss_dataframe(beam=1,
-                                 df_twiss=df_twiss,
-                                 max_order=n_kmax)
+    df = prepare_twiss_dataframe(df_twiss=df_twiss, max_order=n_kmax)
     assert df_twiss.equals(df)
 
 
@@ -215,9 +209,9 @@ def test_prepare_twiss_dataframe_no_error():
 def test_prepare_twiss_dataframe_beams():
     n_index, n_kmax, n_valmax = 5, 6, 10
     df_twiss, df_errors = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
-    df1 = prepare_twiss_dataframe(beam=1, df_twiss=df_twiss, df_errors=df_errors)
-    df2 = prepare_twiss_dataframe(beam=2, df_twiss=df_twiss, df_errors=df_errors)
-    df4 = prepare_twiss_dataframe(beam=4, df_twiss=df_twiss, df_errors=df_errors)
+    df1 = prepare_twiss_dataframe(df_twiss=df_twiss, df_errors=df_errors)
+    df2 = prepare_twiss_dataframe(df_twiss=df_twiss, df_errors=df_errors)
+    df4 = prepare_twiss_dataframe(df_twiss=df_twiss, df_errors=df_errors, invert_signs_madx=True)
 
     assert df1.equals(df2)
     assert not df1.equals(df4)

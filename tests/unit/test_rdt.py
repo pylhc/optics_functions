@@ -67,7 +67,7 @@ def test_generator_vs_all_to_order():
 @pytest.mark.basic
 def test_rdts_normal_sextupole_bump():
     df = get_df(n=7)
-    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    df = prepare_twiss_dataframe(df_twiss=df)
     df.loc["3", "K2L"] = 1
     df.loc["5", "K2L"] = -1
 
@@ -82,7 +82,7 @@ def test_rdts_normal_sextupole_bump():
 @pytest.mark.basic
 def test_wrong_rdt_names():
     df = get_df(n=8)
-    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    df = prepare_twiss_dataframe(df_twiss=df)
     with pytest.raises(ValueError):
         calculate_rdts(df, rdts=["F10003", "F1002"])
 
@@ -124,7 +124,7 @@ def test_real_terms_and_hamiltonians():
     np.random.seed(2047294792)
     n=12
     df = get_df(n=n)
-    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    df = prepare_twiss_dataframe(df_twiss=df)
     df.loc[:, "K2L"] = np.random.rand(n)
     df.loc[:, "K2SL"] = np.random.rand(n)
     rdts = ["F1002", "F2001"]
@@ -144,7 +144,7 @@ def test_rdts_save_memory():
     np.random.seed(2047294792)
     n = 10
     df = get_df(n=n)
-    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    df = prepare_twiss_dataframe(df_twiss=df)
     df.loc[:, "K2L"] = np.random.rand(n)
     df.loc[:, "K2SL"] = np.random.rand(n)
 
@@ -157,7 +157,7 @@ def test_rdts_save_memory():
 @pytest.mark.basic
 def test_rdts_skew_octupole_bump():
     df = get_df(n=8)
-    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    df = prepare_twiss_dataframe(df_twiss=df)
     df.loc["3", "K3SL"] = 1
     df.loc["5", "K3SL"] = -1
 
@@ -170,9 +170,9 @@ def test_rdts_skew_octupole_bump():
 
 
 @pytest.mark.basic
-def test_rdts_normal_octuple_to_sextupole_feeddown():
+def test_rdts_normal_octupole_to_sextupole_feeddown():
     df = get_df(n=15)
-    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    df = prepare_twiss_dataframe(df_twiss=df)
     df_comp = df.copy()
 
     df.loc["3", "K3L"] = 1
@@ -214,7 +214,7 @@ def test_rdts_normal_octuple_to_sextupole_feeddown():
 @pytest.mark.basic
 def test_rdts_normal_dodecapole_to_octupole_feeddown():
     df = get_df(n=7)
-    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    df = prepare_twiss_dataframe(df_twiss=df)
     df_comp = df.copy()
 
     df.loc["3", "K5L"] = 1
@@ -267,7 +267,7 @@ def test_coupling_bump_sextupole_rdts():
     input_dir = INPUT / "coupling_bump"
     df_twiss = tfs.read(input_dir / "twiss.lhc.b1.coupling_bump.tfs", index=NAME)
     df_ptc_rdt = tfs.read(input_dir / "ptc_rdt.lhc.b1.coupling_bump.tfs", index=NAME)
-    df_twiss = prepare_twiss_dataframe(beam=1, df_twiss=df_twiss)
+    df_twiss = prepare_twiss_dataframe(df_twiss=df_twiss)
     rdt_names = ["F1002", "F3000"]
     df_rdt = calculate_rdts(df_twiss, rdt_names)
 

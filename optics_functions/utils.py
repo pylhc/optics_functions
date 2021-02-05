@@ -24,9 +24,11 @@ D = DELTA_ORBIT
 # DataFrames -------------------------------------------------------------------
 
 
-def prepare_twiss_dataframe(beam: int,
-                            df_twiss: TfsDataFrame, df_errors: pd.DataFrame = None,
-                            max_order: int = 16, join: str = "inner") -> TfsDataFrame:
+def prepare_twiss_dataframe(df_twiss: TfsDataFrame,
+                            df_errors: pd.DataFrame = None,
+                            invert_signs_madx=False,
+                            max_order: int = 16,
+                            join: str = "inner") -> TfsDataFrame:
     """ Prepare dataframe to use with the optics functions.
 
     - Adapt Beam 4 signs.
@@ -34,18 +36,20 @@ def prepare_twiss_dataframe(beam: int,
     - Merge optics and error dataframes (add values).
 
     Args:
-        beam (int): Beam that is being used. 1,2 or 4. Only 4 has an effect.
         df_twiss (TfsDataFrame): Twiss-optics DataFrame
         df_errors (DataFrame): Twiss-errors DataFrame (optional)
+        invert_signs_madx (bool): Inverts signs after the madx-convention for beam 4.
+                                  That is, if you use beam 4 you should set this
+                                  flag to True to convert beam 4 to beam 2 signs.
         max_order (int): Maximum field order to be still included (1==Dipole)
         join (str): How to join elements of optics and errors. "inner" or "outer".
 
     Returns:
         TfsDataFrame with necessary columns added. If a merge happened, only the
-        neccessary columns are present.
+        necessary columns are present.
     """
     df_twiss = df_twiss.copy()  # As data is moved around
-    if beam == 4:
+    if invert_signs_madx:
         df_twiss, df_errors = switch_signs_for_beam4(df_twiss, df_errors)
 
     df_twiss = set_name_index(df_twiss, "twiss")

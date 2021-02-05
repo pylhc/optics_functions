@@ -1,5 +1,5 @@
-Biblioraphy
-***********
+Bibliography
+************
 
 
 .. [CalagaBetatronCoupling2005]

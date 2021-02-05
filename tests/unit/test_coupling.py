@@ -38,7 +38,7 @@ def test_real_option():
     n = 7
     np.random.seed(474987942)
     df = get_df(n)
-    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    df = prepare_twiss_dataframe(df_twiss=df)
     df.loc[:, "K1L"] = np.random.rand(n)
     df.loc[:, "K1SL"] = np.random.rand(n)
 
@@ -61,7 +61,7 @@ def test_real_option():
 def test_closest_tune_approach():
     beam = 1
     df_twiss = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b{beam:d}.coupling_bump.tfs", index=NAME)
-    df = prepare_twiss_dataframe(beam=beam, df_twiss=df_twiss, max_order=7)
+    df = prepare_twiss_dataframe(df_twiss=df_twiss, max_order=7)
     df_cmatrix = coupling_from_cmatrix(df)
     df_twiss[COUPLING_RDTS] = df_cmatrix[COUPLING_RDTS]
 
@@ -79,7 +79,7 @@ def test_closest_tune_approach():
 def test_coupling_rdt_bump_cmatrix_compare():
     beam = 1
     df_twiss = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b{beam:d}.coupling_bump.tfs", index=NAME)
-    df = prepare_twiss_dataframe(beam=beam, df_twiss=df_twiss, max_order=7)
+    df = prepare_twiss_dataframe(df_twiss=df_twiss, max_order=7)
     df_rdts = coupling_from_rdts(df)
     df_cmatrix = coupling_from_cmatrix(df)
 
