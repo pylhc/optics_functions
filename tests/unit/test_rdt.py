@@ -80,6 +80,26 @@ def test_rdts_normal_sextupole_bump():
 
 
 @pytest.mark.basic
+def test_real_terms_and_hamiltonians():
+    np.random.seed(2047294792)
+    n=12
+    df = get_df(n=n)
+    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    df.loc[:, "K2L"] = np.random.rand(n)
+    df.loc[:, "K2SL"] = np.random.rand(n)
+    rdts = ["F1002", "F2001"]
+    df_rdts = calculate_rdts(df, rdts=rdts, real=True, hamiltionian_terms=True)
+
+    n_rdts = len(rdts)
+    assert all(np.real(df_rdts) == df_rdts)
+    assert len(df_rdts.columns) == 4 * n_rdts
+    assert df_rdts.columns.str.match(f".+{REAL}$").sum() == 2*n_rdts
+    assert df_rdts.columns.str.match(f".+{IMAG}$").sum() == 2*n_rdts
+    assert df_rdts.columns.str.match("F").sum() == 2*n_rdts
+    assert df_rdts.columns.str.match("H").sum() == 2*n_rdts
+
+
+@pytest.mark.basic
 def test_rdts_save_memory():
     np.random.seed(2047294792)
     n = 10

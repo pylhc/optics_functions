@@ -128,7 +128,7 @@ def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
         terms = list(rdts)
         if hamiltionian_terms:
             terms += [f2h(rdt) for rdt in rdts]  # F#### -> H####
-        df_res = split_complex_columns(df, terms)
+        df_res = split_complex_columns(df_res, terms)
     return df_res
 
 

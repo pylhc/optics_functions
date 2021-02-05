@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import tfs
 
-from optics_functions.constants import NAME, S, ALPHA, Y, BETA, X, GAMMA
+from optics_functions.constants import NAME, S, ALPHA, Y, BETA, X, GAMMA, REAL, IMAG, TUNE, PHASE_ADV
 from optics_functions.coupling import (closest_tune_approach, coupling_from_rdts,
                                        coupling_from_cmatrix, COUPLING_RDTS)
 from optics_functions.utils import prepare_twiss_dataframe
@@ -16,16 +16,8 @@ INPUT = Path(__file__).parent.parent / "inputs"
 @pytest.mark.basic
 def test_cmatrix():
     n = 5
-    df = tfs.TfsDataFrame(0, index=[str(i) for i in range(n)],
-    columns=[f"{ALPHA}{X}", f"{ALPHA}{Y}", f"{BETA}{X}", f"{BETA}{Y}", "R11", "R12", "R21", "R22"])
     np.random.seed(487423872)
-    r = np.random.rand(n)
-    df[S] = np.linspace(0, n, n)
-    df.loc[:, "R11"] = np.sin(r)
-    df.loc[:, "R22"] = r
-    df.loc[:, "R21"] = np.cos(r)
-    df.loc[:, "R12"] = -r
-    df.loc[:, [f"{BETA}{X}", f"{BETA}{Y}"]] = 1
+    df = get_df(n)
 
     df_res = coupling_from_cmatrix(df)
     assert all(c in df_res.columns for c in ("F1001", "F1010", "C11", "C12", "C21", "C22", GAMMA))
@@ -42,12 +34,36 @@ def test_cmatrix():
 
 
 @pytest.mark.basic
+def test_real_option():
+    n = 7
+    np.random.seed(474987942)
+    df = get_df(n)
+    df = prepare_twiss_dataframe(beam=1, df_twiss=df)
+    df.loc[:, "K1L"] = np.random.rand(n)
+    df.loc[:, "K1SL"] = np.random.rand(n)
+
+    df_cmatrix = coupling_from_cmatrix(df, real=True)
+    df_rdts = coupling_from_rdts(df, qx=1.31,  qy=1.32, real=True)
+
+    assert all(np.real(df_cmatrix) == df_cmatrix)
+    assert all(np.real(df_rdts) == df_rdts)
+    columns = [f"{c}{r}" for c in COUPLING_RDTS for r in (REAL, IMAG)]
+    assert df_rdts[columns].all().all()
+    assert df_cmatrix[columns].all().all()
+
+    assert df_cmatrix.columns.str.match(f".+{REAL}$").sum() == 2
+    assert df_cmatrix.columns.str.match(f".+{IMAG}$").sum() == 2
+    assert df_rdts.columns.str.match(f".+{REAL}$").sum() == 2
+    assert df_rdts.columns.str.match(f".+{IMAG}$").sum() == 2
+
+
+@pytest.mark.basic
 def test_closest_tune_approach():
     beam = 1
     df_twiss = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b{beam:d}.coupling_bump.tfs", index=NAME)
     df = prepare_twiss_dataframe(beam=beam, df_twiss=df_twiss, max_order=7)
     df_cmatrix = coupling_from_cmatrix(df)
-    df_twiss[list(COUPLING_RDTS)] = df_cmatrix[list(COUPLING_RDTS)]
+    df_twiss[COUPLING_RDTS] = df_cmatrix[COUPLING_RDTS]
 
     res = dict().fromkeys(('calaga', 'franchi', 'persson', 'persson_alt'))
     for method in res.keys():
@@ -76,6 +92,35 @@ def test_coupling_rdt_bump_cmatrix_compare():
 
 
 # Helper -----------------------------------------------------------------------
+
+
+def get_df(n):
+    qx, qy = 1.31, 1.32
+    df = tfs.TfsDataFrame(0,
+                          index=[str(i) for i in range(n)],
+                          columns=[
+                              S,
+                              f"{ALPHA}{X}", f"{ALPHA}{Y}",
+                              f"{BETA}{X}", f"{BETA}{Y}",
+                              f"{PHASE_ADV}{X}", f"{PHASE_ADV}{Y}",
+                              "R11", "R12", "R21", "R22"],
+                          headers={f"{TUNE}1": qx,
+                                   f"{TUNE}2": qy
+                                   }
+                          )
+
+    df[S] = np.linspace(0, n, n)
+    r = np.random.rand(n)
+    df[S] = np.linspace(0, n, n)
+    df.loc[:, "R11"] = np.sin(r)
+    df.loc[:, "R22"] = r
+    df.loc[:, "R21"] = np.cos(r)
+    df.loc[:, "R12"] = -r
+    df[f"{PHASE_ADV}{X}"] = np.linspace(0, qx, n+1)[:n]
+    df[f"{PHASE_ADV}{Y}"] = np.linspace(0, qy, n+1)[:n]
+    df.loc[:, [f"{BETA}{X}", f"{BETA}{Y}"]] = 1
+    return df
+
 
 def err_rel(a, b):
     return np.abs((a-b)/b)

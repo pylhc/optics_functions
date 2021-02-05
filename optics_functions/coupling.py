@@ -18,7 +18,7 @@ from optics_functions.constants import (ALPHA, BETA, GAMMA,
 from optics_functions.rdt import calculate_rdts
 from optics_functions.utils import split_complex_columns, timeit
 
-COUPLING_RDTS = ('F1001', 'F1010')
+COUPLING_RDTS = ['F1001', 'F1010']
 
 
 LOG = logging.getLogger(__name__)
