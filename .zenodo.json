@@ -8,6 +8,15 @@
       "name": "Joschua Dilly",
       "affiliation": "CERN",
       "orcid": "0000-0001-7864-5448"
+    },
+    {
+      "name": "Rogelio Tomas Garcia",
+      "affiliation": "CERN",
+      "orcid": "0000-0002-9857-1703"
+    },
+    {
+      "name": "Tobias Persson",
+      "affiliation": "CERN",
     }
   ],
   "title": "optics_functions",
