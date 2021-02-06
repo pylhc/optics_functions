@@ -26,7 +26,7 @@ D = DELTA_ORBIT
 
 def prepare_twiss_dataframe(df_twiss: TfsDataFrame,
                             df_errors: pd.DataFrame = None,
-                            invert_signs_madx=False,
+                            invert_signs_madx: bool = False,
                             max_order: int = 16,
                             join: str = "inner") -> TfsDataFrame:
     """ Prepare dataframe to use with the optics functions.
@@ -36,12 +36,12 @@ def prepare_twiss_dataframe(df_twiss: TfsDataFrame,
     - Merge optics and error dataframes (add values).
 
     Args:
-        df_twiss (TfsDataFrame): Twiss-optics DataFrame
-        df_errors (DataFrame): Twiss-errors DataFrame (optional)
+        df_twiss (TfsDataFrame): Twiss-optics DataFrame.
+        df_errors (DataFrame): Twiss-errors DataFrame (optional).
         invert_signs_madx (bool): Inverts signs after the madx-convention for beam 4.
                                   That is, if you use beam 4 you should set this
                                   flag to True to convert beam 4 to beam 2 signs.
-        max_order (int): Maximum field order to be still included (1==Dipole)
+        max_order (int): Maximum field order to be still included (1==Dipole).
         join (str): How to join elements of optics and errors. "inner" or "outer".
 
     Returns:
@@ -49,13 +49,14 @@ def prepare_twiss_dataframe(df_twiss: TfsDataFrame,
         necessary columns are present.
     """
     df_twiss = df_twiss.copy()  # As data is moved around
+
     if invert_signs_madx:
         df_twiss, df_errors = switch_signs_for_beam4(df_twiss, df_errors)
 
     df_twiss = set_name_index(df_twiss, "twiss")
-
     k_columns = [f"K{n}{s}L" for n in range(max_order) for s in ("S", "")]
     orbit_columns = list(PLANES)
+
     if df_errors is None:
         return add_missing_columns(df_twiss, k_columns + orbit_columns)
 
@@ -97,7 +98,7 @@ def split_complex_columns(df: pd.DataFrame, columns: Sequence[str],
     Args:
         df (TfsDataFrame): DataFrame containing the original columns.
         columns (Sequence[str]): List of column names to be replaced.
-        drop (bool): Original columns are not present in resulting DataFrame
+        drop (bool): Original columns are not present in resulting DataFrame.
 
     Returns:
         Original TfsDataFrame with added columns.
@@ -112,7 +113,8 @@ def split_complex_columns(df: pd.DataFrame, columns: Sequence[str],
     return df
 
 
-def switch_signs_for_beam4(df_twiss: pd.DataFrame, df_errors: pd.DataFrame = None) -> Tuple[TfsDataFrame, TfsDataFrame]:
+def switch_signs_for_beam4(df_twiss: pd.DataFrame,
+                           df_errors: pd.DataFrame = None) -> Tuple[TfsDataFrame, TfsDataFrame]:
     """ Switch the signs for Beam 4 optics.
     This is due to the switch in direction for this beam and
     (anti-) symmetry after a rotation of 180deg around the y-axis of magnets,
@@ -149,10 +151,10 @@ def get_all_phase_advances(df: pd.DataFrame) -> dict:
     Will result in a elements x elements matrix, that might be very large!
 
     Args:
-        df (DataFrame): DataFrame with phase advance columns (MUX, MUY)
+        df (DataFrame): DataFrame with phase advance columns (MUX, MUY).
 
     Returns:
-        Dictionary with DataFrame matrices similar to dmu(i,j) = mu(j) - mu(i)
+        Dictionary with DataFrame matrices similar to dmu(i,j) = mu(j) - mu(i).
     """
     LOG.debug("Calculating Phase Advances:")
     phase_advance_dict = dict.fromkeys(PLANES)
@@ -171,34 +173,34 @@ def get_all_phase_advances(df: pd.DataFrame) -> dict:
 
 
 def dphi(data: np.ndarray, q: float) -> np.ndarray:
-    """ Return dphi from phase advances in data, see Eq. 8 in [FranchiAnalyticFormulas2017]_
+    """ Return dphi from phase advances in data, see Eq. (8) in [FranchiAnalyticFormulas2017]_ .
 
     Args:
         data (DataFrame, Series): Phase-Advance data.
-        q: Tune
+        q: Tune.
 
     Returns:
-        dphi's in matrix of shape of data
+        dphi's in matrix of shape of data.
     """
     return data + np.where(data <= 0, q, 0)  # '<=' seems to be what MAD-X does
 
 
 def tau(data: np.ndarray, q: float) -> np.ndarray:
-    """Return tau from phase advances in data, see Eq. 16 in [FranchiAnalyticFormulas2017]_
+    """Return tau from phase advances in data, see Eq. (16) in [FranchiAnalyticFormulas2017]_ .
 
     Args:
         data (DataFrame, Series, Array): Phase-Advance data.
-        q: Tune
+        q: Tune.
 
     Returns:
-        tau's in matrix of shape of data
+        tau's in matrix of shape of data.
     """
     return data + np.where(data <= 0, q / 2, -q / 2)  # '<=' seems to be what MAD-X does
 
 
 def dphi_at_element(df: pd.DataFrame, element: str, qx: float, qy: float) -> dict:
     """ Return dphis for both planes at the given element.
-    See Eq. 8 in [FranchiAnalyticFormulas2017]_
+    See Eq. (8) in [FranchiAnalyticFormulas2017]_ .
 
     Args:
         df (DataFrame): DataFrame containing the Phase-Advance columns for both planes.
@@ -214,7 +216,7 @@ def dphi_at_element(df: pd.DataFrame, element: str, qx: float, qy: float) -> dic
         phases = df[f"{PHASE_ADV}{plane}"]
         phase_advance_dict[plane] = pd.concat(
             [
-                (phases[element] - phases.loc[:element])[:-1],  #  only until element
+                (phases[element] - phases.loc[:element])[:-1],  # only until element
                 (phases[element] - phases.loc[element:] + tune),
             ]
         )
@@ -223,10 +225,10 @@ def dphi_at_element(df: pd.DataFrame, element: str, qx: float, qy: float) -> dic
 
 def add_missing_columns(df: pd.DataFrame, columns: Iterable) -> pd.DataFrame:
     """ Check if `columns` are in `df` and add them all zero if not."""
-    for c in columns:
-        if c not in df.columns:
-            LOG.debug(f"Added {c:s} with all zero to data-frame.")
-            df[c] = 0.0
+    for col in columns:
+        if col not in df.columns:
+            LOG.debug(f"Added {col:s} with all zero to data-frame.")
+            df[col] = 0.0
     return df
 
 
@@ -263,7 +265,7 @@ def get_format_keys(format_str: str) -> list:
 
 
 def seq2str(sequence: Iterable) -> str:
-    """ Converts an Iterable to string of it's comma separated elements. """
+    """ Converts an Iterable to string of its comma separated elements. """
     return ", ".join(str(item) for item in sequence)
 
 
