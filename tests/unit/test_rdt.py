@@ -128,7 +128,7 @@ def test_real_terms_and_hamiltonians():
     df.loc[:, "K2L"] = np.random.rand(n)
     df.loc[:, "K2SL"] = np.random.rand(n)
     rdts = ["F1002", "F2001"]
-    df_rdts = calculate_rdts(df, rdts=rdts, real=True, hamiltionian_terms=True)
+    df_rdts = calculate_rdts(df, rdts=rdts, complex_columns=False, hamiltionian_terms=True)
 
     n_rdts = len(rdts)
     assert all(np.real(df_rdts) == df_rdts)

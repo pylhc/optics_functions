@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
 
 def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
                    qx: float = None, qy: float = None, feeddown: int = 0,
-                   real: bool = False, loop_phases=False,
+                   complex_columns: bool = True, loop_phases: bool = False,
                    hamiltionian_terms: bool = False) -> TfsDataFrame:
     """ Calculates the Resonance Driving Terms.
 
@@ -36,7 +36,8 @@ def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
         qx (float): Tune in X-Plane (if not given df.Q1 is assumed present)
         qy (float): Tune in Y-Plane (if not given df.Q2 is assumed present)
         feeddown (int): Levels of feed-down to include.
-        real (bool): Split complex columns into two real-valued columns.
+        complex_columns (bool): Output complex values in single column of type complex.
+                        If ``False``, split complex columns into two real-valued columns.
         loop_phases (bool): Loop over elements when calculating phase-advances.
                             Might be slower for small number of elements, but
                             allows for large (e.g. sliced) optics.
@@ -124,7 +125,7 @@ def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
 
                     if hamiltionian_terms:
                         df_res[f2h(rdt)] = h_jklm
-    if real:
+    if not complex_columns:
         terms = list(rdts)
         if hamiltionian_terms:
             terms += [f2h(rdt) for rdt in rdts]  # F#### -> H####

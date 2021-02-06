@@ -89,7 +89,7 @@ df_twiss = prepare_twiss_dataframe(df_twiss=df_twiss, df_errors=None, max_order=
 df_rdts = calculate_rdts(df_twiss, rdts=rdts,
                          loop_phases=True,  # loop over phase-advance calculation, slower but saves memory
                          feeddown=2,  # include feed-down up to this order
-                         real=False,  # complex output
+                         complex_columns=True,  # complex output
                          )
 
 # do something with the rdts.

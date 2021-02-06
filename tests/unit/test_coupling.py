@@ -34,7 +34,7 @@ def test_cmatrix():
 
 
 @pytest.mark.basic
-def test_real_option():
+def test_real_output():
     n = 7
     np.random.seed(474987942)
     df = get_df(n)
@@ -42,8 +42,8 @@ def test_real_option():
     df.loc[:, "K1L"] = np.random.rand(n)
     df.loc[:, "K1SL"] = np.random.rand(n)
 
-    df_cmatrix = coupling_from_cmatrix(df, real=True)
-    df_rdts = coupling_from_rdts(df, qx=1.31,  qy=1.32, real=True)
+    df_cmatrix = coupling_from_cmatrix(df, complex_columns=False)
+    df_rdts = coupling_from_rdts(df, qx=1.31, qy=1.32, complex_columns=False)
 
     assert all(np.real(df_cmatrix) == df_cmatrix)
     assert all(np.real(df_rdts) == df_rdts)

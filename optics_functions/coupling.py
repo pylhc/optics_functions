@@ -24,7 +24,7 @@ COUPLING_RDTS = ["F1001", "F1010"]
 LOG = logging.getLogger(__name__)
 
 
-def coupling_from_rdts(df: TfsDataFrame, real: bool = False, **kwargs):
+def coupling_from_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs):
     """ Returns the coupling term.
 
     .. warning::
@@ -34,7 +34,8 @@ def coupling_from_rdts(df: TfsDataFrame, real: bool = False, **kwargs):
 
     Args:
         df (TfsDataFrame): Twiss Dataframe
-        real (bool): Split complex columns into two real-valued columns.
+        complex_columns (bool): Output complex values in single column of type complex.
+                       If ``False``, split complex columns into two real-valued columns.
 
     Keyword Args:
         **kwargs: Remaining arguments from :func:`~optics_functions.rdt.rdts`
@@ -48,27 +49,28 @@ def coupling_from_rdts(df: TfsDataFrame, real: bool = False, **kwargs):
     for rdt in COUPLING_RDTS:
         df_res.loc[:, rdt].to_numpy().real *= -1  # definition, also: sets value in dataframe
 
-    if real:
+    if not complex_columns:
         df_res = split_complex_columns(df_res, COUPLING_RDTS)
 
     return df_res
 
 
-def coupling_from_cmatrix(df: TfsDataFrame, real: bool = False,
+def coupling_from_cmatrix(df: TfsDataFrame, complex_columns: bool = True,
                           output: Sequence[str] = ("rdts", "gamma", "cmatrix")):
     """ Calculates C matrix then Coupling and Gamma from it.
     See [CalagaBetatronCoupling2005]_ .
 
     Args:
         df (TfsDataFrame): Twiss Dataframe
-        real (bool): Split complex columns into two real-valued columns.
+        complex_columns (bool): Output complex values in single column of type complex.
+                        If ``False``, split complex columns into two real-valued columns.
         output (Sequence[str]): Combination of 'rdts', 'gamma' and 'cmatrix'.
                             Specifies which parameters one wants to output.
 
     Returns:
         New TfsDataFrame with columns as specified in 'output'.
     """
-    LOG.debug("Calculating CMatrix.")
+    LOG.info("Calculating coupling from c-matrix.")
     df_res = TfsDataFrame(index=df.index)
 
     with timeit("CMatrix calculation", print_fun=LOG.debug):
@@ -107,7 +109,7 @@ def coupling_from_cmatrix(df: TfsDataFrame, real: bool = False,
         LOG.info(f"Average coupling amplitude |F1001|: {df_res['F1001'].abs().mean():g}")
         LOG.info(f"Average coupling amplitude |F1010|: {df_res['F1010'].abs().mean():g}")
 
-        if real:
+        if not complex_columns:
             df_res = split_complex_columns(df_res, COUPLING_RDTS)
 
     if "cmatrix" in output:
