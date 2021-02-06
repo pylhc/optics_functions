@@ -8,7 +8,7 @@ Calculations of Resonance Driving Terms.
 import itertools
 import logging
 from math import factorial
-from typing import Tuple, Sequence, List
+from typing import Tuple, Sequence, List, Union
 
 import numpy as np
 import pandas as pd
@@ -24,21 +24,19 @@ LOG = logging.getLogger(__name__)
 
 def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
                    qx: float = None, qy: float = None, feeddown: int = 0,
-                   complex_columns: bool = True, loop_phases: bool = False,
+                   real: bool = False, loop_phases: bool = False,
                    hamiltionian_terms: bool = False) -> TfsDataFrame:
     """ Calculates the Resonance Driving Terms.
 
-    Eq. A8 in [FranchiAnalyticFormulas2017]_
+    Eq. (A8) in [FranchiAnalyticFormulas2017]_ .
 
     Args:
-        df (TfsDataFrame): Twiss Dataframe
+        df (TfsDataFrame): Twiss Dataframe.
         rdts (Sequence): List of rdt-names to calculate.
-        qx (float): Tune in X-Plane (if not given df.Q1 is assumed present)
-        qy (float): Tune in Y-Plane (if not given df.Q2 is assumed present)
+        qx (float): Tune in X-Plane (if not given, header df.Q1 is assumed present).
+        qy (float): Tune in Y-Plane (if not given, header df.Q2 is assumed present).
         feeddown (int): Levels of feed-down to include.
-        complex_columns (bool): Output complex values in single column of type complex.
-                                If ``False``, split complex columns into two
-                                real-valued columns.
+        real (bool): Split complex columns into two real-valued columns.
         loop_phases (bool): Loop over elements when calculating phase-advances.
                             Might be slower for small number of elements, but
                             allows for large (e.g. sliced) optics.
@@ -52,7 +50,6 @@ def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
         df_res = TfsDataFrame(index=df.index)
         if qx is None:
             qx = df.headers[f"{TUNE}1"]
-
         if qy is None:
             qy = df.headers[f"{TUNE}2"]
 
@@ -65,8 +62,8 @@ def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
                 raise ValueError(f"'{rdt:s}' does not seem to be a valid RDT name.")
 
             j, k, l, m = [int(i) for i in rdt[1:]]
-
             conj_rdt = jklm2str(k, j, m, l)
+
             if conj_rdt in df_res:
                 df_res[rdt] = np.conjugate(df_res[conj_rdt])
             else:
@@ -86,15 +83,17 @@ def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
                     # Magnetic Field Strengths with Feed-Down
                     dx_idy = df[X] + 1j*df[Y]
                     k_complex = pd.Series(0j, index=df.index)  # Complex sum of strenghts (from K_n + iJ_n) and feeddown to them
+
                     for q in range(feeddown+1):
-                        n_mad = n+q-1
+                        n_mad = n + q - 1
                         kl_iksl = df[f"K{n_mad:d}L"] + 1j * df[f"K{n_mad:d}SL"]
                         k_complex += (kl_iksl * (dx_idy**q)) / factorial(q)
 
                     # real(i**lm * k+ij) is equivalent to Omega-function in paper, see Eq.(A11)
                     # pd.Series is needed here, as np.real() returns numpy-array
-                    k_real = pd.Series(np.real(i_pow(lm)*k_complex), index=df.index)
+                    k_real = pd.Series(np.real(i_pow(lm) * k_complex), index=df.index)
                     sources = df.index[k_real != 0]  # other elements do not contribute to integral, speedup summations
+
                     if not len(sources):
                         LOG.warning(f"No sources found for {rdt}. RDT will be zero.")
                         df_res[rdt] = 0j
@@ -126,7 +125,8 @@ def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
 
                     if hamiltionian_terms:
                         df_res[f2h(rdt)] = h_jklm
-    if not complex_columns:
+
+    if real:
         terms = list(rdts)
         if hamiltionian_terms:
             terms += [f2h(rdt) for rdt in rdts]  # F#### -> H####
@@ -134,23 +134,21 @@ def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
     return df_res
 
 
-def get_ac_dipole_rdts(self, order_or_terms, spectral_line, plane, ac_tunes, acd_name):
+def get_ac_dipole_rdts(order_or_terms: Union[int, str, Sequence[str]], spectral_line: Tuple[int],
+                       plane: str, ac_tunes: Tuple[float, float], acd_name: str):
     """ Calculates the Hamiltonian Terms under Forced Motion.
 
     Args:
-        order_or_terms: int, string or list of strings
-            If an int is given all Resonance Driving Terms up to this order
-            will be calculated.
-            The strings are assumed to be the desired driving term names, e.g. "F1001"
-        spectral_line: tuple
-            Needed to determine what phase advance is needed before and
-            after AC dipole location, depends on detal+ and delta-.
-            Sample input: (2,-1)
-        plane: string
-            Either 'H' or 'V' to determine phase term of
-            AC dipole before and after ACD location.
-        ac_tunes: tuple
-            Contains horizontal and vertical AC dipole tunes, i.e. (0.302, 0.33)
+        order_or_terms (Union[int, str, Sequence[str]]): If an int is given all Resonance Driving
+            Terms up to this order will be calculated. The strings are assumed to be the desired
+            driving term names, e.g. "F1001"
+        spectral_line (Tuple[int]): Needed to determine what phase advance is needed before and
+            after AC dipole location, depends on detal+ and delta-. Sample input: (2,-1)
+        plane (str):  Either 'H' or 'V' to determine phase term of AC dipole before and after
+            ACD location.
+        ac_tunes (Tuple[float, float]) Contains horizontal and vertical AC dipole tunes,
+            i.e. (0.302, 0.33)
+        acd_name (str): The AC Dipole element name (?).
     """
     raise NotImplementedError("Todo. Leave it here so it's not forgotten. See (and improve) python2 code!")
 
@@ -161,20 +159,22 @@ def get_all_to_order(n: int) -> List[Tuple[int, int, int, int]]:
     """ Returns list of all valid RDT jklm-tuple of order 2 to n """
     if n <= 1:
         raise ValueError("'n' must be greater 1 for resonance driving terms.")
+
     permut = [x for x in itertools.product(range(n + 1), repeat=4)
               if 1 < sum(x) <= n and not (x[0] == x[1] and x[2] == x[3])]
     return list(sorted(permut, key=sum))
 
 
-def generator(orders: Sequence[int], normal=True, skew=True, complex_conj=True) -> dict:
+def generator(orders: Sequence[int], normal: bool = True,
+              skew: bool = True, complex_conj: bool = True) -> dict:
     """ Generates lists of RDT-4-tuples sorted into a dictionary by order.
 
     Args:
         orders (list): list of orders to be generated. Orders < 2 raise errors.
-        normal (bool): calculate normal RDTs (default: True)
-        skew (bool): calculate skew RDTs (default: True)
+        normal (bool): generate normal RDTs (default: True).
+        skew (bool): generate skew RDTs (default: True).
         complex_conj (bool): Have both, RDT and it's complex conjugate RDT in the list
-                            (default: True)
+                            (default: True).
 
     Returns:
         Dictionary with keys of orders containing lists of 4-Tuples for the RDTs of that order.
@@ -183,7 +183,7 @@ def generator(orders: Sequence[int], normal=True, skew=True, complex_conj=True) 
         raise ValueError("All order must be greater 1 for resonance driving terms.")
 
     if not (normal or skew):
-        raise ValueError("'normal' or 'skew' (or both) must be activated.")
+        raise ValueError("At least one of 'normal' or 'skew' parameters must be True.")
 
     permut = {o: [] for o in orders}
     for x in itertools.product(range(max(orders) + 1), repeat=4):
