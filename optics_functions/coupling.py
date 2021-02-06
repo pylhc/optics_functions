@@ -35,7 +35,8 @@ def coupling_from_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs)
     Args:
         df (TfsDataFrame): Twiss Dataframe
         complex_columns (bool): Output complex values in single column of type complex.
-                       If ``False``, split complex columns into two real-valued columns.
+                                If ``False``, split complex columns into
+                                two real-valued columns.
 
     Keyword Args:
         **kwargs: Remaining arguments from :func:`~optics_functions.rdt.rdts`
@@ -63,7 +64,8 @@ def coupling_from_cmatrix(df: TfsDataFrame, complex_columns: bool = True,
     Args:
         df (TfsDataFrame): Twiss Dataframe
         complex_columns (bool): Output complex values in single column of type complex.
-                        If ``False``, split complex columns into two real-valued columns.
+                                If ``False``, split complex columns into two
+                                real-valued columns.
         output (Sequence[str]): Combination of 'rdts', 'gamma' and 'cmatrix'.
                             Specifies which parameters one wants to output.
 

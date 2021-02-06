@@ -37,7 +37,8 @@ def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
         qy (float): Tune in Y-Plane (if not given df.Q2 is assumed present)
         feeddown (int): Levels of feed-down to include.
         complex_columns (bool): Output complex values in single column of type complex.
-                        If ``False``, split complex columns into two real-valued columns.
+                                If ``False``, split complex columns into two
+                                real-valued columns.
         loop_phases (bool): Loop over elements when calculating phase-advances.
                             Might be slower for small number of elements, but
                             allows for large (e.g. sliced) optics.
