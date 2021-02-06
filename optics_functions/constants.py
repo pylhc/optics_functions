@@ -5,6 +5,7 @@ Constants
 Constants for the optics functions.
 """
 import numpy as np
+
 PI = np.pi
 PI2 = 2 * np.pi
 PI2I = 2j * np.pi
@@ -18,19 +19,19 @@ S = "S"
 ALPHA = "ALF"
 BETA = "BET"
 GAMMA = "GAMMA"
-AMPLITUDE = 'AMP'
-PHASE = 'PHASE'
-PHASE_ADV = 'MU'
+AMPLITUDE = "AMP"
+PHASE = "PHASE"
+PHASE_ADV = "MU"
 DISPERSION = "D"
 CHROM_TERM = "CHROM"
 
 X, Y = PLANES
 
-TUNE = 'Q'
+TUNE = "Q"
 
 # Column Pre- and Suffixes ---
-REAL = 'REAL'
-IMAG = 'IMAG'
+REAL = "REAL"
+IMAG = "IMAG"
 DELTA = "DELTA"
 DELTA_ORBIT = "D"  # MAD-X
 MINIMUM = "MIN"

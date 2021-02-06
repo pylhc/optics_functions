@@ -18,7 +18,7 @@ from optics_functions.constants import (ALPHA, BETA, GAMMA,
 from optics_functions.rdt import calculate_rdts
 from optics_functions.utils import split_complex_columns, timeit
 
-COUPLING_RDTS = ['F1001', 'F1010']
+COUPLING_RDTS = ["F1001", "F1010"]
 
 
 LOG = logging.getLogger(__name__)
@@ -39,10 +39,10 @@ def coupling_from_rdts(df: TfsDataFrame, real: bool = False, **kwargs):
     Keyword Args:
         **kwargs: Remaining arguments from :func:`~optics_functions.rdt.rdts`
                   i.e. ``qx``, ``qy``, ``feeddown``, ``loop_phases``
-                  and ``hamiltionian_terms``
+                  and ``hamiltionian_terms``.
 
     Returns:
-        New TfsDataFrame with Coupling Columns
+        New TfsDataFrame with Coupling Columns.
     """
     df_res = calculate_rdts(df, rdts=COUPLING_RDTS, **kwargs)
     for rdt in COUPLING_RDTS:
@@ -56,13 +56,13 @@ def coupling_from_rdts(df: TfsDataFrame, real: bool = False, **kwargs):
 
 def coupling_from_cmatrix(df: TfsDataFrame, real=False,
                           output: Sequence[str] = ("rdts", "gamma", "cmatrix")):
-    """ Calculates C matrix and Coupling and Gamma from it.
-    See [CalagaBetatronCoupling2005]_
+    """ Calculates C matrix then Coupling and Gamma from it.
+    See [CalagaBetatronCoupling2005]_ .
 
     Args:
         df (TfsDataFrame): Twiss Dataframe
         real (bool): Split complex columns into two real-valued columns.
-        output (list[str]): Combination of 'rdts', 'gamma' and 'cmatrix'.
+        output (Sequence[str]): Combination of 'rdts', 'gamma' and 'cmatrix'.
                             Specifies which parameters one wants to output.
 
     Returns:
@@ -70,9 +70,10 @@ def coupling_from_cmatrix(df: TfsDataFrame, real=False,
     """
     LOG.debug("Calculating CMatrix.")
     df_res = TfsDataFrame(index=df.index)
+
     with timeit("CMatrix calculation", print_fun=LOG.debug):
         n = len(df)
-        gx, r, igy = np.zeros((n, 2, 2)), np.zeros((n, 2, 2)), np.zeros((n, 2, 2))
+        gx, r, inv_gy = np.zeros((n, 2, 2)), np.zeros((n, 2, 2)), np.zeros((n, 2, 2))
 
         # rs form after -J R^T J == inv(R)*det|R| == C
         r[:, 0, 0] = df["R22"]
@@ -82,7 +83,7 @@ def coupling_from_cmatrix(df: TfsDataFrame, real=False,
 
         r *= 1 / np.sqrt(1 + np.linalg.det(r)[:, None, None])
 
-        # Cbar = Gx * C * Gy^-1
+        # Cbar = Gx * C * Gy^-1  (Eq. (5) in reference)
         sqrtbetax = np.sqrt(df[f"{BETA}{X}"])
         sqrtbetay = np.sqrt(df[f"{BETA}{Y}"])
 
@@ -90,11 +91,11 @@ def coupling_from_cmatrix(df: TfsDataFrame, real=False,
         gx[:, 1, 0] = df[f"{ALPHA}{X}"] * gx[:, 0, 0]
         gx[:, 1, 1] = sqrtbetax
 
-        igy[:, 1, 1] = 1 / sqrtbetay
-        igy[:, 1, 0] = -df[f"{ALPHA}{Y}"] * igy[:, 1, 1]
-        igy[:, 0, 0] = sqrtbetay
+        inv_gy[:, 1, 1] = 1 / sqrtbetay
+        inv_gy[:, 1, 0] = -df[f"{ALPHA}{Y}"] * inv_gy[:, 1, 1]
+        inv_gy[:, 0, 0] = sqrtbetay
 
-        c = np.matmul(gx, np.matmul(r, igy))
+        c = np.matmul(gx, np.matmul(r, inv_gy))
         gamma = np.sqrt(1 - np.linalg.det(c))
 
     if "rdts" in output:
@@ -122,7 +123,7 @@ def coupling_from_cmatrix(df: TfsDataFrame, real=False,
     return df_res
 
 
-def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, method: str = 'calaga'):
+def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, method: str = "calaga"):
     """ Calculates the closest tune approach from coupling resonances.
 
     A complex F1001 column is assumed to be present in the DataFrame.
@@ -131,12 +132,12 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, 
     :func:`~optics_functions.coupling.coupling_from_cmatrix`.
     If F1010 is also present it is used, otherwise assumed 0.
 
-    The closest tune approach is calculated by means of
-    Eq. (27) in [CalagaBetatronCoupling2005]_ ('calaga')
-    by default, or approximated by
-    Eq. (1) in [PerssonImprovedControlCoupling2014]_ ('franchi')
-    or Eq. (2) in [PerssonImprovedControlCoupling2014]_ ('persson')
-    or the latter without the exp(i(Qx-Qy)s/R) term ('persson_alt').
+    The closest tune approach is calculated by means of Eq. (27) in
+    [CalagaBetatronCoupling2005]_ (method='calaga') by default,
+    or approximated by Eq. (1) in [PerssonImprovedControlCoupling2014]_
+    (method='franchi') or Eq. (2) in [PerssonImprovedControlCoupling2014]_
+    (method='persson') or the latter without the exp(i(Qx-Qy)s/R) term
+    (method='persson_alt').
 
     For the 'persson' and 'persson_alt' methods, also MUX and MUY columns
     are needed in the DataFrame as well as LENGTH (of the machine) and S column
@@ -144,65 +145,65 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, 
 
     Args:
         df (TfsDataFrame): Twiss Dataframe, needs to have complex-valued F1001 column.
-        qx (float): Tune in X-Plane (if not given df.Q1 is assumed present)
-        qy (float): Tune in Y-Plane (if not given df.Q2 is assumed present)
+        qx (float): Tune in X-Plane (if not given, header df.Q1 is assumed present).
+        qy (float): Tune in Y-Plane (if not given, header df.Q2 is assumed present).
         method (str): Which method to use for evaluation.
-                      Choices: 'calaga', 'franchi', 'perrson' and 'persson_alt'.
+                      Choices: 'calaga', 'franchi', 'persson' and 'persson_alt'.
 
     Returns:
         New DataFrame with closest tune approach (DELTAQMIN) column.
         The value is real for 'calaga' and 'franchi' methods,
     """
     method_map = {
-        'calaga': _cta_calaga,
-        'franchi': _cta_franchi,
-        'persson': _cta_persson,
-        'persson_alt': _cta_persson_alt,
+        "calaga": _cta_calaga,
+        "franchi": _cta_franchi,
+        "persson": _cta_persson,
+        "persson_alt": _cta_persson_alt,
     }
     if qx is None:
         qx = df.headers[f"{TUNE}1"]
-
     if qy is None:
         qy = df.headers[f"{TUNE}2"]
-    qx, qy = qx % 1, qy % 1
 
-    dqmin = f"{DELTA}{TUNE}{MINIMUM}"
-    df_res = TfsDataFrame(index=df.index, columns=[dqmin])
-    df_res[dqmin] = method_map[method.lower()](df, qx, qy)
+    qx_frac, qy_frac = qx % 1, qy % 1
 
-    LOG.info(f"({method}) |C-| = {np.abs(df_res[dqmin].mean())}")
+    dqmin_str = f"{DELTA}{TUNE}{MINIMUM}"
+    df_res = TfsDataFrame(index=df.index, columns=[dqmin_str])
+    df_res[dqmin_str] = method_map[method.lower()](df, qx_frac, qy_frac)
+
+    LOG.info(f"({method}) |C-| = {np.abs(df_res[dqmin_str].mean())}")
     return df_res
 
 
-def _cta_franchi(df, qx, qy):
+def _cta_franchi(df, qx_frac, qy_frac):
     """ Closest tune approach calculated by Eq. (1) in [PerssonImprovedControlCoupling2014]_ . """
-    return 4 * (qx - qy) * df['F1001'].abs()
+    return 4 * (qx_frac - qy_frac) * df['F1001'].abs()
 
 
-def _cta_persson_alt(df, qx, qy):
+def _cta_persson_alt(df, qx_frac, qy_frac):
     """ Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ .
 
     The exp(i(Qx-Qy)s/R) term is omitted. """
-    return 4 * (qx - qy) * df['F1001'] * np.exp(-1j*(df[f"{PHASE_ADV}{X}"]-df[f"{PHASE_ADV}{Y}"]))
+    deltaq = qx_frac - qy_frac  # fractional tune split
+    return 4 * deltaq * df['F1001'] * np.exp(-1j * (df[f"{PHASE_ADV}{X}"] - df[f"{PHASE_ADV}{Y}"]))
 
 
-def _cta_persson(df, qx, qy):
+def _cta_persson(df, qx_frac, qy_frac):
     """ Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ . """
-    return 4 * (qx - qy) * df['F1001'] * np.exp(1j *
-           (((qx - qy) * df[S] / (df.headers[LENGTH]/PI2)) - (df[f"{PHASE_ADV}{X}"]-df[f"{PHASE_ADV}{Y}"])))
+    deltaq = qx_frac - qy_frac  # fractional tune split
+    return 4 * deltaq * df['F1001'] * np.exp(1j *
+           ((deltaq * df[S] / (df.headers[LENGTH] / PI2)) - (df[f"{PHASE_ADV}{X}"] - df[f"{PHASE_ADV}{Y}"])))
 
 
-def _cta_calaga(df, qx, qy):
+def _cta_calaga(df, qx_frac, qy_frac):
     """ Closest tune approach calculated by Eq. (27) in [CalagaBetatronCoupling2005]_ .
 
     If F1010 is not given, it is assumed to be zero.
     """
-    f_diff = df["F1001"].abs()**2
+    f_diff = df["F1001"].abs() ** 2
     with suppress(KeyError):
-        f_diff -= df["1010"].abs()**2
+        f_diff -= df["1010"].abs() ** 2
 
-    return ((np.cos(PI2*qx) - np.cos(PI2*qy)) / (np.pi*(np.sin(PI2*qx) + np.sin(PI2*qy)))
+    return ((np.cos(PI2 * qx_frac) - np.cos(PI2 * qy_frac))
+            / (np.pi * (np.sin(PI2 * qx_frac) + np.sin(PI2 * qy_frac)))
             * (4 * np.sqrt(f_diff) / (1 + 4*f_diff)))
-
-
-

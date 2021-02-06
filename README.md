@@ -11,7 +11,8 @@ This package provides functions to calculate various optics parameters from **MA
 ## Getting Started
 
 The package depends heavily on another one of our packages, `tfs-pandas`.
-Installation is easily done via `pip`. The package is then used as `optics_functions`.
+Installation is easily done via `pip`.
+The package is then used as `optics_functions`.
 
 ```
 pip install optics_functions
@@ -27,8 +28,8 @@ pip install optics_functions
 This package serves as a library of functions to calculate various optics parameters such as RDTs and coupling from a MAD-X twiss output.
 The functionality mainly manipulates and returns TFS files or `TfsDataFrame` objects from the `tfs-pandas` package.
 
+### Usage Examples
 
-### Usage Examples 
 Coupling Example:
 
 ```python
@@ -63,7 +64,6 @@ tfs.write("coupling.tfs",
           split_complex_columns(df_coupling, columns=["F1001", "F1010"]),
           save_index="NAME"
           )
-
 ```
 
 RDT Example:
@@ -101,7 +101,6 @@ tfs.write("rdts.tfs",
           split_complex_columns(df_rdts, columns=rdts),
           save_index="NAME"
           )
-
 ```
 
 Appending Example:
@@ -122,7 +121,6 @@ df_twiss = tfs.read("twiss.tfs", index="NAME")
 # calculate coupling from the cmatrix and append to original dataframe
 # output=['rdts'] is used to avoid the output of the gamma and C## columns.
 df_twiss[["F1001", "F1010"]] = coupling_from_cmatrix(df_twiss, output=['rdts'])
-
 ```
 
 ## Quality checks
