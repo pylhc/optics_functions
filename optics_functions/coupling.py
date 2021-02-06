@@ -54,7 +54,7 @@ def coupling_from_rdts(df: TfsDataFrame, real: bool = False, **kwargs):
     return df_res
 
 
-def coupling_from_cmatrix(df: TfsDataFrame, real=False,
+def coupling_from_cmatrix(df: TfsDataFrame, real: bool = False,
                           output: Sequence[str] = ("rdts", "gamma", "cmatrix")):
     """ Calculates C matrix then Coupling and Gamma from it.
     See [CalagaBetatronCoupling2005]_ .
@@ -175,12 +175,12 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, 
     return df_res
 
 
-def _cta_franchi(df, qx_frac, qy_frac):
+def _cta_franchi(df: TfsDataFrame, qx_frac: float, qy_frac: float):
     """ Closest tune approach calculated by Eq. (1) in [PerssonImprovedControlCoupling2014]_ . """
     return 4 * (qx_frac - qy_frac) * df['F1001'].abs()
 
 
-def _cta_persson_alt(df, qx_frac, qy_frac):
+def _cta_persson_alt(df: TfsDataFrame, qx_frac: float, qy_frac: float):
     """ Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ .
 
     The exp(i(Qx-Qy)s/R) term is omitted. """
@@ -188,14 +188,14 @@ def _cta_persson_alt(df, qx_frac, qy_frac):
     return 4 * deltaq * df['F1001'] * np.exp(-1j * (df[f"{PHASE_ADV}{X}"] - df[f"{PHASE_ADV}{Y}"]))
 
 
-def _cta_persson(df, qx_frac, qy_frac):
+def _cta_persson(df: TfsDataFrame, qx_frac: float, qy_frac: float):
     """ Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ . """
     deltaq = qx_frac - qy_frac  # fractional tune split
     return 4 * deltaq * df['F1001'] * np.exp(1j *
            ((deltaq * df[S] / (df.headers[LENGTH] / PI2)) - (df[f"{PHASE_ADV}{X}"] - df[f"{PHASE_ADV}{Y}"])))
 
 
-def _cta_calaga(df, qx_frac, qy_frac):
+def _cta_calaga(df: TfsDataFrame, qx_frac: float, qy_frac: float):
     """ Closest tune approach calculated by Eq. (27) in [CalagaBetatronCoupling2005]_ .
 
     If F1010 is not given, it is assumed to be zero.
