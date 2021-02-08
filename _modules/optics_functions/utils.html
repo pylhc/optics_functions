@@ -1,0 +1,503 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>optics_functions.utils &mdash; optics_functions 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html">
+          
+
+          
+            
+            <img src="../../_static/omc_logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Main Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html">Coupling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html">Resonance Driving Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html">Utilities</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Helper</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../helper/bibliography.html">Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../helper/constants.html">Constants</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optics_functions</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>optics_functions.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for optics_functions.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utilities</span>
+<span class="sd">*********</span>
+
+<span class="sd">Helper functions to prepare the twiss dataframes for use with the optics</span>
+<span class="sd">functions as well as reusable utilities,</span>
+<span class="sd">that are needed within multiple optics calculations.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Iterable</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">tfs</span> <span class="kn">import</span> <span class="n">TfsDataFrame</span>
+
+<span class="kn">from</span> <span class="nn">optics_functions.constants</span> <span class="kn">import</span> <span class="p">(</span><span class="n">REAL</span><span class="p">,</span> <span class="n">IMAG</span><span class="p">,</span> <span class="n">PLANES</span><span class="p">,</span> <span class="n">PHASE_ADV</span><span class="p">,</span>
+                                        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">NAME</span><span class="p">,</span> <span class="n">DELTA_ORBIT</span><span class="p">)</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">D</span> <span class="o">=</span> <span class="n">DELTA_ORBIT</span>
+
+<span class="c1"># DataFrames -------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="prepare_twiss_dataframe"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.prepare_twiss_dataframe">[docs]</a><span class="k">def</span> <span class="nf">prepare_twiss_dataframe</span><span class="p">(</span><span class="n">df_twiss</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span>
+                            <span class="n">df_errors</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="n">invert_signs_madx</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                            <span class="n">max_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+                            <span class="n">join</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inner&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TfsDataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Prepare dataframe to use with the optics functions.</span>
+
+<span class="sd">    - Adapt Beam 4 signs.</span>
+<span class="sd">    - Add missing K(S)L and orbit columns.</span>
+<span class="sd">    - Merge optics and error dataframes (add values).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df_twiss (TfsDataFrame): Twiss-optics DataFrame.</span>
+<span class="sd">        df_errors (DataFrame): Twiss-errors DataFrame (optional).</span>
+<span class="sd">        invert_signs_madx (bool): Inverts signs after the madx-convention for beam 4.</span>
+<span class="sd">                                  That is, if you use beam 4 you should set this</span>
+<span class="sd">                                  flag to True to convert beam 4 to beam 2 signs.</span>
+<span class="sd">        max_order (int): Maximum field order to be still included (1==Dipole).</span>
+<span class="sd">        join (str): How to join elements of optics and errors. &quot;inner&quot; or &quot;outer&quot;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        TfsDataFrame with necessary columns added. If a merge happened, only the</span>
+<span class="sd">        necessary columns are present.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_twiss</span> <span class="o">=</span> <span class="n">df_twiss</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># As data is moved around</span>
+
+    <span class="k">if</span> <span class="n">invert_signs_madx</span><span class="p">:</span>
+        <span class="n">df_twiss</span><span class="p">,</span> <span class="n">df_errors</span> <span class="o">=</span> <span class="n">switch_signs_for_beam4</span><span class="p">(</span><span class="n">df_twiss</span><span class="p">,</span> <span class="n">df_errors</span><span class="p">)</span>
+
+    <span class="n">df_twiss</span> <span class="o">=</span> <span class="n">set_name_index</span><span class="p">(</span><span class="n">df_twiss</span><span class="p">,</span> <span class="s2">&quot;twiss&quot;</span><span class="p">)</span>
+    <span class="n">k_columns</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;K</span><span class="si">{</span><span class="n">n</span><span class="si">}{</span><span class="n">s</span><span class="si">}</span><span class="s2">L&quot;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_order</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)]</span>
+    <span class="n">orbit_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">PLANES</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">df_errors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">add_missing_columns</span><span class="p">(</span><span class="n">df_twiss</span><span class="p">,</span> <span class="n">k_columns</span> <span class="o">+</span> <span class="n">orbit_columns</span><span class="p">)</span>
+
+    <span class="c1"># Merge Dataframes</span>
+    <span class="n">df_errors</span> <span class="o">=</span> <span class="n">df_errors</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df_errors</span> <span class="o">=</span> <span class="n">set_name_index</span><span class="p">(</span><span class="n">df_errors</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">)</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">df_twiss</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df_errors</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="n">join</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">df_twiss</span><span class="o">.</span><span class="n">index</span><span class="p">)):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df_twiss</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">TfsDataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">df_twiss</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="c1"># Merge S column and set zeros in dfs for addition, where elements are missing</span>
+        <span class="k">for</span> <span class="n">df_self</span><span class="p">,</span> <span class="n">df_other</span> <span class="ow">in</span> <span class="p">((</span><span class="n">df_twiss</span><span class="p">,</span> <span class="n">df_errors</span><span class="p">),</span> <span class="p">(</span><span class="n">df_errors</span><span class="p">,</span> <span class="n">df_twiss</span><span class="p">)):</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">S</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_self</span><span class="p">[</span><span class="n">S</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">new_indx</span> <span class="ow">in</span> <span class="n">df_other</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">df_self</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+                <span class="n">df_self</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">new_indx</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">S</span><span class="p">)</span>
+
+    <span class="n">df_twiss</span> <span class="o">=</span> <span class="n">add_missing_columns</span><span class="p">(</span><span class="n">df_twiss</span><span class="p">,</span> <span class="n">k_columns</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">PLANES</span><span class="p">))</span>
+    <span class="n">df_errors</span> <span class="o">=</span> <span class="n">add_missing_columns</span><span class="p">(</span><span class="n">df_errors</span><span class="p">,</span> <span class="n">k_columns</span> <span class="o">+</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">D</span><span class="si">}{</span><span class="n">X</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">D</span><span class="si">}{</span><span class="n">Y</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
+    <span class="n">df_errors</span> <span class="o">=</span> <span class="n">df_errors</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">D</span><span class="si">}{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">PLANES</span><span class="p">})</span>
+
+    <span class="n">add_columns</span> <span class="o">=</span> <span class="n">k_columns</span> <span class="o">+</span> <span class="n">orbit_columns</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">add_columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_twiss</span><span class="p">[</span><span class="n">add_columns</span><span class="p">]</span> <span class="o">+</span> <span class="n">df_errors</span><span class="p">[</span><span class="n">add_columns</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">df_old</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">&quot;twiss&quot;</span><span class="p">,</span> <span class="n">df_twiss</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;errors&quot;</span><span class="p">,</span> <span class="n">df_errors</span><span class="p">)):</span>
+        <span class="n">dropped_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">df_old</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dropped_columns</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The following </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-columns were&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot; dropped on merge: </span><span class="si">{</span><span class="n">seq2str</span><span class="p">(</span><span class="n">dropped_columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="split_complex_columns"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.split_complex_columns">[docs]</a><span class="k">def</span> <span class="nf">split_complex_columns</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                          <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TfsDataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Splits the given complex columns into two real-values columns containing the</span>
+<span class="sd">    real and imaginary parts of the original columns.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (TfsDataFrame): DataFrame containing the original columns.</span>
+<span class="sd">        columns (Sequence[str]): List of column names to be replaced.</span>
+<span class="sd">        drop (bool): Original columns are not present in resulting DataFrame.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Original TfsDataFrame with added columns.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column</span><span class="si">}{</span><span class="n">REAL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">])</span>
+        <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column</span><span class="si">}{</span><span class="n">IMAG</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">drop</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="switch_signs_for_beam4"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.switch_signs_for_beam4">[docs]</a><span class="k">def</span> <span class="nf">switch_signs_for_beam4</span><span class="p">(</span><span class="n">df_twiss</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                           <span class="n">df_errors</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">TfsDataFrame</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot; Switch the signs for Beam 4 optics.</span>
+<span class="sd">    This is due to the switch in direction for this beam and</span>
+<span class="sd">    (anti-) symmetry after a rotation of 180deg around the y-axis of magnets,</span>
+<span class="sd">    combined with the fact that the KL values in MAD-X twiss do not change sign,</span>
+<span class="sd">    but in the errors they do (otherwise it would compensate).</span>
+<span class="sd">    Magnet orders that show anti-symmetry are: a1 (K0SL), b2 (K1L), a3 (K2SL), b4 (K3L) etc.</span>
+<span class="sd">    Also the sign for (delta) X is switched back to have the same orientation as beam2.&quot;&quot;&quot;</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Switching signs for X and K(S)L values when needed, to match Beam 4 to Beam 2.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">df_twiss</span><span class="p">,</span> <span class="n">df_errors</span> <span class="o">=</span> <span class="n">df_twiss</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">df_errors</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df_twiss</span><span class="p">[</span><span class="n">X</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">df_twiss</span><span class="p">[</span><span class="n">X</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">df_errors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df_errors</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">D</span><span class="si">}{</span><span class="n">X</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">df_errors</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">D</span><span class="si">}{</span><span class="n">X</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="n">max_order</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">df_errors</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^K(\d+)S?L$&quot;</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;K</span><span class="si">{</span><span class="n">order</span><span class="si">:</span><span class="s2">d</span><span class="si">}{</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">order</span> <span class="o">%</span> <span class="mi">2</span> <span class="k">else</span> <span class="s1">&#39;S&#39;</span><span class="si">}</span><span class="s2">L&quot;</span>  <span class="c1"># odd -&gt; &#39;&#39;, even -&gt; S</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">df_errors</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">df_errors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">df_errors</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">df_twiss</span><span class="p">,</span> <span class="n">df_errors</span></div>
+
+
+<span class="c1"># Phase Advance Functions ------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="get_all_phase_advances"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.get_all_phase_advances">[docs]</a><span class="k">def</span> <span class="nf">get_all_phase_advances</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Calculate phase advances between all elements.</span>
+<span class="sd">    Will result in a elements x elements matrix, that might be very large!</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (DataFrame): DataFrame with phase advance columns (MUX, MUY).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dictionary with DataFrame matrices similar to dmu(i,j) = mu(j) - mu(i).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Calculating Phase Advances:&quot;</span><span class="p">)</span>
+    <span class="n">phase_advance_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">PLANES</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;Phase Advance calculations&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">plane</span> <span class="ow">in</span> <span class="n">PLANES</span><span class="p">:</span>
+            <span class="n">phases_mdl</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PHASE_ADV</span><span class="si">}{</span><span class="n">plane</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+            <span class="c1"># Same convention as in [1]: DAdv(i,j) = Phi(j) - Phi(i)</span>
+            <span class="c1"># Do not calculate dphi and tau here.</span>
+            <span class="c1"># only slices of phase_advances as otherwise super slow</span>
+            <span class="n">phase_advance_dict</span><span class="p">[</span><span class="n">plane</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">phases_mdl</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">phases_mdl</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]),</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                <span class="n">columns</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">phase_advance_dict</span></div>
+
+
+<div class="viewcode-block" id="dphi"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.dphi">[docs]</a><span class="k">def</span> <span class="nf">dphi</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Return dphi from phase advances in data, see Eq. (8) in [FranchiAnalyticFormulas2017]_ .</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame, Series): Phase-Advance data.</span>
+<span class="sd">        q: Tune.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dphi&#39;s in matrix of shape of data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">data</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># &#39;&lt;=&#39; seems to be what MAD-X does</span></div>
+
+
+<div class="viewcode-block" id="tau"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.tau">[docs]</a><span class="k">def</span> <span class="nf">tau</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return tau from phase advances in data, see Eq. (16) in [FranchiAnalyticFormulas2017]_ .</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (DataFrame, Series, Array): Phase-Advance data.</span>
+<span class="sd">        q: Tune.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tau&#39;s in matrix of shape of data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">data</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">q</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="n">q</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># &#39;&lt;=&#39; seems to be what MAD-X does</span></div>
+
+
+<div class="viewcode-block" id="dphi_at_element"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.dphi_at_element">[docs]</a><span class="k">def</span> <span class="nf">dphi_at_element</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">qx</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">qy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Return dphis for both planes at the given element.</span>
+<span class="sd">    See Eq. (8) in [FranchiAnalyticFormulas2017]_ .</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (DataFrame): DataFrame containing the Phase-Advance columns for both planes.</span>
+<span class="sd">        element: Element at which dphi is calculated (must be in the index of df).</span>
+<span class="sd">        qx (float): Tune in X-Plane.</span>
+<span class="sd">        qy (float): Tune in Y-Plane.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict of planes with DPhi[i] = Phi[element] - Phi[i] (+ Tune if Phi[i] &gt; Phi[element])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">phase_advance_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">PLANES</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">tune</span><span class="p">,</span> <span class="n">plane</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">((</span><span class="n">qx</span><span class="p">,</span> <span class="n">qy</span><span class="p">),</span> <span class="n">PLANES</span><span class="p">):</span>
+        <span class="n">phases</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PHASE_ADV</span><span class="si">}{</span><span class="n">plane</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="n">phase_advance_dict</span><span class="p">[</span><span class="n">plane</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="n">phases</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">-</span> <span class="n">phases</span><span class="o">.</span><span class="n">loc</span><span class="p">[:</span><span class="n">element</span><span class="p">])[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># only until element</span>
+                <span class="p">(</span><span class="n">phases</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">-</span> <span class="n">phases</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">element</span><span class="p">:]</span> <span class="o">+</span> <span class="n">tune</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">phase_advance_dict</span></div>
+
+
+<div class="viewcode-block" id="add_missing_columns"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.add_missing_columns">[docs]</a><span class="k">def</span> <span class="nf">add_missing_columns</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Check if `columns` are in `df` and add them all zero if not.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added </span><span class="si">{</span><span class="n">col</span><span class="si">:</span><span class="s2">s</span><span class="si">}</span><span class="s2"> with all zero to data-frame.&quot;</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<span class="c1"># Timing -----------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="timeit"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.timeit">[docs]</a><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">timeit</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Time used </span><span class="si">{:.3f}</span><span class="s2">s&quot;</span><span class="p">,</span> <span class="n">print_fun</span><span class="o">=</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Timing context with logging/printing output.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        text (str): Text to print. If it contains an unnamed format key, this</span>
+<span class="sd">                    is filled with the time. Otherwise `text` is assumed to be</span>
+<span class="sd">                    description of what is happening in this context.</span>
+<span class="sd">        print_fun (function): Function used to print the final text.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">yield</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">time_used</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">get_format_keys</span><span class="p">(</span><span class="n">text</span><span class="p">)):</span>
+            <span class="n">print_fun</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time_used</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">print_fun</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Time used for </span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">time_used</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_format_keys"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.get_format_keys">[docs]</a><span class="k">def</span> <span class="nf">get_format_keys</span><span class="p">(</span><span class="n">format_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Get keys from format string. Unnamed placeholders are returned as empty strings.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">format_str</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span></div>
+
+
+<span class="c1"># Other ------------------------------------------------------------------------</span>
+
+
+<div class="viewcode-block" id="seq2str"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.seq2str">[docs]</a><span class="k">def</span> <span class="nf">seq2str</span><span class="p">(</span><span class="n">sequence</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Converts an Iterable to string of its comma separated elements. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="i_pow"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.i_pow">[docs]</a><span class="k">def</span> <span class="nf">i_pow</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">complex</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Calculates i**n in a quick and exact way. &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="n">j</span> <span class="o">**</span> <span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_name_index"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.set_name_index">[docs]</a><span class="k">def</span> <span class="nf">set_name_index</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">df_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Sets the NAME column as index if present and checks for string index. &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">NAME</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">NAME</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">indx</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">indx</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Index of the </span><span class="si">{</span><span class="n">df_name</span><span class="si">}</span><span class="s2"> Dataframe should be string (i.e. from </span><span class="si">{</span><span class="n">NAME</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">df</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2019-2021, pyLHC/OMC-TEAM.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,427 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>optics_functions.rdt &mdash; optics_functions 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html">
+          
+
+          
+            
+            <img src="../../_static/omc_logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Main Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html">Coupling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html">Resonance Driving Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html">Utilities</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Helper</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../helper/bibliography.html">Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../helper/constants.html">Constants</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">optics_functions</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>optics_functions.rdt</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for optics_functions.rdt</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Resonance Driving Terms</span>
+<span class="sd">***********************</span>
+
+<span class="sd">Functions for the calculations of Resonance Driving Terms, as well as</span>
+<span class="sd">getting lists of valid driving term indices for certain orders.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">factorial</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">tfs</span> <span class="kn">import</span> <span class="n">TfsDataFrame</span>
+
+<span class="kn">from</span> <span class="nn">optics_functions.constants</span> <span class="kn">import</span> <span class="n">PI2I</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">BETA</span><span class="p">,</span> <span class="n">TUNE</span>
+<span class="kn">from</span> <span class="nn">optics_functions.utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">seq2str</span><span class="p">,</span> <span class="n">timeit</span><span class="p">,</span> <span class="n">get_all_phase_advances</span><span class="p">,</span>
+                                    <span class="n">dphi_at_element</span><span class="p">,</span> <span class="n">dphi</span><span class="p">,</span> <span class="n">i_pow</span><span class="p">,</span>
+                                    <span class="n">split_complex_columns</span><span class="p">)</span>
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="calculate_rdts"><a class="viewcode-back" href="../../modules/rdt.html#optics_functions.rdt.calculate_rdts">[docs]</a><span class="k">def</span> <span class="nf">calculate_rdts</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">rdts</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                   <span class="n">qx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">qy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">feeddown</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                   <span class="n">complex_columns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">loop_phases</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                   <span class="n">hamiltionian_terms</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TfsDataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Calculates the Resonance Driving Terms.</span>
+
+<span class="sd">    Eq. (A8) in [FranchiAnalyticFormulas2017]_ .</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (TfsDataFrame): Twiss Dataframe.</span>
+<span class="sd">        rdts (Sequence): List of rdt-names to calculate.</span>
+<span class="sd">        qx (float): Tune in X-Plane (if not given, header df.Q1 is assumed present).</span>
+<span class="sd">        qy (float): Tune in Y-Plane (if not given, header df.Q2 is assumed present).</span>
+<span class="sd">        feeddown (int): Levels of feed-down to include.</span>
+<span class="sd">        complex_columns (bool): Output complex values in single column of type complex.</span>
+<span class="sd">                        If ``False``, split complex columns into two real-valued columns.</span>
+<span class="sd">        loop_phases (bool): Loop over elements when calculating phase-advances.</span>
+<span class="sd">                            Might be slower for small number of elements, but</span>
+<span class="sd">                            allows for large (e.g. sliced) optics.</span>
+<span class="sd">        hamiltionian_terms (bool): Add the hamiltonian terms to the result dataframe.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        New TfsDataFrame with RDT columns.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Calculating RDTs: </span><span class="si">{</span><span class="n">seq2str</span><span class="p">(</span><span class="n">rdts</span><span class="p">)</span><span class="si">:</span><span class="s2">s</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">timeit</span><span class="p">(</span><span class="s2">&quot;RDT calculation&quot;</span><span class="p">,</span> <span class="n">print_fun</span><span class="o">=</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">):</span>
+        <span class="n">df_res</span> <span class="o">=</span> <span class="n">TfsDataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">qx</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">TUNE</span><span class="si">}</span><span class="s2">1&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">qy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">qy</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">TUNE</span><span class="si">}</span><span class="s2">2&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">loop_phases</span><span class="p">:</span>
+            <span class="n">phase_advances</span> <span class="o">=</span> <span class="n">get_all_phase_advances</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>  <span class="c1"># might be huge!</span>
+
+        <span class="k">for</span> <span class="n">rdt</span> <span class="ow">in</span> <span class="n">rdts</span><span class="p">:</span>
+            <span class="n">rdt</span> <span class="o">=</span> <span class="n">rdt</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rdt</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">5</span> <span class="ow">or</span> <span class="n">rdt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;F&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">rdt</span><span class="si">:</span><span class="s2">s</span><span class="si">}</span><span class="s2">&#39; does not seem to be a valid RDT name.&quot;</span><span class="p">)</span>
+
+            <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rdt</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>
+            <span class="n">conj_rdt</span> <span class="o">=</span> <span class="n">jklm2str</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">conj_rdt</span> <span class="ow">in</span> <span class="n">df_res</span><span class="p">:</span>
+                <span class="n">df_res</span><span class="p">[</span><span class="n">rdt</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">df_res</span><span class="p">[</span><span class="n">conj_rdt</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">timeit</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;calculating </span><span class="si">{</span><span class="n">rdt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">print_fun</span><span class="o">=</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">):</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="n">k</span> <span class="o">+</span> <span class="n">l</span> <span class="o">+</span> <span class="n">m</span>
+                    <span class="n">jk</span><span class="p">,</span> <span class="n">lm</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span> <span class="o">+</span> <span class="n">m</span>
+
+                    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The RDT-order has to be &gt;1 but was </span><span class="si">{</span><span class="n">n</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">rdt</span><span class="si">:</span><span class="s2">s</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="n">denom_h</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="n">factorial</span><span class="p">(</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">factorial</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">factorial</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">*</span> <span class="n">factorial</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">n</span><span class="p">))</span>
+                    <span class="n">denom_f</span> <span class="o">=</span> <span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">PI2I</span> <span class="o">*</span> <span class="p">((</span><span class="n">j</span><span class="o">-</span><span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">qx</span> <span class="o">+</span> <span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">qy</span><span class="p">)))</span>
+
+                    <span class="n">betax</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BETA</span><span class="si">}{</span><span class="n">X</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">**</span><span class="p">(</span><span class="n">jk</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span>
+                    <span class="n">betay</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BETA</span><span class="si">}{</span><span class="n">Y</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">**</span><span class="p">(</span><span class="n">lm</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span>
+
+                    <span class="c1"># Magnetic Field Strengths with Feed-Down</span>
+                    <span class="n">dx_idy</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">X</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">df</span><span class="p">[</span><span class="n">Y</span><span class="p">]</span>
+                    <span class="n">k_complex</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="mi">0</span><span class="n">j</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>  <span class="c1"># Complex sum of strenghts (from K_n + iJ_n) and feeddown to them</span>
+
+                    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">feeddown</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                        <span class="n">n_mad</span> <span class="o">=</span> <span class="n">n</span> <span class="o">+</span> <span class="n">q</span> <span class="o">-</span> <span class="mi">1</span>
+                        <span class="n">kl_iksl</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;K</span><span class="si">{</span><span class="n">n_mad</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">L&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;K</span><span class="si">{</span><span class="n">n_mad</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">SL&quot;</span><span class="p">]</span>
+                        <span class="n">k_complex</span> <span class="o">+=</span> <span class="p">(</span><span class="n">kl_iksl</span> <span class="o">*</span> <span class="p">(</span><span class="n">dx_idy</span><span class="o">**</span><span class="n">q</span><span class="p">))</span> <span class="o">/</span> <span class="n">factorial</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+
+                    <span class="c1"># real(i**lm * k+ij) is equivalent to Omega-function in paper, see Eq.(A11)</span>
+                    <span class="c1"># pd.Series is needed here, as np.real() returns numpy-array</span>
+                    <span class="n">k_real</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">i_pow</span><span class="p">(</span><span class="n">lm</span><span class="p">)</span> <span class="o">*</span> <span class="n">k_complex</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">sources</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">k_real</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>  <span class="c1"># other elements do not contribute to integral, speedup summations</span>
+
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">sources</span><span class="p">):</span>
+                        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No sources found for </span><span class="si">{</span><span class="n">rdt</span><span class="si">}</span><span class="s2">. RDT will be zero.&quot;</span><span class="p">)</span>
+                        <span class="n">df_res</span><span class="p">[</span><span class="n">rdt</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="n">j</span>
+                        <span class="k">if</span> <span class="n">hamiltionian_terms</span><span class="p">:</span>
+                            <span class="n">df_res</span><span class="p">[</span><span class="n">f2h</span><span class="p">(</span><span class="n">rdt</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span><span class="n">j</span>
+                        <span class="k">continue</span>
+
+                    <span class="c1"># calculate hamiltionian-numerator part</span>
+                    <span class="n">h_terms</span> <span class="o">=</span> <span class="o">-</span><span class="n">k_real</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sources</span><span class="p">]</span> <span class="o">*</span> <span class="n">betax</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sources</span><span class="p">]</span> <span class="o">*</span> <span class="n">betay</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sources</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="n">loop_phases</span><span class="p">:</span>
+                        <span class="c1"># do loop over elements to not have elements x elements Matrix in memory</span>
+                        <span class="n">h_jklm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                            <span class="c1"># calculate dphi from all sources to the element</span>
+                            <span class="c1"># index-intersection keeps `element` at correct place in index</span>
+                            <span class="n">sources_plus</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">sources</span><span class="o">.</span><span class="n">union</span><span class="p">([</span><span class="n">element</span><span class="p">]))</span>
+                            <span class="n">dphis</span> <span class="o">=</span> <span class="n">dphi_at_element</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sources_plus</span><span class="p">,</span> <span class="p">:],</span> <span class="n">element</span><span class="p">,</span> <span class="n">qx</span><span class="p">,</span> <span class="n">qy</span><span class="p">)</span>
+                            <span class="n">phase_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">PI2I</span> <span class="o">*</span> <span class="p">((</span><span class="n">j</span><span class="o">-</span><span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">dphis</span><span class="p">[</span><span class="n">X</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sources</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">dphis</span><span class="p">[</span><span class="n">Y</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sources</span><span class="p">]))</span>
+                            <span class="n">h_jklm</span><span class="p">[</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">h_terms</span> <span class="o">*</span> <span class="n">phase_term</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">*</span> <span class="n">denom_h</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">phx</span> <span class="o">=</span> <span class="n">dphi</span><span class="p">(</span><span class="n">phase_advances</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sources</span><span class="p">,</span> <span class="p">:],</span> <span class="n">qx</span><span class="p">)</span>
+                        <span class="n">phy</span> <span class="o">=</span> <span class="n">dphi</span><span class="p">(</span><span class="n">phase_advances</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sources</span><span class="p">,</span> <span class="p">:],</span> <span class="n">qy</span><span class="p">)</span>
+                        <span class="n">phase_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">PI2I</span> <span class="o">*</span> <span class="p">((</span><span class="n">j</span><span class="o">-</span><span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="n">phx</span> <span class="o">+</span> <span class="p">(</span><span class="n">l</span><span class="o">-</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">phy</span><span class="p">))</span>
+                        <span class="n">h_jklm</span> <span class="o">=</span> <span class="n">phase_term</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">h_terms</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span> <span class="o">*</span> <span class="n">denom_h</span>
+
+                    <span class="n">df_res</span><span class="p">[</span><span class="n">rdt</span><span class="p">]</span> <span class="o">=</span> <span class="n">h_jklm</span> <span class="o">*</span> <span class="n">denom_f</span>
+                    <span class="n">LOG</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average RDT amplitude |</span><span class="si">{</span><span class="n">rdt</span><span class="si">:</span><span class="s2">s</span><span class="si">}</span><span class="s2">|: </span><span class="si">{</span><span class="n">df_res</span><span class="p">[</span><span class="n">rdt</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">hamiltionian_terms</span><span class="p">:</span>
+                        <span class="n">df_res</span><span class="p">[</span><span class="n">f2h</span><span class="p">(</span><span class="n">rdt</span><span class="p">)]</span> <span class="o">=</span> <span class="n">h_jklm</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">complex_columns</span><span class="p">:</span>
+        <span class="n">terms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rdts</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hamiltionian_terms</span><span class="p">:</span>
+            <span class="n">terms</span> <span class="o">+=</span> <span class="p">[</span><span class="n">f2h</span><span class="p">(</span><span class="n">rdt</span><span class="p">)</span> <span class="k">for</span> <span class="n">rdt</span> <span class="ow">in</span> <span class="n">rdts</span><span class="p">]</span>  <span class="c1"># F#### -&gt; H####</span>
+        <span class="n">df_res</span> <span class="o">=</span> <span class="n">split_complex_columns</span><span class="p">(</span><span class="n">df_res</span><span class="p">,</span> <span class="n">terms</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df_res</span></div>
+
+
+<div class="viewcode-block" id="get_ac_dipole_rdts"><a class="viewcode-back" href="../../modules/rdt.html#optics_functions.rdt.get_ac_dipole_rdts">[docs]</a><span class="k">def</span> <span class="nf">get_ac_dipole_rdts</span><span class="p">(</span><span class="n">order_or_terms</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">spectral_line</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+                       <span class="n">plane</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">ac_tunes</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">acd_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Calculates the Hamiltonian Terms under Forced Motion.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        order_or_terms (Union[int, str, Sequence[str]]): If an int is given all Resonance Driving</span>
+<span class="sd">            Terms up to this order will be calculated. The strings are assumed to be the desired</span>
+<span class="sd">            driving term names, e.g. &quot;F1001&quot;</span>
+<span class="sd">        spectral_line (Tuple[int]): Needed to determine what phase advance is needed before and</span>
+<span class="sd">            after AC dipole location, depends on detal+ and delta-. Sample input: (2,-1)</span>
+<span class="sd">        plane (str):  Either &#39;H&#39; or &#39;V&#39; to determine phase term of AC dipole before and after</span>
+<span class="sd">            ACD location.</span>
+<span class="sd">        ac_tunes (Tuple[float, float]) Contains horizontal and vertical AC dipole tunes,</span>
+<span class="sd">            i.e. (0.302, 0.33)</span>
+<span class="sd">        acd_name (str): The AC Dipole element name (?).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Todo. Leave it here so it&#39;s not forgotten. See (and improve) python2 code!&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># RDT Definition Generation Functions ------------------------------------------</span>
+
+<div class="viewcode-block" id="get_all_to_order"><a class="viewcode-back" href="../../modules/rdt.html#optics_functions.rdt.get_all_to_order">[docs]</a><span class="k">def</span> <span class="nf">get_all_to_order</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot; Returns list of all valid RDT jklm-tuple of order 2 to n &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;n&#39; must be greater 1 for resonance driving terms.&quot;</span><span class="p">)</span>
+
+    <span class="n">permut</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+              <span class="k">if</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">n</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">])]</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">permut</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">sum</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="generator"><a class="viewcode-back" href="../../modules/rdt.html#optics_functions.rdt.generator">[docs]</a><span class="k">def</span> <span class="nf">generator</span><span class="p">(</span><span class="n">orders</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">normal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+              <span class="n">skew</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">complex_conj</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Generates lists of RDT-4-tuples sorted into a dictionary by order.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        orders (list): list of orders to be generated. Orders &lt; 2 raise errors.</span>
+<span class="sd">        normal (bool): generate normal RDTs (default: True).</span>
+<span class="sd">        skew (bool): generate skew RDTs (default: True).</span>
+<span class="sd">        complex_conj (bool): Have both, RDT and it&#39;s complex conjugate RDT in the list</span>
+<span class="sd">                            (default: True).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dictionary with keys of orders containing lists of 4-Tuples for the RDTs of that order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All order must be greater 1 for resonance driving terms.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">normal</span> <span class="ow">or</span> <span class="n">skew</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;At least one of &#39;normal&#39; or &#39;skew&#39; parameters must be True.&quot;</span><span class="p">)</span>
+
+    <span class="n">permut</span> <span class="o">=</span> <span class="p">{</span><span class="n">o</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">orders</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">order</span> <span class="ow">in</span> <span class="n">orders</span><span class="p">)</span>  <span class="c1"># check for order</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>  <span class="c1"># rdt index rule</span>
+            <span class="ow">and</span> <span class="p">((</span><span class="n">skew</span> <span class="ow">and</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">normal</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span> <span class="o">%</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># skew or normal</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="n">complex_conj</span> <span class="ow">or</span> <span class="ow">not</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="ow">in</span> <span class="n">permut</span><span class="p">[</span><span class="n">order</span><span class="p">]))</span>  <span class="c1"># filter conj</span>
+        <span class="p">):</span>
+            <span class="n">permut</span><span class="p">[</span><span class="n">order</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">permut</span></div>
+
+
+<span class="c1"># Other ------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">jklm2str</span><span class="p">(</span><span class="n">j</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">l</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;F</span><span class="si">{</span><span class="n">j</span><span class="si">:</span><span class="s2">d</span><span class="si">}{</span><span class="n">k</span><span class="si">:</span><span class="s2">d</span><span class="si">}{</span><span class="n">l</span><span class="si">:</span><span class="s2">d</span><span class="si">}{</span><span class="n">m</span><span class="si">:</span><span class="s2">d</span><span class="si">}</span><span class="s2">&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">str2jklm</span><span class="p">(</span><span class="n">rdt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rdt</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+
+<span class="k">def</span> <span class="nf">f2h</span><span class="p">(</span><span class="n">rdt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;H</span><span class="si">{</span><span class="n">rdt</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2019-2021, pyLHC/OMC-TEAM.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

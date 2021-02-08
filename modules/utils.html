@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Utilities &mdash; optics_functions 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Bibliography" href="../helper/bibliography.html" />
+    <link rel="prev" title="Resonance Driving Terms" href="rdt.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html">
+          
+
+          
+            
+            <img src="../_static/omc_logo.svg" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Main Modules</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="coupling.html">Coupling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdt.html">Resonance Driving Terms</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Utilities</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Helper</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../helper/bibliography.html">Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/constants.html">Constants</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">optics_functions</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Utilities</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/modules/utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <span class="target" id="module-optics_functions.utils"></span><div class="section" id="utilities">
+<h1>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h1>
+<p>Helper functions to prepare the twiss dataframes for use with the optics
+functions as well as reusable utilities,
+that are needed within multiple optics calculations.</p>
+<dl class="py function">
+<dt id="optics_functions.utils.add_missing_columns">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">add_missing_columns</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">columns</span><span class="p">:</span> <span class="n">Iterable</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/optics_functions/utils.html#add_missing_columns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.add_missing_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if <cite>columns</cite> are in <cite>df</cite> and add them all zero if not.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.dphi">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">dphi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">q</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="../_modules/optics_functions/utils.html#dphi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.dphi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dphi from phase advances in data, see Eq. (8) in <a class="reference internal" href="../helper/bibliography.html#franchianalyticformulas2017" id="id1"><span>[FranchiAnalyticFormulas2017]</span></a> .</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>DataFrame</em><em>, </em><em>Series</em>) -- Phase-Advance data.</p></li>
+<li><p><strong>q</strong> -- Tune.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dphi’s in matrix of shape of data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.dphi_at_element">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">dphi_at_element</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">element</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">qx</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">qy</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; dict<a class="reference internal" href="../_modules/optics_functions/utils.html#dphi_at_element"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.dphi_at_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dphis for both planes at the given element.
+See Eq. (8) in <a class="reference internal" href="../helper/bibliography.html#franchianalyticformulas2017" id="id2"><span>[FranchiAnalyticFormulas2017]</span></a> .</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>DataFrame</em>) -- DataFrame containing the Phase-Advance columns for both planes.</p></li>
+<li><p><strong>element</strong> -- Element at which dphi is calculated (must be in the index of df).</p></li>
+<li><p><strong>qx</strong> (<em>float</em>) -- Tune in X-Plane.</p></li>
+<li><p><strong>qy</strong> (<em>float</em>) -- Tune in Y-Plane.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dict of planes with DPhi[i] = Phi[element] - Phi[i] (+ Tune if Phi[i] &gt; Phi[element])</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.get_all_phase_advances">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">get_all_phase_advances</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em><span class="sig-paren">)</span> &#x2192; dict<a class="reference internal" href="../_modules/optics_functions/utils.html#get_all_phase_advances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.get_all_phase_advances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate phase advances between all elements.
+Will result in a elements x elements matrix, that might be very large!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>df</strong> (<em>DataFrame</em>) -- DataFrame with phase advance columns (MUX, MUY).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary with DataFrame matrices similar to dmu(i,j) = mu(j) - mu(i).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.get_format_keys">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">get_format_keys</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">format_str</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; list<a class="reference internal" href="../_modules/optics_functions/utils.html#get_format_keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.get_format_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get keys from format string. Unnamed placeholders are returned as empty strings.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.i_pow">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">i_pow</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span><span class="p">:</span> <span class="n">int</span></em><span class="sig-paren">)</span> &#x2192; complex<a class="reference internal" href="../_modules/optics_functions/utils.html#i_pow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.i_pow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates i**n in a quick and exact way.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.prepare_twiss_dataframe">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">prepare_twiss_dataframe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df_twiss</span><span class="p">:</span> <span class="n">tfs.handler.TfsDataFrame</span></em>, <em class="sig-param"><span class="n">df_errors</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>pandas.core.frame.DataFrame<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">invert_signs_madx</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">max_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">16</span></em>, <em class="sig-param"><span class="n">join</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'inner'</span></em><span class="sig-paren">)</span> &#x2192; tfs.handler.TfsDataFrame<a class="reference internal" href="../_modules/optics_functions/utils.html#prepare_twiss_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.prepare_twiss_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare dataframe to use with the optics functions.</p>
+<ul class="simple">
+<li><p>Adapt Beam 4 signs.</p></li>
+<li><p>Add missing K(S)L and orbit columns.</p></li>
+<li><p>Merge optics and error dataframes (add values).</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df_twiss</strong> (<em>TfsDataFrame</em>) -- Twiss-optics DataFrame.</p></li>
+<li><p><strong>df_errors</strong> (<em>DataFrame</em>) -- Twiss-errors DataFrame (optional).</p></li>
+<li><p><strong>invert_signs_madx</strong> (<em>bool</em>) -- Inverts signs after the madx-convention for beam 4.
+That is, if you use beam 4 you should set this
+flag to True to convert beam 4 to beam 2 signs.</p></li>
+<li><p><strong>max_order</strong> (<em>int</em>) -- Maximum field order to be still included (1==Dipole).</p></li>
+<li><p><strong>join</strong> (<em>str</em>) -- How to join elements of optics and errors. “inner” or “outer”.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>TfsDataFrame with necessary columns added. If a merge happened, only the
+necessary columns are present.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.seq2str">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">seq2str</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sequence</span><span class="p">:</span> <span class="n">Iterable</span></em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/optics_functions/utils.html#seq2str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.seq2str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an Iterable to string of its comma separated elements.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.set_name_index">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">set_name_index</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">df_name</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="reference internal" href="../_modules/optics_functions/utils.html#set_name_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.set_name_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the NAME column as index if present and checks for string index.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.split_complex_columns">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">split_complex_columns</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">columns</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">drop</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; tfs.handler.TfsDataFrame<a class="reference internal" href="../_modules/optics_functions/utils.html#split_complex_columns"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.split_complex_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits the given complex columns into two real-values columns containing the
+real and imaginary parts of the original columns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>TfsDataFrame</em>) -- DataFrame containing the original columns.</p></li>
+<li><p><strong>columns</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>) -- List of column names to be replaced.</p></li>
+<li><p><strong>drop</strong> (<em>bool</em>) -- Original columns are not present in resulting DataFrame.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Original TfsDataFrame with added columns.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.switch_signs_for_beam4">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">switch_signs_for_beam4</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df_twiss</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">df_errors</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>pandas.core.frame.DataFrame<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>tfs.handler.TfsDataFrame<span class="p">, </span>tfs.handler.TfsDataFrame<span class="p">]</span><a class="reference internal" href="../_modules/optics_functions/utils.html#switch_signs_for_beam4"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.switch_signs_for_beam4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Switch the signs for Beam 4 optics.
+This is due to the switch in direction for this beam and
+(anti-) symmetry after a rotation of 180deg around the y-axis of magnets,
+combined with the fact that the KL values in MAD-X twiss do not change sign,
+but in the errors they do (otherwise it would compensate).
+Magnet orders that show anti-symmetry are: a1 (K0SL), b2 (K1L), a3 (K2SL), b4 (K3L) etc.
+Also the sign for (delta) X is switched back to have the same orientation as beam2.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.tau">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">tau</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">q</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="../_modules/optics_functions/utils.html#tau"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.tau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return tau from phase advances in data, see Eq. (16) in <a class="reference internal" href="../helper/bibliography.html#franchianalyticformulas2017" id="id3"><span>[FranchiAnalyticFormulas2017]</span></a> .</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>DataFrame</em><em>, </em><em>Series</em><em>, </em><em>Array</em>) -- Phase-Advance data.</p></li>
+<li><p><strong>q</strong> -- Tune.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tau’s in matrix of shape of data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="optics_functions.utils.timeit">
+<code class="sig-prename descclassname">optics_functions.utils.</code><code class="sig-name descname">timeit</code><span class="sig-paren">(</span><em class="sig-param">text: str = 'Time used {:.3f}s'</em>, <em class="sig-param">print_fun=&lt;bound method Logger.debug of &lt;Logger optics_functions.utils (WARNING)&gt;&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optics_functions/utils.html#timeit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optics_functions.utils.timeit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timing context with logging/printing output.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) -- Text to print. If it contains an unnamed format key, this
+is filled with the time. Otherwise <cite>text</cite> is assumed to be
+description of what is happening in this context.</p></li>
+<li><p><strong>print_fun</strong> (<em>function</em>) -- Function used to print the final text.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../helper/bibliography.html" class="btn btn-neutral float-right" title="Bibliography" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="rdt.html" class="btn btn-neutral float-left" title="Resonance Driving Terms" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2019-2021, pyLHC/OMC-TEAM.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
