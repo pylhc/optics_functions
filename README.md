@@ -138,10 +138,14 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
 # read MAD-X twiss output
 df_twiss = tfs.read("twiss.tfs", index="NAME")
 
+# generate all valid RDT names, here for RDTs of order 2
+rdts = [jklm2str(*jklm) for jklm in generator(orders=[2])[2]]
+
 # check correct signs (i.e if beam==4), merge twiss and errors, 
 # add empty K(S)L columns if needed
-rdts = [jklm2str(*jklm) for jklm in generator(orders=[2])[2]]
 df_twiss = prepare_twiss_dataframe(df_twiss=df_twiss, df_errors=None, max_order=5)
+
+# do the actual rdt calculation
 df_rdts = calculate_rdts(df_twiss, rdts=rdts,
                          loop_phases=True,  # loop over phase-advance calculation, slower but saves memory
                          feeddown=2,  # include feed-down up to this order
