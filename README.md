@@ -50,7 +50,7 @@ The functionality mainly manipulates and returns TFS files or `TfsDataFrame` obj
 > analytical approximation.
 
 
-Coupling Example:
+#### Coupling Example:
 
 ```python
 import logging
@@ -122,7 +122,7 @@ tfs.write("coupling.tfs",
           )
 ```
 
-RDT Example:
+#### RDT Example:
 
 ```python
 import logging
@@ -176,7 +176,7 @@ tfs.write("rdts.tfs",
           )
 ```
 
-Appending Example:
+#### Appending Example:
 
 ```python
 import logging
