@@ -28,7 +28,7 @@ pip install optics_functions
 This package serves as a library of functions to calculate various optics parameters such as RDTs and coupling from a MAD-X twiss output.
 The functionality mainly manipulates and returns TFS files or `TfsDataFrame` objects from the `tfs-pandas` package.
 
-### Modules:
+### Modules
 
 - `coupling` - Functions to estimate coupling from twiss dataframes and
   different methods to calculate the closest tune approach from
