@@ -28,6 +28,20 @@ pip install optics_functions
 This package serves as a library of functions to calculate various optics parameters such as RDTs and coupling from a MAD-X twiss output.
 The functionality mainly manipulates and returns TFS files or `TfsDataFrame` objects from the `tfs-pandas` package.
 
+### Modules:
+
+- `coupling` - Functions to estimate coupling from twiss dataframes and
+  different methods to calculate the closest tune approach from
+  the calculated coupling RDTs.
+  ([**coupling.py**](optics_functions/coupling.py), [**doc**](https://pylhc.github.io/optics_functions/modules/coupling.html))
+- `rdt` - Functions for the calculations of Resonance Driving Terms, as well as
+  getting lists of valid driving term indices for certain orders. 
+  ([**rdt.py**](optics_functions/rdt.py), [**doc**](https://pylhc.github.io/optics_functions/modules/rdt.html))
+- `utils` - Helper functions to prepare the twiss dataframes for use with the optics
+  functions as well as reusable utilities,
+  that are be needed within multiple optics calculations.
+  ([**utils.py**](optics_functions/utils.py), [**doc**](https://pylhc.github.io/optics_functions/modules/utils.html))
+
 ### Usage Examples
 
 > :warning: In certain scenarios, e.g. in case of non-zero closed orbit, the RDT
@@ -44,7 +58,7 @@ import sys
 
 import tfs  # tfs-pandas
 
-from optics_functions.coupling import coupling_from_cmatrix, closest_tune_approach
+from optics_functions.coupling import coupling_via_cmatrix, closest_tune_approach
 from optics_functions.utils import split_complex_columns
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
@@ -53,7 +67,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
 df_twiss = tfs.read("twiss.tfs", index="NAME")
 
 # calculate coupling from the cmatrix
-df_coupling = coupling_from_cmatrix(df_twiss)
+df_coupling = coupling_via_cmatrix(df_twiss)
 
 # Example:
 # print(df_coupling) 
@@ -163,13 +177,14 @@ tfs.write("rdts.tfs",
 ```
 
 Appending Example:
+
 ```python
 import logging
 import sys
 
 import tfs  # tfs-pandas
 
-from optics_functions.coupling import coupling_from_cmatrix, closest_tune_approach
+from optics_functions.coupling import coupling_via_cmatrix, closest_tune_approach
 from optics_functions.utils import split_complex_columns
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
@@ -179,7 +194,7 @@ df_twiss = tfs.read("twiss.tfs", index="NAME")
 
 # calculate coupling from the cmatrix and append to original dataframe
 # output=['rdts'] is used to avoid the output of the gamma and C## columns.
-df_twiss[["F1001", "F1010"]] = coupling_from_cmatrix(df_twiss, output=['rdts'])
+df_twiss[["F1001", "F1010"]] = coupling_via_cmatrix(df_twiss, output=['rdts'])
 
 # Example:
 # print(df_twiss)

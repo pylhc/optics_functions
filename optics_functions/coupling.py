@@ -2,7 +2,9 @@
 Coupling
 ********
 
-Functions to calculate coupling from twiss dataframes.
+Functions to estimate coupling from twiss dataframes and
+different methods to calculate the closest tune approach from
+the calculated coupling RDTs.
 
 """
 import logging
@@ -24,7 +26,7 @@ COUPLING_RDTS = ["F1001", "F1010"]
 LOG = logging.getLogger(__name__)
 
 
-def coupling_from_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs):
+def coupling_via_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs):
     """ Returns the coupling term.
 
     .. warning::
@@ -56,8 +58,8 @@ def coupling_from_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs)
     return df_res
 
 
-def coupling_from_cmatrix(df: TfsDataFrame, complex_columns: bool = True,
-                          output: Sequence[str] = ("rdts", "gamma", "cmatrix")):
+def coupling_via_cmatrix(df: TfsDataFrame, complex_columns: bool = True,
+                         output: Sequence[str] = ("rdts", "gamma", "cmatrix")):
     """ Calculates C matrix then Coupling and Gamma from it.
     See [CalagaBetatronCoupling2005]_ .
 

@@ -5,8 +5,8 @@ import pytest
 import tfs
 
 from optics_functions.constants import NAME, S, ALPHA, Y, BETA, X, GAMMA, REAL, IMAG, TUNE, PHASE_ADV
-from optics_functions.coupling import (closest_tune_approach, coupling_from_rdts,
-                                       coupling_from_cmatrix, COUPLING_RDTS)
+from optics_functions.coupling import (closest_tune_approach, coupling_via_rdts,
+                                       coupling_via_cmatrix, COUPLING_RDTS)
 from optics_functions.utils import prepare_twiss_dataframe
 from tests.unit.test_rdt import arrays_are_close_almost_everywhere
 
@@ -19,7 +19,7 @@ def test_cmatrix():
     np.random.seed(487423872)
     df = get_df(n)
 
-    df_res = coupling_from_cmatrix(df)
+    df_res = coupling_via_cmatrix(df)
     assert all(c in df_res.columns for c in ("F1001", "F1010", "C11", "C12", "C21", "C22", GAMMA))
     assert not df_res.isna().any().any()
 
@@ -42,8 +42,8 @@ def test_real_output():
     df.loc[:, "K1L"] = np.random.rand(n)
     df.loc[:, "K1SL"] = np.random.rand(n)
 
-    df_cmatrix = coupling_from_cmatrix(df, complex_columns=False)
-    df_rdts = coupling_from_rdts(df, qx=1.31, qy=1.32, complex_columns=False)
+    df_cmatrix = coupling_via_cmatrix(df, complex_columns=False)
+    df_rdts = coupling_via_rdts(df, qx=1.31, qy=1.32, complex_columns=False)
 
     assert all(np.real(df_cmatrix) == df_cmatrix)
     assert all(np.real(df_rdts) == df_rdts)
@@ -62,7 +62,7 @@ def test_closest_tune_approach():
     beam = 1
     df_twiss = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b{beam:d}.coupling_bump.tfs", index=NAME)
     df = prepare_twiss_dataframe(df_twiss=df_twiss, max_order=7)
-    df_cmatrix = coupling_from_cmatrix(df)
+    df_cmatrix = coupling_via_cmatrix(df)
     df_twiss[COUPLING_RDTS] = df_cmatrix[COUPLING_RDTS]
 
     res = dict().fromkeys(('calaga', 'franchi', 'persson', 'persson_alt'))
@@ -80,8 +80,8 @@ def test_coupling_rdt_bump_cmatrix_compare():
     beam = 1
     df_twiss = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b{beam:d}.coupling_bump.tfs", index=NAME)
     df = prepare_twiss_dataframe(df_twiss=df_twiss, max_order=7)
-    df_rdts = coupling_from_rdts(df)
-    df_cmatrix = coupling_from_cmatrix(df)
+    df_rdts = coupling_via_rdts(df)
+    df_cmatrix = coupling_via_cmatrix(df)
 
     # from tests.unit.debug_helper import plot_rdts_vs
     # plot_rdts_vs(df_rdts, "analytical", df_cmatrix, "cmatrix", df_twiss, ["F1001", "F1010"])

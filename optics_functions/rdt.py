@@ -2,7 +2,8 @@
 Resonance Driving Terms
 ***********************
 
-Calculations of Resonance Driving Terms.
+Functions for the calculations of Resonance Driving Terms, as well as
+getting lists of valid driving term indices for certain orders.
 
 """
 import itertools
