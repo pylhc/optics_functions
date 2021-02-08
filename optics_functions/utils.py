@@ -4,7 +4,7 @@ Utilities
 
 Helper functions to prepare the twiss dataframes for use with the optics
 functions as well as reusable utilities,
-that are be needed within multiple optics calculations.
+that are needed within multiple optics calculations.
 
 """
 import logging

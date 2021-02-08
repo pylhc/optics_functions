@@ -39,7 +39,7 @@ The functionality mainly manipulates and returns TFS files or `TfsDataFrame` obj
   ([**rdt.py**](optics_functions/rdt.py), [**doc**](https://pylhc.github.io/optics_functions/modules/rdt.html))
 - `utils` - Helper functions to prepare the twiss dataframes for use with the optics
   functions as well as reusable utilities,
-  that are be needed within multiple optics calculations.
+  that are needed within multiple optics calculations.
   ([**utils.py**](optics_functions/utils.py), [**doc**](https://pylhc.github.io/optics_functions/modules/utils.html))
 
 ### Usage Examples
