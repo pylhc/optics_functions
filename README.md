@@ -40,6 +40,10 @@ The functionality mainly manipulates and returns TFS files or `TfsDataFrame` obj
 - `rdt` - Functions for the calculations of Resonance Driving Terms, as well as
   getting lists of valid driving term indices for certain orders. 
   ([**rdt.py**](optics_functions/rdt.py), [**doc**](https://pylhc.github.io/optics_functions/modules/rdt.html))
+- `dispersion` - (TODO)
+  ([**dispersion.py**](optics_functions/dispersion.py), [**doc**](https://pylhc.github.io/optics_functions/modules/dispersion.html))
+- `chromaticity` - (TODO)
+  ([**chromaticity.py**](optics_functions/chromaticity.py), [**doc**](https://pylhc.github.io/optics_functions/modules/chromaticity.html))
 - `utils` - Helper functions to prepare the twiss dataframes for use with the optics
   functions as well as reusable utilities,
   that are needed within multiple optics calculations.
