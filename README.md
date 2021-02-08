@@ -5,18 +5,21 @@
 [![Code Climate maintainability (percentage)](https://img.shields.io/codeclimate/maintainability-percentage/pylhc/optics_functions.svg?style=popout)](https://codeclimate.com/github/pylhc/optics_functions)
 [![GitHub last commit](https://img.shields.io/github/last-commit/pylhc/optics_functions.svg?style=popout)](https://github.com/pylhc/optics_functions)
 [![GitHub release](https://img.shields.io/github/release/pylhc/optics_functions.svg?style=popout)](https://github.com/pylhc/optics_functions)
+[![DOI](https://zenodo.org/badge/215268186.svg)](https://zenodo.org/badge/latestdoi/215268186)
 
 This package provides functions to calculate various optics parameters from **MAD-X TWISS** outputs.
 
 ## Getting Started
 
 The package depends heavily on another one of our packages, `tfs-pandas`.
-Installation is easily done via `pip`.
+Installation is easily done via `pip` as `optics-functions`.
 The package is then used as `optics_functions`.
 
 ```
-pip install optics_functions
+pip install optics-functions
 ```
+
+This installs from [the latest release on the Python Package Index](https://pypi.org/project/optics-functions/).
 
 ## Documentation
 
@@ -108,7 +111,7 @@ df_dqmin = closest_tune_approach(df_coupling,
 # MQWA.B4L3.B1  1.760865e-07
 # MQWA.A4L3.B1  1.760866e-07
 # BPMW.4L3.B1   1.760865e-07
-# MCBWH.4L3.B1  1.760865e-0
+# MCBWH.4L3.B1  1.760865e-07
 
 # do something with the data.
 # (...)
