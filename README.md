@@ -30,6 +30,12 @@ The functionality mainly manipulates and returns TFS files or `TfsDataFrame` obj
 
 ### Usage Examples
 
+> :warning: In certain scenarios, e.g. in case of non-zero closed orbit, the RDT
+> calculations can be unreliable for **thick** lattices.
+> Convert to a _thin_ lattice by slicing the lattice reduce the error of the
+> analytical approximation.
+
+
 Coupling Example:
 
 ```python
@@ -49,13 +55,49 @@ df_twiss = tfs.read("twiss.tfs", index="NAME")
 # calculate coupling from the cmatrix
 df_coupling = coupling_from_cmatrix(df_twiss)
 
+# Example:
+# print(df_coupling) 
+#
+#                            F1001               F1010  ...       C22     GAMMA
+# NAME                                                  ...
+# IP3          -0.000000+0.000004j -0.004026+0.003574j  ... -0.007140  1.000058
+# MCBWV.4R3.B1  0.000001+0.000004j -0.002429+0.004805j  ... -0.009601  1.000058
+# BPMW.4R3.B1   0.000001+0.000004j -0.002351+0.004843j  ... -0.009678  1.000058
+# MQWA.A4R3.B1  0.000001+0.000004j -0.001852+0.005055j  ... -0.010102  1.000058
+# MQWA.B4R3.B1  0.000001+0.000004j -0.001231+0.005241j  ... -0.010474  1.000058
+# ...                          ...                 ...  ...       ...       ...
+# MQWB.4L3.B1  -0.000000+0.000004j -0.005059+0.001842j  ... -0.003675  1.000058
+# MQWA.B4L3.B1 -0.000000+0.000004j -0.004958+0.002098j  ... -0.004187  1.000058
+# MQWA.A4L3.B1 -0.000000+0.000004j -0.004850+0.002337j  ... -0.004666  1.000058
+# BPMW.4L3.B1  -0.000000+0.000004j -0.004831+0.002376j  ... -0.004743  1.000058
+# MCBWH.4L3.B1 -0.000000+0.000004j -0.004691+0.002641j  ... -0.005274  1.000058
+
+
 # calculate the closest tune approach from the complex rdts
 df_dqmin = closest_tune_approach(df_coupling,
                                  qx=df_twiss.Q1, qy=df_twiss.Q2,
                                  method='calaga'
                                  )
 
+# Example:
+# print(df_dqmin) 
+#
+#                  DELTAQMIN
+# NAME
+# IP3           1.760865e-07
+# MCBWV.4R3.B1  1.760865e-07
+# BPMW.4R3.B1   1.760866e-07
+# MQWA.A4R3.B1  1.760865e-07
+# MQWA.B4R3.B1  1.760865e-07
+# ...                    ...
+# MQWB.4L3.B1   1.760865e-07
+# MQWA.B4L3.B1  1.760865e-07
+# MQWA.A4L3.B1  1.760866e-07
+# BPMW.4L3.B1   1.760865e-07
+# MCBWH.4L3.B1  1.760865e-0
+
 # do something with the data.
+# (...)
 
 # write out
 # as the writer can only handle real data, 
@@ -92,7 +134,24 @@ df_rdts = calculate_rdts(df_twiss, rdts=rdts,
                          complex_columns=True,  # complex output
                          )
 
+# Example: 
+# print(df_rdts) 
+#                            F0002  ...               F2000
+# NAME                              ...
+# IP3           2.673376-1.045712j  ... -2.863617-0.789910j
+# MCBWV.4R3.B1  2.475684-1.453081j  ... -1.927365-2.260426j
+# BPMW.4R3.B1   2.470411-1.462027j  ... -1.862287-2.314336j
+# MQWA.A4R3.B1  2.440763-1.511004j  ... -1.413706-2.612603j
+# MQWA.B4R3.B1  2.228282-1.555324j  ... -0.788608-2.855177j
+# ...                          ...  ...                 ...
+# MQWB.4L3.B1   2.733194+0.167312j  ... -2.632290+0.135418j
+# MQWA.B4L3.B1  2.763986-0.041253j  ... -2.713212+0.063256j
+# MQWA.A4L3.B1  2.804960-0.235493j  ... -2.847616-0.017922j
+# BPMW.4L3.B1   2.858218-0.266543j  ... -2.970384-0.032890j
+# MCBWH.4L3.B1  2.831426-0.472735j  ... -2.966818-0.149180j
+
 # do something with the rdts.
+# (...)
 
 # write out
 # as the writer can only handle real data, either set real = True above 
@@ -121,7 +180,34 @@ df_twiss = tfs.read("twiss.tfs", index="NAME")
 # calculate coupling from the cmatrix and append to original dataframe
 # output=['rdts'] is used to avoid the output of the gamma and C## columns.
 df_twiss[["F1001", "F1010"]] = coupling_from_cmatrix(df_twiss, output=['rdts'])
+
+# Example:
+# print(df_twiss)
+# 
+# Headers:
+# NAME: TWISS
+# TYPE: TWISS
+# SEQUENCE: LHCB1
+# ...
+# ORIGIN: 5.05.02 Linux 64
+# DATE: 01/02/21
+# TIME: 19.58.08
+# 
+#                  KEYWORD           S  ...               F1001               F1010
+# NAME                                  ...
+# IP3               MARKER      0.0000  ... -0.000000+0.000004j -0.004026+0.003574j
+# MCBWV.4R3.B1     VKICKER     21.8800  ...  0.000001+0.000004j -0.002429+0.004805j
+# BPMW.4R3.B1      MONITOR     22.5205  ...  0.000001+0.000004j -0.002351+0.004843j
+# MQWA.A4R3.B1  QUADRUPOLE     26.1890  ...  0.000001+0.000004j -0.001852+0.005055j
+# MQWA.B4R3.B1  QUADRUPOLE     29.9890  ...  0.000001+0.000004j -0.001231+0.005241j
+# ...                  ...         ...  ...                 ...                 ...
+# MQWB.4L3.B1   QUADRUPOLE  26628.2022  ... -0.000000+0.000004j -0.005059+0.001842j
+# MQWA.B4L3.B1  QUADRUPOLE  26632.0022  ... -0.000000+0.000004j -0.004958+0.002098j
+# MQWA.A4L3.B1  QUADRUPOLE  26635.8022  ... -0.000000+0.000004j -0.004850+0.002337j
+# BPMW.4L3.B1      MONITOR  26636.4387  ... -0.000000+0.000004j -0.004831+0.002376j
+# MCBWH.4L3.B1     HKICKER  26641.0332  ... -0.000000+0.000004j -0.004691+0.002641j
 ```
+
 
 ## Quality checks
 

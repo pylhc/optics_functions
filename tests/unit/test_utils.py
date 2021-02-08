@@ -245,8 +245,8 @@ def test_switch_signs_for_beam4_madx_data():
     df_errors_b4 = tfs.read(input_dir / file_errors.format(4), index=NAME)
 
     # Reverse index to compare with beam 2
-    df_twiss_b4 = df_twiss_b4.loc[::-1, :]
-    df_errors_b4 = df_errors_b4.loc[::-1, :]
+    df_twiss_b4 = df_twiss_b4.iloc[::-1, :]
+    df_errors_b4 = df_errors_b4.iloc[::-1, :]
 
     df_twiss_b4switched, df_errors_b4switched = switch_signs_for_beam4(df_twiss_b4, df_errors_b4)
     twiss_cols, err_cols = get_twiss_and_error_columns(6)
