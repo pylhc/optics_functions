@@ -9,7 +9,7 @@ the calculated coupling RDTs.
 """
 import logging
 from contextlib import suppress
-from typing import Sequence
+from typing import Sequence, Tuple
 
 import numpy as np
 from tfs import TfsDataFrame
@@ -181,23 +181,25 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, 
     return df_res
 
 
-def _cta_franchi(df: TfsDataFrame, qx_frac: float, qy_frac: float):
+def _cta_franchi(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> np.array:
     """ Closest tune approach calculated by Eq. (1) in [PerssonImprovedControlCoupling2014]_ . """
     return 4 * (qx_frac - qy_frac) * df['F1001'].abs()
 
 
-def _cta_persson_alt(df: TfsDataFrame, qx_frac: float, qy_frac: float):
+def _cta_persson_alt(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> np.array:
     """ Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ .
 
     The exp(i(Qx-Qy)s/R) term is omitted. """
     deltaq = qx_frac - qy_frac  # fractional tune split
-    return 4 * deltaq * df['F1001'] * np.exp(-1j * (df[f"{PHASE_ADV}{X}"] - df[f"{PHASE_ADV}{Y}"]))
+    length_weights = _get_weights_from_lengths(df)
+    return 4 * deltaq * length_weights * df['F1001'] * np.exp(-1j * PI2 * (df[f"{PHASE_ADV}{X}"] - df[f"{PHASE_ADV}{Y}"]))
 
 
-def _cta_persson(df: TfsDataFrame, qx_frac: float, qy_frac: float):
+def _cta_persson(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> np.array:
     """ Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ . """
     deltaq = qx_frac - qy_frac  # fractional tune split
-    return 4 * deltaq * df['F1001'] * np.exp(1j *
+    length_weights = _get_weights_from_lengths(df)
+    return 4 * deltaq * length_weights * df['F1001'] * np.exp(1j * PI2 *
            ((deltaq * df[S] / (df.headers[LENGTH] / PI2)) - (df[f"{PHASE_ADV}{X}"] - df[f"{PHASE_ADV}{Y}"])))
 
 
@@ -213,3 +215,15 @@ def _cta_calaga(df: TfsDataFrame, qx_frac: float, qy_frac: float):
     return ((np.cos(PI2 * qx_frac) - np.cos(PI2 * qy_frac))
             / (np.pi * (np.sin(PI2 * qx_frac) + np.sin(PI2 * qy_frac)))
             * (4 * np.sqrt(f_diff) / (1 + 4*f_diff)))
+
+
+def _get_weights_from_lengths(df: TfsDataFrame) -> Tuple[float, np.array]:
+    """ Coefficients for the two `persson` methods. """
+    # approximate length of each element (ds in integral)
+    s_periodic = np.zeros(len(df) + 1)
+    s_periodic[1:] = df[S].to_numpy()
+    s_periodic[0] = df[S][-1] - df.headers[LENGTH]
+
+    # weight ds/(2*pi*R) * N (as we take the mean afterwards)
+    weights = np.diff(s_periodic) / df.headers[LENGTH] * len(df)
+    return weights
