@@ -16,7 +16,7 @@ from tfs import TfsDataFrame
 
 from optics_functions.constants import (ALPHA, BETA, GAMMA,
                                         X, Y, TUNE, DELTA,
-                                        MINIMUM, PI2, PHASE_ADV, S, LENGTH)
+                                        MINIMUM, PI2, PHASE_ADV, S, LENGTH, IMAG, REAL)
 from optics_functions.rdt import calculate_rdts
 from optics_functions.utils import split_complex_columns, timeit
 
@@ -25,6 +25,8 @@ COUPLING_RDTS = ["F1001", "F1010"]
 
 LOG = logging.getLogger(__name__)
 
+
+# Coupling ---------------------------------------------------------------------
 
 def coupling_via_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs):
     """ Returns the coupling term.
@@ -59,7 +61,7 @@ def coupling_via_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs):
 
 
 def coupling_via_cmatrix(df: TfsDataFrame, complex_columns: bool = True,
-                         output: Sequence[str] = ("rdts", "gamma", "cmatrix")):
+                         output: Sequence[str] = ("rdts", "gamma", "cmatrix")) -> TfsDataFrame:
     """ Calculates C matrix then Coupling and Gamma from it.
     See [CalagaBetatronCoupling2005]_ .
 
@@ -128,6 +130,78 @@ def coupling_via_cmatrix(df: TfsDataFrame, complex_columns: bool = True,
 
     return df_res
 
+
+# R-Matrix ---------------------------------------------------------------------
+
+def rmatrix_from_coupling(df: TfsDataFrame, complex_columns: bool = True) -> TfsDataFrame:
+    """ Calculates R matrix from a DataFrame containing the coupling columns
+     as well as alpha and beta columns. This is in principle the inverse of
+     func:`optics_functions.coupling.coupling_via_cmatrix`.
+    See [CalagaBetatronCoupling2005]_ .
+
+    Args:
+        df (TfsDataFrame): Twiss Dataframe
+        complex_columns (bool): Tells the function if the coupling input columns
+                                are complex-valued or split into real and
+                                imaginary parts.
+
+    Returns:
+        New TfsDataFrame containing the R-columns.
+    """
+    LOG.info("Calculating r-matrix from coupling rdts.")
+    df_res = TfsDataFrame(index=df.index)
+
+    with timeit("R-Matrix calculation", print_fun=LOG.debug):
+        if complex_columns:
+            df = split_complex_columns(df, COUPLING_RDTS, drop=False)
+
+        n = len(df)
+
+        # From Eq. (5) in reference:
+        inv_gx, jcj, gy = np.zeros((n, 2, 2)), np.zeros((n, 2, 2)), np.zeros((n, 2, 2))
+
+        sqrtbetax = np.sqrt(df[f"{BETA}{X}"])
+        sqrtbetay = np.sqrt(df[f"{BETA}{Y}"])
+
+        inv_gx[:, 1, 1] = 1 / sqrtbetax
+        inv_gx[:, 1, 0] = -df[f"{ALPHA}{X}"] * inv_gx[:, 1, 1]
+        inv_gx[:, 0, 0] = sqrtbetax
+
+        gy[:, 0, 0] = 1 / sqrtbetay
+        gy[:, 1, 0] = df[f"{ALPHA}{Y}"] * gy[:, 0, 0]
+        gy[:, 1, 1] = sqrtbetay
+
+        # Eq. (15)
+        gamma = np.sqrt(1. / (1. + 4. * (df["F1001"].abs()**2 - df["F1010"].abs()**2)))
+
+        # Eq. (11) and Eq. (12)
+        cbar = np.zeros((n, 2, 2))
+        cbar[:, 0, 0] = (df[f"F1001{IMAG}"] + df[f"F1010{IMAG}"]).to_numpy()
+        cbar[:, 0, 1] = -(df[f"F1010{REAL}"] - df[f"F1001{REAL}"]).to_numpy()
+        cbar[:, 1, 0] = -(df[f"F1010{REAL}"] + df[f"F1001{REAL}"]).to_numpy()
+        cbar[:, 1, 1] = (df[f"F1001{IMAG}"] - df[f"F1010{IMAG}"]).to_numpy()
+        cbar = 2 * gamma.to_numpy()[:, None, None] * cbar
+
+        # Gx^-1 * Cbar * Gy = C  (Eq. (5) inverted)
+        c = np.matmul(inv_gx, np.matmul(cbar, gy))
+
+        # from above: -J R^T J == inv(R)*det|R| == C
+        # therefore -J C^T J = R
+        jcj[:, 0, 0] = c[:, 1, 1]
+        jcj[:, 0, 1] = -c[:, 0, 1]
+        jcj[:, 1, 0] = -c[:, 1, 0]
+        jcj[:, 1, 1] = c[:, 0, 0]
+
+        rmat = jcj * np.sqrt(1/(1 - np.linalg.det(jcj))[:, None, None])
+        df_res["R11"] = rmat[:, 0, 0]
+        df_res["R12"] = rmat[:, 0, 1]
+        df_res["R21"] = rmat[:, 1, 0]
+        df_res["R22"] = rmat[:, 1, 1]
+
+    return df_res
+
+
+# Closest Tune Approach --------------------------------------------------------
 
 def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None, method: str = "calaga"):
     """ Calculates the closest tune approach from coupling resonances.

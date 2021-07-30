@@ -6,7 +6,7 @@ import tfs
 
 from optics_functions.constants import NAME, S, ALPHA, Y, BETA, X, GAMMA, REAL, IMAG, TUNE, PHASE_ADV
 from optics_functions.coupling import (closest_tune_approach, coupling_via_rdts,
-                                       coupling_via_cmatrix, COUPLING_RDTS)
+                                       coupling_via_cmatrix, COUPLING_RDTS, rmatrix_from_coupling)
 from optics_functions.utils import prepare_twiss_dataframe
 from tests.unit.test_rdt import arrays_are_close_almost_everywhere
 
@@ -23,14 +23,38 @@ def test_cmatrix():
     assert all(c in df_res.columns for c in ("F1001", "F1010", "C11", "C12", "C21", "C22", GAMMA))
     assert not df_res.isna().any().any()
 
-    detC = (df_res["C11"]*df_res["C22"] - df_res["C12"]*df_res["C21"])
+    # Checks based on CalagaBetatronCoupling2005
+    detC = (df_res["C11"] * df_res["C22"] - df_res["C12"] * df_res["C21"])
     fsq_diff = np.abs(df_res["F1001"])**2 - np.abs(df_res["F1010"])**2
-    f_term = 1/(1+4*fsq_diff)
+    f_term = 1/(1 + 4 * fsq_diff)
     g_sq = df_res[GAMMA]**2
     assert all(np.abs(detC + g_sq - 1) < 1e-15)
     assert all(np.abs(detC / (4 * g_sq) - fsq_diff) < 1e-15)  # Eq. (13)
     assert all(np.abs(detC + f_term - 1) < 1e-15)  # Eq. (13)
     assert all(np.abs(g_sq - f_term) < 1e-15)  # Eq. (14)
+
+
+@pytest.mark.basic
+@pytest.mark.parametrize('source', ['real', 'fake'])
+def test_rmatrix_to_coupling_to_rmatrix(source):
+    if source == "fake":
+        n = 5
+        np.random.seed(487423872)
+        df = get_df(n)
+    else:
+        df = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b1.coupling_bump.tfs", index=NAME)
+
+    df_coupling = coupling_via_cmatrix(df)
+    for col in ("ALFX", "BETX", "ALFY", "BETY"):
+        df_coupling[col] = df[col]
+
+    df_res = rmatrix_from_coupling(df_coupling)
+
+    for col in ("R11", "R12", "R21", "R22"):
+        # For debugging:
+        # print(col)
+        # print(max(np.abs(df[col] - df_res[col])))
+        assert all(np.abs(df[col] - df_res[col]) < 5e-15)
 
 
 @pytest.mark.basic
