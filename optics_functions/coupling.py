@@ -13,6 +13,7 @@ from typing import Sequence
 
 import numpy as np
 from tfs import TfsDataFrame
+from pandas import DataFrame
 
 from optics_functions.constants import (ALPHA, BETA, GAMMA,
                                         X, Y, TUNE, DELTA,
@@ -60,13 +61,13 @@ def coupling_via_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs):
     return df_res
 
 
-def coupling_via_cmatrix(df: TfsDataFrame, complex_columns: bool = True,
-                         output: Sequence[str] = ("rdts", "gamma", "cmatrix")) -> TfsDataFrame:
+def coupling_via_cmatrix(df: DataFrame, complex_columns: bool = True,
+                         output: Sequence[str] = ("rdts", "gamma", "cmatrix")) -> DataFrame:
     """ Calculates C matrix then Coupling and Gamma from it.
     See [CalagaBetatronCoupling2005]_ .
 
     Args:
-        df (TfsDataFrame): Twiss Dataframe
+        df (DataFrame): Twiss Dataframe
         complex_columns (bool): Output complex values in single column of type complex.
                                 If ``False``, split complex columns into two
                                 real-valued columns.
@@ -77,7 +78,7 @@ def coupling_via_cmatrix(df: TfsDataFrame, complex_columns: bool = True,
         New TfsDataFrame with columns as specified in 'output'.
     """
     LOG.info("Calculating coupling from c-matrix.")
-    df_res = TfsDataFrame(index=df.index)
+    df_res = DataFrame(index=df.index)
 
     with timeit("CMatrix calculation", print_fun=LOG.debug):
         n = len(df)
@@ -133,10 +134,10 @@ def coupling_via_cmatrix(df: TfsDataFrame, complex_columns: bool = True,
 
 # R-Matrix ---------------------------------------------------------------------
 
-def rmatrix_from_coupling(df: TfsDataFrame, complex_columns: bool = True) -> TfsDataFrame:
-    """ Calculates R matrix from a DataFrame containing the coupling columns
-     as well as alpha and beta columns. This is in principle the inverse of
-     func:`optics_functions.coupling.coupling_via_cmatrix`.
+def rmatrix_from_coupling(df: DataFrame, complex_columns: bool = True) -> DataFrame:
+    """ Calculates the R-matrix from a DataFrame containing the coupling columns
+     as well as alpha and beta columns. This is the inverse of
+    :func:`optics_functions.coupling.coupling_via_cmatrix`.
     See [CalagaBetatronCoupling2005]_ .
 
     Args:
@@ -149,7 +150,7 @@ def rmatrix_from_coupling(df: TfsDataFrame, complex_columns: bool = True) -> Tfs
         New TfsDataFrame containing the R-columns.
     """
     LOG.info("Calculating r-matrix from coupling rdts.")
-    df_res = TfsDataFrame(index=df.index)
+    df_res = DataFrame(index=df.index)
 
     with timeit("R-Matrix calculation", print_fun=LOG.debug):
         if complex_columns:
