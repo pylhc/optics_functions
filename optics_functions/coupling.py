@@ -84,7 +84,8 @@ def coupling_via_cmatrix(df: DataFrame, complex_columns: bool = True,
         n = len(df)
         gx, r, inv_gy = np.zeros((n, 2, 2)), np.zeros((n, 2, 2)), np.zeros((n, 2, 2))
 
-        # rs form after -J R^T J == inv(R)*det|R| == C
+        # Eq. (16)  C = 1 / (1 + |R|) * -J R J
+        # rs form after -J R^T J
         r[:, 0, 0] = df["R22"]
         r[:, 0, 1] = -df["R12"]
         r[:, 1, 0] = -df["R21"]
@@ -173,7 +174,12 @@ def rmatrix_from_coupling(df: DataFrame, complex_columns: bool = True) -> DataFr
         gy[:, 1, 1] = sqrtbetay
 
         # Eq. (15)
-        gamma = np.sqrt(1. / (1. + 4. * (df["F1001"].abs()**2 - df["F1010"].abs()**2)))
+        if complex_columns:
+            abs_squared_diff = df["F1001"].abs()**2 - df["F1010"].abs()**2
+        else:
+            abs_squared_diff = df[f"F1001{REAL}"]**2 + df[f"F1001{IMAG}"]**2 - df[f"F1010{REAL}"]**2 - df[f"F1010{IMAG}"]**2
+
+        gamma = np.sqrt(1. / (1. + 4. * abs_squared_diff))
 
         # Eq. (11) and Eq. (12)
         cbar = np.zeros((n, 2, 2))

@@ -115,6 +115,27 @@ def split_complex_columns(df: pd.DataFrame, columns: Sequence[str],
     return df
 
 
+def merge_complex_columns(df: pd.DataFrame, columns: Sequence[str],
+                          drop: bool = True) -> TfsDataFrame:
+    """ Merges the given real and imag columns into complex columns.
+
+    Args:
+        df (TfsDataFrame): DataFrame containing the original columns.
+        columns (Sequence[str]): List of complex columns names to be created.
+        drop (bool): Original columns are not present in resulting DataFrame.
+
+    Returns:
+        Original TfsDataFrame with added columns.
+    """
+    df = df.copy()
+    for column in columns:
+        df[column] = df[f"{column}{REAL}"] + 1j * df[f"{column}{IMAG}"]
+
+    if drop:
+        df = df.drop(columns=[f"{column}{part}" for column in columns for part in (REAL, IMAG)])
+    return df
+
+
 def switch_signs_for_beam4(df_twiss: pd.DataFrame,
                            df_errors: pd.DataFrame = None) -> Tuple[TfsDataFrame, TfsDataFrame]:
     """ Switch the signs for Beam 4 optics.
