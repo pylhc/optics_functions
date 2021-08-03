@@ -291,7 +291,7 @@ def _cta_calaga(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series:
     """
     f_diff = df["F1001"].abs() ** 2
     with suppress(KeyError):
-        f_diff -= df["F1010"].abs() ** 2
+        f_diff -= df["1010"].abs() ** 2
 
     return (
         (np.cos(PI2 * qx_frac) - np.cos(PI2 * qy_frac))
