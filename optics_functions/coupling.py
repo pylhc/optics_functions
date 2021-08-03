@@ -92,27 +92,26 @@ def coupling_via_cmatrix(df: DataFrame, complex_columns: bool = True,
 
         r *= 1 / np.sqrt(1 + np.linalg.det(r)[:, None, None])
 
-        # Cbar = Gx * C * Gy^-1  (Eq. (5) in reference)
-        sqrtbetax = np.sqrt(df[f"{BETA}{X}"])
-        sqrtbetay = np.sqrt(df[f"{BETA}{Y}"])
+        # Cbar = Gx * C * Gy^-1,   Eq. (5)
+        sqrt_betax = np.sqrt(df[f"{BETA}{X}"])
+        sqrt_betay = np.sqrt(df[f"{BETA}{Y}"])
 
-        gx[:, 0, 0] = 1 / sqrtbetax
+        gx[:, 0, 0] = 1 / sqrt_betax
         gx[:, 1, 0] = df[f"{ALPHA}{X}"] * gx[:, 0, 0]
-        gx[:, 1, 1] = sqrtbetax
+        gx[:, 1, 1] = sqrt_betax
 
-        inv_gy[:, 1, 1] = 1 / sqrtbetay
+        inv_gy[:, 1, 1] = 1 / sqrt_betay
         inv_gy[:, 1, 0] = -df[f"{ALPHA}{Y}"] * inv_gy[:, 1, 1]
-        inv_gy[:, 0, 0] = sqrtbetay
+        inv_gy[:, 0, 0] = sqrt_betay
 
         c = np.matmul(gx, np.matmul(r, inv_gy))
         gamma = np.sqrt(1 - np.linalg.det(c))
 
     if "rdts" in output:
+        # Eq. (9) and Eq. (10)
         denom = 1 / (4 * gamma)
-        df_res.loc[:, "F1001"] = ((c[:, 0, 0] + c[:, 1, 1]) * 1j +
-                                  (c[:, 0, 1] - c[:, 1, 0])) * denom
-        df_res.loc[:, "F1010"] = ((c[:, 0, 0] - c[:, 1, 1]) * 1j +
-                                  (-c[:, 0, 1]) - c[:, 1, 0]) * denom
+        df_res.loc[:, "F1001"] = denom * (+c[:, 0, 1] - c[:, 1, 0] + (c[:, 0, 0] + c[:, 1, 1]) * 1j)
+        df_res.loc[:, "F1010"] = denom * (-c[:, 0, 1] - c[:, 1, 0] + (c[:, 0, 0] - c[:, 1, 1]) * 1j)
         LOG.info(f"Average coupling amplitude |F1001|: {df_res['F1001'].abs().mean():g}")
         LOG.info(f"Average coupling amplitude |F1010|: {df_res['F1010'].abs().mean():g}")
 
