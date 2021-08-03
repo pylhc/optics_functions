@@ -11,14 +11,13 @@ import logging
 import string
 from contextlib import contextmanager
 from time import time
-from typing import Sequence, Tuple, Iterable
+from typing import Iterable, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
 from tfs import TfsDataFrame
 
-from optics_functions.constants import (REAL, IMAG, PLANES, PHASE_ADV,
-                                        X, Y, S, NAME, DELTA_ORBIT)
+from optics_functions.constants import DELTA_ORBIT, IMAG, NAME, PHASE_ADV, PLANES, REAL, S, X, Y
 
 LOG = logging.getLogger(__name__)
 D = DELTA_ORBIT
@@ -26,12 +25,14 @@ D = DELTA_ORBIT
 # DataFrames -------------------------------------------------------------------
 
 
-def prepare_twiss_dataframe(df_twiss: TfsDataFrame,
-                            df_errors: pd.DataFrame = None,
-                            invert_signs_madx: bool = False,
-                            max_order: int = 16,
-                            join: str = "inner") -> TfsDataFrame:
-    """ Prepare dataframe to use with the optics functions.
+def prepare_twiss_dataframe(
+    df_twiss: TfsDataFrame,
+    df_errors: pd.DataFrame = None,
+    invert_signs_madx: bool = False,
+    max_order: int = 16,
+    join: str = "inner",
+) -> TfsDataFrame:
+    """Prepare dataframe to use with the optics functions.
 
     - Adapt Beam 4 signs.
     - Add missing K(S)L and orbit columns.
@@ -87,14 +88,14 @@ def prepare_twiss_dataframe(df_twiss: TfsDataFrame,
     for name, df_old in (("twiss", df_twiss), ("errors", df_errors)):
         dropped_columns = set(df_old.columns) - set(df.columns)
         if dropped_columns:
-            LOG.warning(f"The following {name}-columns were"
-                        f" dropped on merge: {seq2str(dropped_columns)}")
+            LOG.warning(f"The following {name}-columns were dropped on merge: {seq2str(dropped_columns)}")
     return df
 
 
-def split_complex_columns(df: pd.DataFrame, columns: Sequence[str],
-                          drop: bool = True) -> TfsDataFrame:
-    """ Splits the given complex columns into two real-values columns containing the
+def split_complex_columns(
+    df: pd.DataFrame, columns: Sequence[str], drop: bool = True
+) -> TfsDataFrame:
+    """Splits the given complex columns into two real-values columns containing the
     real and imaginary parts of the original columns.
 
     Args:
@@ -115,12 +116,13 @@ def split_complex_columns(df: pd.DataFrame, columns: Sequence[str],
     return df
 
 
-def merge_complex_columns(df: pd.DataFrame, columns: Sequence[str],
-                          drop: bool = True) -> TfsDataFrame:
-    """ Merges the given real and imag columns into complex columns.
+def merge_complex_columns(
+    df: pd.DataFrame, columns: Sequence[str], drop: bool = True
+) -> TfsDataFrame:
+    """Merges the given real and imag columns into complex columns.
 
     Args:
-        df (TfsDataFrame): DataFrame containing the original columns.
+        df (pd.DataFrame): DataFrame containing the original columns.
         columns (Sequence[str]): List of complex columns names to be created.
         drop (bool): Original columns are not present in resulting DataFrame.
 
@@ -136,28 +138,24 @@ def merge_complex_columns(df: pd.DataFrame, columns: Sequence[str],
     return df
 
 
-def switch_signs_for_beam4(df_twiss: pd.DataFrame,
-                           df_errors: pd.DataFrame = None) -> Tuple[TfsDataFrame, TfsDataFrame]:
-    """ Switch the signs for Beam 4 optics.
+def switch_signs_for_beam4(
+    df_twiss: pd.DataFrame, df_errors: pd.DataFrame = None
+) -> Tuple[TfsDataFrame, TfsDataFrame]:
+    """Switch the signs for Beam 4 optics.
     This is due to the switch in direction for this beam and
     (anti-) symmetry after a rotation of 180deg around the y-axis of magnets,
     combined with the fact that the KL values in MAD-X twiss do not change sign,
     but in the errors they do (otherwise it would compensate).
     Magnet orders that show anti-symmetry are: a1 (K0SL), b2 (K1L), a3 (K2SL), b4 (K3L) etc.
     Also the sign for (delta) X is switched back to have the same orientation as beam2."""
-    LOG.debug(
-        f"Switching signs for X and K(S)L values when needed, to match Beam 4 to Beam 2."
-    )
+    LOG.debug(f"Switching signs for X and K(S)L values when needed, to match Beam 4 to Beam 2.")
     df_twiss, df_errors = df_twiss.copy(), df_errors.copy()
     df_twiss[X] = -df_twiss[X]
 
     if df_errors is not None:
         df_errors[f"{D}{X}"] = -df_errors[f"{D}{X}"]
         max_order = (
-            df_errors.columns.str.extract(r"^K(\d+)S?L$", expand=False)
-            .dropna()
-            .astype(int)
-            .max()
+            df_errors.columns.str.extract(r"^K(\d+)S?L$", expand=False).dropna().astype(int).max()
         )
         for order in range(max_order + 1):
             name = f"K{order:d}{'' if order % 2 else 'S'}L"  # odd -> '', even -> S
@@ -170,7 +168,7 @@ def switch_signs_for_beam4(df_twiss: pd.DataFrame,
 
 
 def get_all_phase_advances(df: pd.DataFrame) -> dict:
-    """ Calculate phase advances between all elements.
+    """Calculate phase advances between all elements.
     Will result in a elements x elements matrix, that might be very large!
 
     Args:
@@ -196,7 +194,7 @@ def get_all_phase_advances(df: pd.DataFrame) -> dict:
 
 
 def dphi(data: np.ndarray, q: float) -> np.ndarray:
-    """ Return dphi from phase advances in data, see Eq. (8) in [FranchiAnalyticFormulas2017]_ .
+    """Return dphi from phase advances in data, see Eq. (8) in [FranchiAnalyticFormulas2017]_ .
 
     Args:
         data (DataFrame, Series): Phase-Advance data.
@@ -222,7 +220,7 @@ def tau(data: np.ndarray, q: float) -> np.ndarray:
 
 
 def dphi_at_element(df: pd.DataFrame, element: str, qx: float, qy: float) -> dict:
-    """ Return dphis for both planes at the given element.
+    """Return dphis for both planes at the given element.
     See Eq. (8) in [FranchiAnalyticFormulas2017]_ .
 
     Args:
@@ -260,7 +258,7 @@ def add_missing_columns(df: pd.DataFrame, columns: Iterable) -> pd.DataFrame:
 
 @contextmanager
 def timeit(text: str = "Time used {:.3f}s", print_fun=LOG.debug):
-    """ Timing context with logging/printing output.
+    """Timing context with logging/printing output.
 
     Args:
         text (str): Text to print. If it contains an unnamed format key, this
@@ -303,8 +301,6 @@ def set_name_index(df: pd.DataFrame, df_name="") -> pd.DataFrame:
         df = df.set_index(NAME)
 
     if not all(isinstance(indx, str) for indx in df.index):
-        raise TypeError(
-            f"Index of the {df_name} Dataframe should be string (i.e. from {NAME})"
-        )
+        raise TypeError(f"Index of the {df_name} Dataframe should be string (i.e. from {NAME})")
 
     return df
