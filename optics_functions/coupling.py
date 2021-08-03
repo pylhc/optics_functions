@@ -177,7 +177,8 @@ def rmatrix_from_coupling(df: DataFrame, complex_columns: bool = True) -> DataFr
         if complex_columns:
             abs_squared_diff = df["F1001"].abs()**2 - df["F1010"].abs()**2
         else:
-            abs_squared_diff = df[f"F1001{REAL}"]**2 + df[f"F1001{IMAG}"]**2 - df[f"F1010{REAL}"]**2 - df[f"F1010{IMAG}"]**2
+            abs_squared_diff = (df[f"F1001{REAL}"]**2 + df[f"F1001{IMAG}"]**2 -
+                                df[f"F1010{REAL}"]**2 - df[f"F1010{IMAG}"]**2)
 
         gamma = np.sqrt(1.0 / (1.0 + 4.0 * abs_squared_diff))
 
