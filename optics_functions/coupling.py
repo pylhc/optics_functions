@@ -23,7 +23,7 @@ from optics_functions.utils import split_complex_columns, timeit
 COUPLING_RDTS = ["F1001", "F1010"]
 
 
-LOGGER = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 # Coupling ---------------------------------------------------------------------
@@ -60,11 +60,8 @@ def coupling_via_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs) 
     return df_res
 
 
-def coupling_via_cmatrix(
-    df: DataFrame,
-    complex_columns: bool = True,
-    output: Sequence[str] = ("rdts", "gamma", "cmatrix"),
-) -> DataFrame:
+def coupling_via_cmatrix(df: DataFrame, complex_columns: bool = True,
+                         output: Sequence[str] = ("rdts", "gamma", "cmatrix")) -> DataFrame:
     """Calculates C matrix then Coupling and Gamma from it.
     See [CalagaBetatronCoupling2005]_ .
 
@@ -79,10 +76,10 @@ def coupling_via_cmatrix(
     Returns:
         New TfsDataFrame with columns as specified in 'output'.
     """
-    LOGGER.info("Calculating coupling from c-matrix.")
+    LOG.info("Calculating coupling from c-matrix.")
     df_res = DataFrame(index=df.index)
 
-    with timeit("CMatrix calculation", print_fun=LOGGER.debug):
+    with timeit("CMatrix calculation", print_fun=LOG.debug):
         n = len(df)
         gx, r, inv_gy = np.zeros((n, 2, 2)), np.zeros((n, 2, 2)), np.zeros((n, 2, 2))
 
@@ -112,10 +109,12 @@ def coupling_via_cmatrix(
 
     if "rdts" in output:
         denom = 1 / (4 * gamma)
-        df_res.loc[:, "F1001"] = ((c[:, 0, 0] + c[:, 1, 1]) * 1j + (c[:, 0, 1] - c[:, 1, 0])) * denom
-        df_res.loc[:, "F1010"] = ((c[:, 0, 0] - c[:, 1, 1]) * 1j + (-c[:, 0, 1]) - c[:, 1, 0]) * denom
-        LOGGER.info(f"Average coupling amplitude |F1001|: {df_res['F1001'].abs().mean():g}")
-        LOGGER.info(f"Average coupling amplitude |F1010|: {df_res['F1010'].abs().mean():g}")
+        df_res.loc[:, "F1001"] = ((c[:, 0, 0] + c[:, 1, 1]) * 1j +
+                                  (c[:, 0, 1] - c[:, 1, 0])) * denom
+        df_res.loc[:, "F1010"] = ((c[:, 0, 0] - c[:, 1, 1]) * 1j +
+                                  (-c[:, 0, 1]) - c[:, 1, 0]) * denom
+        LOG.info(f"Average coupling amplitude |F1001|: {df_res['F1001'].abs().mean():g}")
+        LOG.info(f"Average coupling amplitude |F1010|: {df_res['F1010'].abs().mean():g}")
 
         if not complex_columns:
             df_res = split_complex_columns(df_res, COUPLING_RDTS)
@@ -128,7 +127,7 @@ def coupling_via_cmatrix(
 
     if "gamma" in output:
         df_res.loc[:, GAMMA] = gamma
-        LOGGER.debug(f"Average gamma: {df_res[GAMMA].mean():g}")
+        LOG.debug(f"Average gamma: {df_res[GAMMA].mean():g}")
 
     return df_res
 
@@ -151,15 +150,16 @@ def rmatrix_from_coupling(df: DataFrame, complex_columns: bool = True) -> DataFr
     Returns:
         New DataFrame containing the R-columns.
     """
-    LOGGER.info("Calculating r-matrix from coupling rdts.")
+    LOG.info("Calculating r-matrix from coupling rdts.")
     df_res = DataFrame(index=df.index)
 
-    with timeit("R-Matrix calculation", print_fun=LOGGER.debug):
+    with timeit("R-Matrix calculation", print_fun=LOG.debug):
         if complex_columns:
             df = split_complex_columns(df, COUPLING_RDTS, drop=False)
 
-        # From Eq. (5) in reference:
         n = len(df)
+
+        # From Eq. (5) in reference:
         inv_gx, jcj, gy = np.zeros((n, 2, 2)), np.zeros((n, 2, 2)), np.zeros((n, 2, 2))
 
         sqrt_betax = np.sqrt(df[f"{BETA}{X}"])
@@ -175,9 +175,9 @@ def rmatrix_from_coupling(df: DataFrame, complex_columns: bool = True) -> DataFr
 
         # Eq. (15)
         if complex_columns:
-            abs_squared_diff = df["F1001"].abs() ** 2 - df["F1010"].abs() ** 2
+            abs_squared_diff = df["F1001"].abs()**2 - df["F1010"].abs()**2
         else:
-            abs_squared_diff = df[f"F1001{REAL}"] ** 2 + df[f"F1001{IMAG}"] ** 2 - df[f"F1010{REAL}"] ** 2 - df[f"F1010{IMAG}"] ** 2
+            abs_squared_diff = df[f"F1001{REAL}"]**2 + df[f"F1001{IMAG}"]**2 - df[f"F1010{REAL}"]**2 - df[f"F1010{IMAG}"]**2
 
         gamma = np.sqrt(1.0 / (1.0 + 4.0 * abs_squared_diff))
 
@@ -210,10 +210,8 @@ def rmatrix_from_coupling(df: DataFrame, complex_columns: bool = True) -> DataFr
 
 # Closest Tune Approach --------------------------------------------------------
 
-
-def closest_tune_approach(
-    df: TfsDataFrame, qx: float = None, qy: float = None, method: str = "calaga"
-) -> TfsDataFrame:
+def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None,
+                          method: str = "calaga") -> TfsDataFrame:
     """Calculates the closest tune approach from coupling resonances.
 
     A complex F1001 column is assumed to be present in the DataFrame.
@@ -261,7 +259,7 @@ def closest_tune_approach(
     df_res = TfsDataFrame(index=df.index, columns=[dqmin_str])
     df_res[dqmin_str] = method_map[method.lower()](df, qx_frac, qy_frac)
 
-    LOGGER.info(f"({method}) |C-| = {np.abs(df_res[dqmin_str].mean())}")
+    LOG.info(f"({method}) |C-| = {np.abs(df_res[dqmin_str].mean())}")
     return df_res
 
 
