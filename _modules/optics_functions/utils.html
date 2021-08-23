@@ -91,13 +91,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">Main Modules</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Main Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html">Coupling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html">Resonance Driving Terms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html">Utilities</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Helper</span></p>
+<p class="caption" role="heading"><span class="caption-text">Helper</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../helper/bibliography.html">Bibliography</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../helper/constants.html">Constants</a></li>
@@ -180,14 +180,13 @@
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">tfs</span> <span class="kn">import</span> <span class="n">TfsDataFrame</span>
 
-<span class="kn">from</span> <span class="nn">optics_functions.constants</span> <span class="kn">import</span> <span class="p">(</span><span class="n">REAL</span><span class="p">,</span> <span class="n">IMAG</span><span class="p">,</span> <span class="n">PLANES</span><span class="p">,</span> <span class="n">PHASE_ADV</span><span class="p">,</span>
-                                        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">NAME</span><span class="p">,</span> <span class="n">DELTA_ORBIT</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">optics_functions.constants</span> <span class="kn">import</span> <span class="n">DELTA_ORBIT</span><span class="p">,</span> <span class="n">IMAG</span><span class="p">,</span> <span class="n">NAME</span><span class="p">,</span> <span class="n">PHASE_ADV</span><span class="p">,</span> <span class="n">PLANES</span><span class="p">,</span> <span class="n">REAL</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span>
 
 <span class="n">LOG</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">D</span> <span class="o">=</span> <span class="n">DELTA_ORBIT</span>
@@ -195,12 +194,14 @@
 <span class="c1"># DataFrames -------------------------------------------------------------------</span>
 
 
-<div class="viewcode-block" id="prepare_twiss_dataframe"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.prepare_twiss_dataframe">[docs]</a><span class="k">def</span> <span class="nf">prepare_twiss_dataframe</span><span class="p">(</span><span class="n">df_twiss</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span>
-                            <span class="n">df_errors</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                            <span class="n">invert_signs_madx</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                            <span class="n">max_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
-                            <span class="n">join</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inner&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TfsDataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Prepare dataframe to use with the optics functions.</span>
+<div class="viewcode-block" id="prepare_twiss_dataframe"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.prepare_twiss_dataframe">[docs]</a><span class="k">def</span> <span class="nf">prepare_twiss_dataframe</span><span class="p">(</span>
+    <span class="n">df_twiss</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span>
+    <span class="n">df_errors</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">invert_signs_madx</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">max_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="n">join</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;inner&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TfsDataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Prepare dataframe to use with the optics functions.</span>
 
 <span class="sd">    - Adapt Beam 4 signs.</span>
 <span class="sd">    - Add missing K(S)L and orbit columns.</span>
@@ -256,14 +257,14 @@
     <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">df_old</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">&quot;twiss&quot;</span><span class="p">,</span> <span class="n">df_twiss</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;errors&quot;</span><span class="p">,</span> <span class="n">df_errors</span><span class="p">)):</span>
         <span class="n">dropped_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">df_old</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dropped_columns</span><span class="p">:</span>
-            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The following </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-columns were&quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot; dropped on merge: </span><span class="si">{</span><span class="n">seq2str</span><span class="p">(</span><span class="n">dropped_columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The following </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-columns were dropped on merge: </span><span class="si">{</span><span class="n">seq2str</span><span class="p">(</span><span class="n">dropped_columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
-<div class="viewcode-block" id="split_complex_columns"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.split_complex_columns">[docs]</a><span class="k">def</span> <span class="nf">split_complex_columns</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-                          <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TfsDataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Splits the given complex columns into two real-values columns containing the</span>
+<div class="viewcode-block" id="split_complex_columns"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.split_complex_columns">[docs]</a><span class="k">def</span> <span class="nf">split_complex_columns</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TfsDataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Splits the given complex columns into two real-values columns containing the</span>
 <span class="sd">    real and imaginary parts of the original columns.</span>
 
 <span class="sd">    Args:</span>
@@ -284,28 +285,46 @@
     <span class="k">return</span> <span class="n">df</span></div>
 
 
-<div class="viewcode-block" id="switch_signs_for_beam4"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.switch_signs_for_beam4">[docs]</a><span class="k">def</span> <span class="nf">switch_signs_for_beam4</span><span class="p">(</span><span class="n">df_twiss</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-                           <span class="n">df_errors</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">TfsDataFrame</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot; Switch the signs for Beam 4 optics.</span>
+<div class="viewcode-block" id="merge_complex_columns"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.merge_complex_columns">[docs]</a><span class="k">def</span> <span class="nf">merge_complex_columns</span><span class="p">(</span>
+    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">drop</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TfsDataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Merges the given real and imag columns into complex columns.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        df (pd.DataFrame): DataFrame containing the original columns.</span>
+<span class="sd">        columns (Sequence[str]): List of complex columns names to be created.</span>
+<span class="sd">        drop (bool): Original columns are not present in resulting DataFrame.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Original TfsDataFrame with added columns.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column</span><span class="si">}{</span><span class="n">REAL</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column</span><span class="si">}{</span><span class="n">IMAG</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">drop</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">column</span><span class="si">}{</span><span class="n">part</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="p">(</span><span class="n">REAL</span><span class="p">,</span> <span class="n">IMAG</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
+
+<div class="viewcode-block" id="switch_signs_for_beam4"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.switch_signs_for_beam4">[docs]</a><span class="k">def</span> <span class="nf">switch_signs_for_beam4</span><span class="p">(</span>
+    <span class="n">df_twiss</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">df_errors</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">TfsDataFrame</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Switch the signs for Beam 4 optics.</span>
 <span class="sd">    This is due to the switch in direction for this beam and</span>
 <span class="sd">    (anti-) symmetry after a rotation of 180deg around the y-axis of magnets,</span>
 <span class="sd">    combined with the fact that the KL values in MAD-X twiss do not change sign,</span>
 <span class="sd">    but in the errors they do (otherwise it would compensate).</span>
 <span class="sd">    Magnet orders that show anti-symmetry are: a1 (K0SL), b2 (K1L), a3 (K2SL), b4 (K3L) etc.</span>
 <span class="sd">    Also the sign for (delta) X is switched back to have the same orientation as beam2.&quot;&quot;&quot;</span>
-    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;Switching signs for X and K(S)L values when needed, to match Beam 4 to Beam 2.&quot;</span>
-    <span class="p">)</span>
+    <span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Switching signs for X and K(S)L values when needed, to match Beam 4 to Beam 2.&quot;</span><span class="p">)</span>
     <span class="n">df_twiss</span><span class="p">,</span> <span class="n">df_errors</span> <span class="o">=</span> <span class="n">df_twiss</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">df_errors</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">df_twiss</span><span class="p">[</span><span class="n">X</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">df_twiss</span><span class="p">[</span><span class="n">X</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">df_errors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">df_errors</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">D</span><span class="si">}{</span><span class="n">X</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">df_errors</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">D</span><span class="si">}{</span><span class="n">X</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
         <span class="n">max_order</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">df_errors</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^K(\d+)S?L$&quot;</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-            <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">df_errors</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^K(\d+)S?L$&quot;</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
             <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;K</span><span class="si">{</span><span class="n">order</span><span class="si">:</span><span class="s2">d</span><span class="si">}{</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">order</span> <span class="o">%</span> <span class="mi">2</span> <span class="k">else</span> <span class="s1">&#39;S&#39;</span><span class="si">}</span><span class="s2">L&quot;</span>  <span class="c1"># odd -&gt; &#39;&#39;, even -&gt; S</span>
@@ -318,7 +337,7 @@
 
 
 <div class="viewcode-block" id="get_all_phase_advances"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.get_all_phase_advances">[docs]</a><span class="k">def</span> <span class="nf">get_all_phase_advances</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Calculate phase advances between all elements.</span>
+    <span class="sd">&quot;&quot;&quot;Calculate phase advances between all elements.</span>
 <span class="sd">    Will result in a elements x elements matrix, that might be very large!</span>
 
 <span class="sd">    Args:</span>
@@ -344,7 +363,7 @@
 
 
 <div class="viewcode-block" id="dphi"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.dphi">[docs]</a><span class="k">def</span> <span class="nf">dphi</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Return dphi from phase advances in data, see Eq. (8) in [FranchiAnalyticFormulas2017]_ .</span>
+    <span class="sd">&quot;&quot;&quot;Return dphi from phase advances in data, see Eq. (8) in [FranchiAnalyticFormulas2017]_ .</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        data (DataFrame, Series): Phase-Advance data.</span>
@@ -370,7 +389,7 @@
 
 
 <div class="viewcode-block" id="dphi_at_element"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.dphi_at_element">[docs]</a><span class="k">def</span> <span class="nf">dphi_at_element</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">element</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">qx</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">qy</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Return dphis for both planes at the given element.</span>
+    <span class="sd">&quot;&quot;&quot;Return dphis for both planes at the given element.</span>
 <span class="sd">    See Eq. (8) in [FranchiAnalyticFormulas2017]_ .</span>
 
 <span class="sd">    Args:</span>
@@ -408,7 +427,7 @@
 
 <div class="viewcode-block" id="timeit"><a class="viewcode-back" href="../../modules/utils.html#optics_functions.utils.timeit">[docs]</a><span class="nd">@contextmanager</span>
 <span class="k">def</span> <span class="nf">timeit</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Time used </span><span class="si">{:.3f}</span><span class="s2">s&quot;</span><span class="p">,</span> <span class="n">print_fun</span><span class="o">=</span><span class="n">LOG</span><span class="o">.</span><span class="n">debug</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Timing context with logging/printing output.</span>
+    <span class="sd">&quot;&quot;&quot;Timing context with logging/printing output.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        text (str): Text to print. If it contains an unnamed format key, this</span>
@@ -451,9 +470,7 @@
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">NAME</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">indx</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">indx</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Index of the </span><span class="si">{</span><span class="n">df_name</span><span class="si">}</span><span class="s2"> Dataframe should be string (i.e. from </span><span class="si">{</span><span class="n">NAME</span><span class="si">}</span><span class="s2">)&quot;</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Index of the </span><span class="si">{</span><span class="n">df_name</span><span class="si">}</span><span class="s2"> Dataframe should be string (i.e. from </span><span class="si">{</span><span class="n">NAME</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">df</span></div>
 </pre></div>
