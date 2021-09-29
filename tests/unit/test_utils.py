@@ -10,7 +10,7 @@ from optics_functions.constants import PHASE_ADV, Y, X, REAL, IMAG, NAME, DELTA_
 from optics_functions.utils import (add_missing_columns, dphi,
                                     get_all_phase_advances, tau, seq2str, i_pow,
                                     prepare_twiss_dataframe, switch_signs_for_beam4,
-                                    get_format_keys, dphi_at_element, split_complex_columns)
+                                    get_format_keys, dphi_at_element, split_complex_columns, merge_complex_columns)
 
 INPUT = Path(__file__).parent.parent / "inputs"
 
@@ -91,6 +91,21 @@ def test_split_complex_columns():
     for col in df.columns:
         for fun, part in ((np.real, REAL), (np.imag, IMAG)):
             assert (fun(df[col]) == df_split[f"{col}{part}"]).all()
+
+
+@pytest.mark.basic
+def test_merge_complex_columns():
+    df = pd.DataFrame([1+2j, 3j + 4], columns=["Col"], index=["A", "B"])
+    df_split = split_complex_columns(df, df.columns, drop=True)
+
+    df_merged = merge_complex_columns(df_split, df.columns, drop=False)
+    assert len(df_merged.columns) == 3
+
+    df_merged = merge_complex_columns(df_split, df.columns, drop=True)
+    assert len(df_merged.columns) == 1
+
+    for col in df.columns:
+        assert (df[col] == df_merged[col]).all()
 
 
 @pytest.mark.basic
