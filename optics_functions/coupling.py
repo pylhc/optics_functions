@@ -362,7 +362,7 @@ def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
 
     Args:
         df (DataFrame): Dataframe containing the coupling columns.
-        to_nan (bool): If true, sets values where F1001 <= F1010 to NaN
+        to_nan (bool): If true, sets values where |F1001| <= |F1010| to NaN
 
     Returns:
         df, either as given or a copy with NaNs.
