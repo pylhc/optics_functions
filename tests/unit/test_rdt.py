@@ -299,7 +299,7 @@ def get_df(n):
 
 
 def get_absdiff_and_jumps(df_rdts):
-    df_temp = df_rdts.append(pd.DataFrame(df_rdts.iloc[[0], :].to_numpy(), index=["temp"]))
+    df_temp = pd.DataFrame(df_rdts).append(pd.DataFrame(df_rdts.iloc[[0], :].to_numpy(), index=["temp"]))
     df_diff = df_temp.abs().diff().shift(-1).iloc[:-1, :]
     df_jump = df_diff.abs() > 1e-15
     return df_diff, df_jump
