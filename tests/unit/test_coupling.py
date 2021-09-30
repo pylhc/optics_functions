@@ -6,21 +6,24 @@ import pandas as pd
 import pytest
 import tfs
 from pandas.testing import assert_frame_equal
-
-from optics_functions.constants import (
-    NAME, S, ALPHA, Y, BETA, X, GAMMA,
-    REAL, IMAG, TUNE, PHASE_ADV,
-    F1001, F1010
-)
-from optics_functions.coupling import (
-    closest_tune_approach, coupling_via_rdts,
-    coupling_via_cmatrix, COUPLING_RDTS, rmatrix_from_coupling,
-    check_resonance_relation
-)
-from optics_functions.utils import prepare_twiss_dataframe
 from test_rdt import arrays_are_close_almost_everywhere
 
+from optics_functions.constants import (
+    NAME, S, ALPHA, Y, BETA, X, GAMMA, REAL, IMAG, TUNE, PHASE_ADV, F1001, F1010
+)
+from optics_functions.coupling import (
+    COUPLING_RDTS,
+    check_resonance_relation,
+    closest_tune_approach,
+    coupling_via_cmatrix,
+    coupling_via_rdts,
+    rmatrix_from_coupling,
+)
+from optics_functions.utils import prepare_twiss_dataframe
+
 INPUT = Path(__file__).parent.parent / "inputs"
+COUPLING_BUMP_INPUTS = INPUT / "coupling_bump"
+COUPLING_BUMP_TWISS_BEAM_1 = COUPLING_BUMP_INPUTS / "twiss.lhc.b1.coupling_bump.tfs"
 
 
 @pytest.mark.basic
@@ -34,10 +37,10 @@ def test_cmatrix():
     assert not df_res.isna().any().any()
 
     # Checks based on CalagaBetatronCoupling2005
-    detC = (df_res["C11"] * df_res["C22"] - df_res["C12"] * df_res["C21"])
+    detC = df_res["C11"] * df_res["C22"] - df_res["C12"] * df_res["C21"]
     fsq_diff = df_res[F1001].abs() ** 2 - df_res[F1010].abs() ** 2
     f_term = 1 / (1 + 4 * fsq_diff)
-    g_sq = df_res[GAMMA]**2
+    g_sq = df_res[GAMMA] ** 2
 
     assert all(np.abs(detC + g_sq - 1) < 1e-15)
     assert all(np.abs(detC / (4 * g_sq) - fsq_diff) < 1e-15)  # Eq. (13)
@@ -46,7 +49,7 @@ def test_cmatrix():
 
 
 @pytest.mark.basic
-@pytest.mark.parametrize('source', ['real', 'fake'])
+@pytest.mark.parametrize("source", ["real", "fake"])
 def test_rmatrix_to_coupling_to_rmatrix(source):
     if source == "fake":
         np.random.seed(487423872)
@@ -91,20 +94,20 @@ def test_real_output():
 
 @pytest.mark.basic
 def test_closest_tune_approach():
-    desired_result = namedtuple('desired_result', ['error', 'is_real'])
+    desired_result = namedtuple("desired_result", ["error", "is_real"])
     functions_map = {
-        'teapot': desired_result(error=0, is_real=True),  # we compare to this, a madx-match may be better
-           'calaga': desired_result(error=0, is_real=True),  # same method as teapot
-           'franchi': desired_result(error=0.001, is_real=True),
-           'teapot_franchi': desired_result(error=0.0005, is_real=True),
-           'persson': desired_result(error=0.25, is_real=False),  # Not sure why it is so high here
-           'persson_alt': desired_result(error=0.25, is_real=False),
-           'hoydalsvik': desired_result(error=0.25, is_real=False),
-           'hoydalsvik_alt': desired_result(error=0.25, is_real=False),
-           }
+        "teapot": desired_result(error=0, is_real=True),  # to compare to, a madx-match may be better
+        "calaga": desired_result(error=0, is_real=True),  # same method as teapot
+        "franchi": desired_result(error=0.001, is_real=True),
+        "teapot_franchi": desired_result(error=0.0005, is_real=True),
+        "persson": desired_result(error=0.25, is_real=False),  # Not sure why it is so high here
+        "persson_alt": desired_result(error=0.25, is_real=False),
+        "hoydalsvik": desired_result(error=0.25, is_real=False),
+        "hoydalsvik_alt": desired_result(error=0.25, is_real=False),
+    }
 
     beam = 1
-    df_twiss = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b{beam:d}.coupling_bump.tfs", index=NAME)
+    df_twiss = tfs.read(COUPLING_BUMP_TWISS_BEAM_1, index=NAME)
     df = prepare_twiss_dataframe(df_twiss=df_twiss, max_order=7)
     df_cmatrix = coupling_via_cmatrix(df)
     df_twiss[F1001] = df_cmatrix[F1001]  # ignoring F1010 in this test as it is bigger than F1001
@@ -115,7 +118,7 @@ def test_closest_tune_approach():
     for method, desired_result in functions_map.items():
         cta = closest_tune_approach(df_twiss, method=method)
         res[method] = np.abs(np.mean(cta))[0]
-        err[method] = _relative_error(res[method], res['teapot'])
+        err[method] = _relative_error(res[method], res["teapot"])
         assert err[method] <= desired_result.error
 
         assert not cta.isna().any().any()  # check no NaNs
@@ -157,8 +160,7 @@ def test_check_resonance_relation_all_good(caplog):
 
 @pytest.mark.extended
 def test_coupling_rdt_bump_cmatrix_compare():
-    beam = 1
-    df_twiss = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b{beam:d}.coupling_bump.tfs", index=NAME)
+    df_twiss = tfs.read(COUPLING_BUMP_TWISS_BEAM_1, index=NAME)
     df = prepare_twiss_dataframe(df_twiss=df_twiss, max_order=7)
     df_rdts = coupling_via_rdts(df)
     df_cmatrix = coupling_via_cmatrix(df)
@@ -190,8 +192,8 @@ def generate_fake_data(n) -> tfs.TfsDataFrame:
     df.loc[:, "R22"] = r
     df.loc[:, "R21"] = np.cos(r)
     df.loc[:, "R12"] = -r
-    df[f"{PHASE_ADV}{X}"] = np.linspace(0, qx, n+1)[:n]
-    df[f"{PHASE_ADV}{Y}"] = np.linspace(0, qy, n+1)[:n]
+    df[f"{PHASE_ADV}{X}"] = np.linspace(0, qx, n + 1)[:n]
+    df[f"{PHASE_ADV}{Y}"] = np.linspace(0, qy, n + 1)[:n]
     df.loc[:, [f"{BETA}{X}", f"{BETA}{Y}"]] = 1
     return df
 
