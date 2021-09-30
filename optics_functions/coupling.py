@@ -2,10 +2,8 @@
 Coupling
 ********
 
-Functions to estimate coupling from twiss dataframes and
-different methods to calculate the closest tune approach from
-the calculated coupling RDTs.
-
+Functions to estimate coupling from twiss dataframes and different methods to calculate the closest tune
+approach from the calculated coupling RDTs.
 """
 import logging
 from contextlib import suppress
@@ -22,8 +20,6 @@ from optics_functions.rdt import calculate_rdts
 from optics_functions.utils import split_complex_columns, timeit
 
 COUPLING_RDTS = [F1001, F1010]
-
-
 LOG = logging.getLogger(__name__)
 
 
@@ -39,7 +35,7 @@ def coupling_via_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs) 
         calculations from [CalagaBetatronCoupling2005]_ .
 
     Args:
-        df (TfsDataFrame): Twiss Dataframe
+        df (TfsDataFrame): Twiss Dataframe.
         complex_columns (bool): Output complex values in single column of type complex.
                                 If ``False``, split complex columns into
                                 two real-valued columns.
@@ -50,11 +46,11 @@ def coupling_via_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs) 
                   and ``hamiltionian_terms``.
 
     Returns:
-        New TfsDataFrame with Coupling Columns.
+        A new ``TfsDataFrame`` with Coupling Columns.
     """
     df_res = calculate_rdts(df, rdts=COUPLING_RDTS, **kwargs)
     for rdt in COUPLING_RDTS:
-        rdt_array = df_res[rdt].to_numpy()  # might return a copy
+        rdt_array = df_res[rdt].to_numpy()  # might return a copy!
         rdt_array.real *= -1  # definition
         df_res.loc[:, rdt] = rdt_array
 
@@ -144,13 +140,13 @@ def rmatrix_from_coupling(df: DataFrame, complex_columns: bool = True) -> DataFr
     See [CalagaBetatronCoupling2005]_ .
 
     Args:
-        df (DataFrame): Twiss Dataframe
+        df (DataFrame): Twiss Dataframe.
         complex_columns (bool): Tells the function if the coupling input columns
                                 are complex-valued or split into real and
                                 imaginary parts.
 
     Returns:
-        New DataFrame containing the R-columns.
+        A new ``DataFrame`` containing the R-columns.
     """
     LOG.info("Calculating r-matrix from coupling rdts.")
     df_res = DataFrame(index=df.index)
@@ -213,47 +209,47 @@ def rmatrix_from_coupling(df: DataFrame, complex_columns: bool = True) -> DataFr
 
 # Closest Tune Approach --------------------------------------------------------
 
-def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None,
-                          method: str = "teapot") -> TfsDataFrame:
+def closest_tune_approach(
+    df: TfsDataFrame, qx: float = None, qy: float = None, method: str = "teapot"
+) -> TfsDataFrame:
     """Calculates the closest tune approach from coupling resonances.
 
     A complex F1001 column is assumed to be present in the DataFrame.
     This can be calculated by :func:`~optics_functions.rdt.rdts`
     :func:`~optics_functions.coupling.coupling_from_rdts` or
     :func:`~optics_functions.coupling.coupling_from_cmatrix`.
-    If F1010 is also present it is used, otherwise assumed 0.
+    If F1010 is also present it is used, otherwise it is assumed 0.
 
     The closest tune approach is calculated by means of Eq. (27) in
-    [CalagaBetatronCoupling2005]_ (method='teapot' or 'calaga') by default,
+    [CalagaBetatronCoupling2005]_ (method="teapot" or "calaga") by default,
     or approximated by
-    Eq. (1) in [PerssonImprovedControlCoupling2014]_ (method='franchi'),
-    Eq. (27) in [CalagaBetatronCoupling2005]_ with the Franchi appoximation (method='teapot_franchi'),
-    Eq. (2) in [PerssonImprovedControlCoupling2014]_ (method='persson'),
-    the latter without the exp(i(Qx-Qy)s/R) term (method='persson_alt'),
-    Eq. (14) in [HoydalsvikEvaluationOfTheClosestTuneApproach2021]_ (method='hoydalsvik'),
-    the latter without the exp(i(Qx-Qy)s/R) term (method='hoydalsvik_alt').
+    Eq. (1) in [PerssonImprovedControlCoupling2014]_ (method="franchi"),
+    Eq. (27) in [CalagaBetatronCoupling2005]_ with the Franchi appoximation (method="teapot_franchi"),
+    Eq. (2) in [PerssonImprovedControlCoupling2014]_ (method="persson"),
+    the latter without the exp(i(Qx-Qy)s/R) term (method="persson_alt"),
+    Eq. (14) in [HoydalsvikEvaluationOfTheClosestTuneApproach2021]_ (method="hoydalsvik"),
+    or the latter without the exp(i(Qx-Qy)s/R) term (method="hoydalsvik_alt").
 
-    For 'persson[_alt]' and 'hoydalsvik[_alt]' methods, also MUX and MUY columns
+    For "persson[_alt]" and "hoydalsvik[_alt]" methods, also MUX and MUY columns
     are needed in the DataFrame as well as LENGTH (of the machine) and S column
-    for the 'persson' and `hoydalsvik' methods.
+    for the "persson" and "hoydalsvik" methods.
 
     Args:
         df (TfsDataFrame): Twiss Dataframe, needs to have complex-valued F1001 column.
         qx (float): Tune in X-Plane (if not given, header df.Q1 is assumed present).
         qy (float): Tune in Y-Plane (if not given, header df.Q2 is assumed present).
         method (str): Which method to use for evaluation.
-                      Choices: 'calaga', 'teapot', 'franchi', 'teapot_franchi',
-                      'persson', 'persson_alt', 'hoydalsvik' or 'hoydalsvik_alt'.
+                      Choices: "calaga", "teapot", "franchi", "teapot_franchi",
+                      "persson", "persson_alt", "hoydalsvik" or "hoydalsvik_alt".
 
     Returns:
-        New TfsDataFrame with closest tune approach (DELTAQMIN) column.
-        The value is real for 'calaga', 'teapot', 'teapot_franchi' and 'franchi'
+        A new ``TfsDataFrame`` with a closest tune approach (DELTAQMIN) column.
+        The value is real for "calaga", "teapot", "teapot_franchi" and "franchi"
         methods. The actual closest tune approach value is the absolute value
         of the mean of this column.
     """
     if F1001 not in df.columns:
-        raise KeyError(f"'{F1001}' column not in dataframe. "
-                       f"Needed to calculated closest tune approach.")
+        raise KeyError(f"'{F1001}' column not in dataframe. Needed to calculated closest tune approach.")
 
     method_map = {
         "teapot": _cta_teapot,  # as named in [HoydalsvikEvaluationOfTheClosestTuneApproach2021]_
@@ -278,7 +274,7 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None,
     df_res = TfsDataFrame(index=df.index, columns=[dqmin_str])
     df_res[dqmin_str] = method_map[method.lower()](df, qx_frac, qy_frac)
 
-    LOG.info(f"({method}) |C-| = {np.abs(df_res[dqmin_str].dropna().mean())}")
+    LOG.info(f"({method.lower()}) |C-| = {np.abs(df_res[dqmin_str].dropna().mean())}")
     return df_res
 
 
@@ -362,21 +358,21 @@ def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
 
     Args:
         df (DataFrame): Dataframe containing the coupling columns.
-        to_nan (bool): If true, sets values where |F1001| <= |F1010| to NaN
+        to_nan (bool): If true, sets values where |F1001| <= |F1010| to ``NaN``.
 
     Returns:
-        df, either as given or a copy with NaNs.
+        A copy of the input data frame, with or without NaNs.
     """
     df = df.copy()
     if F1010 not in df.columns:
         LOG.debug("Sum-resonance not in df, skipping resonance relation check.")
         return df
 
-    condition_not_fulfilled = df[F1001].abs() < df[F1010].abs()
+    condition_not_fulfilled = df[F1001].abs() < df[F1010].abs()  # comparison with NaN always yields False
     if any(condition_not_fulfilled):
-        LOG.warning(f"At {sum(condition_not_fulfilled) / len(df.index) * 100}%"
-                    " of the data, the |F1001| < |F1010|. Your closest tune"
-                    " approach estimates might not be accurate.")
+        LOG.warning(f"In {sum(condition_not_fulfilled) / len(df.index) * 100}% "
+                    "of the data points |F1001| < |F1010|. Your closest tune "
+                    "approach estimates might not be accurate.")
         if to_nan:
             df.loc[condition_not_fulfilled, COUPLING_RDTS] = np.NaN
     return df
