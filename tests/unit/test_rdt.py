@@ -317,4 +317,4 @@ def arrays_are_close_almost_everywhere(array1, array2, rtol=1e-2, atol=None, per
     if atol is None:
         atol = rtol * np.mean(np.abs(array2))
     return sum(np.isclose(np.abs(array1), np.abs(array2), rtol=rtol, atol=0) |
-               np.isclose(np.abs(array1), np.abs(array2), rtol=0, atol=atol)) > percentile*len(array1)
+               np.isclose(np.abs(array1), np.abs(array2), rtol=0, atol=atol)) > percentile * len(array1)
