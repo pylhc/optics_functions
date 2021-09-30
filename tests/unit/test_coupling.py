@@ -93,7 +93,7 @@ def test_real_output():
 
 
 @pytest.mark.basic
-def test_closest_tune_approach():
+def test_closest_tune_approach(_coupling_bump_teapot_cta):
     desired_result = namedtuple("desired_result", ["error", "is_real"])
     functions_map = {
         "teapot": desired_result(error=0, is_real=True),  # to compare to, a madx-match may be better
@@ -106,7 +106,6 @@ def test_closest_tune_approach():
         "hoydalsvik_alt": desired_result(error=0.25, is_real=False),
     }
 
-    beam = 1
     df_twiss = tfs.read(COUPLING_BUMP_TWISS_BEAM_1, index=NAME)
     df = prepare_twiss_dataframe(df_twiss=df_twiss, max_order=7)
     df_cmatrix = coupling_via_cmatrix(df)
@@ -118,7 +117,7 @@ def test_closest_tune_approach():
     for method, desired_result in functions_map.items():
         cta = closest_tune_approach(df_twiss, method=method)
         res[method] = np.abs(np.mean(cta))[0]
-        err[method] = _relative_error(res[method], res["teapot"])
+        err[method] = _relative_error(res[method], _coupling_bump_teapot_cta)
         assert err[method] <= desired_result.error
 
         assert not cta.isna().any().any()  # check no NaNs
@@ -174,7 +173,7 @@ def test_coupling_rdt_bump_cmatrix_compare():
         )
 
 
-# Helper -----------------------------------------------------------------------
+# ----- Helpers ----- #
 
 
 def generate_fake_data(n) -> tfs.TfsDataFrame:
@@ -200,3 +199,17 @@ def generate_fake_data(n) -> tfs.TfsDataFrame:
 
 def _relative_error(a, b):
     return np.abs((a - b) / b)
+
+# ----- Fixtures ----- #
+
+
+@pytest.fixture(scope="module")
+def _coupling_bump_teapot_cta() -> float:
+    """Compute and return the CTA for teapot reference method on the lhcb1 coupling bump test case."""
+    df_twiss = tfs.read(COUPLING_BUMP_TWISS_BEAM_1, index=NAME)
+    df = prepare_twiss_dataframe(df_twiss=df_twiss, max_order=7)
+    df_cmatrix = coupling_via_cmatrix(df)
+    df_twiss[F1001] = df_cmatrix[F1001]  # ignoring F1010 in this test as it is bigger than F1001
+
+    cta = closest_tune_approach(df_twiss, method="teapot")
+    return np.abs(np.mean(cta))[0]
