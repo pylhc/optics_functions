@@ -12,15 +12,17 @@ from contextlib import suppress
 from typing import Sequence, Tuple
 
 import numpy as np
+import pandas as pd
 from pandas import DataFrame, Series
 from tfs import TfsDataFrame
 
 from optics_functions.constants import (ALPHA, BETA, GAMMA, X, Y, TUNE, DELTA,
-                                        MINIMUM, PI2, PHASE_ADV, S, LENGTH, IMAG, REAL)
+                                        MINIMUM, PI2, PHASE_ADV, S, LENGTH,
+                                        IMAG, REAL, F1010, F1001)
 from optics_functions.rdt import calculate_rdts
 from optics_functions.utils import split_complex_columns, timeit
 
-COUPLING_RDTS = ["F1001", "F1010"]
+COUPLING_RDTS = [F1001, F1010]
 
 
 LOG = logging.getLogger(__name__)
@@ -110,10 +112,10 @@ def coupling_via_cmatrix(df: DataFrame, complex_columns: bool = True,
     if "rdts" in output:
         # Eq. (9) and Eq. (10)
         denom = 1 / (4 * gamma)
-        df_res.loc[:, "F1001"] = denom * (+c[:, 0, 1] - c[:, 1, 0] + (c[:, 0, 0] + c[:, 1, 1]) * 1j)
-        df_res.loc[:, "F1010"] = denom * (-c[:, 0, 1] - c[:, 1, 0] + (c[:, 0, 0] - c[:, 1, 1]) * 1j)
-        LOG.info(f"Average coupling amplitude |F1001|: {df_res['F1001'].abs().mean():g}")
-        LOG.info(f"Average coupling amplitude |F1010|: {df_res['F1010'].abs().mean():g}")
+        df_res.loc[:, F1001] = denom * (+c[:, 0, 1] - c[:, 1, 0] + (c[:, 0, 0] + c[:, 1, 1]) * 1j)
+        df_res.loc[:, F1010] = denom * (-c[:, 0, 1] - c[:, 1, 0] + (c[:, 0, 0] - c[:, 1, 1]) * 1j)
+        LOG.info(f"Average coupling amplitude |F1001|: {df_res[F1001].abs().mean():g}")
+        LOG.info(f"Average coupling amplitude |F1010|: {df_res[F1010].abs().mean():g}")
 
         if not complex_columns:
             df_res = split_complex_columns(df_res, COUPLING_RDTS)
@@ -174,19 +176,19 @@ def rmatrix_from_coupling(df: DataFrame, complex_columns: bool = True) -> DataFr
 
         # Eq. (15)
         if complex_columns:
-            abs_squared_diff = df["F1001"].abs()**2 - df["F1010"].abs()**2
+            abs_squared_diff = df[F1001].abs()**2 - df[F1010].abs()**2
         else:
-            abs_squared_diff = (df[f"F1001{REAL}"]**2 + df[f"F1001{IMAG}"]**2 -
-                                df[f"F1010{REAL}"]**2 - df[f"F1010{IMAG}"]**2)
+            abs_squared_diff = (df[f"{F1001}{REAL}"]**2 + df[f"{F1001}{IMAG}"]**2 -
+                                df[f"{F1010}{REAL}"]**2 - df[f"{F1010}{IMAG}"]**2)
 
         gamma = np.sqrt(1.0 / (1.0 + 4.0 * abs_squared_diff))
 
         # Eq. (11) and Eq. (12)
         cbar = np.zeros((n, 2, 2))
-        cbar[:, 0, 0] = (df[f"F1001{IMAG}"] + df[f"F1010{IMAG}"]).to_numpy()
-        cbar[:, 0, 1] = -(df[f"F1010{REAL}"] - df[f"F1001{REAL}"]).to_numpy()
-        cbar[:, 1, 0] = -(df[f"F1010{REAL}"] + df[f"F1001{REAL}"]).to_numpy()
-        cbar[:, 1, 1] = (df[f"F1001{IMAG}"] - df[f"F1010{IMAG}"]).to_numpy()
+        cbar[:, 0, 0] = (df[f"{F1001}{IMAG}"] + df[f"{F1010}{IMAG}"]).to_numpy()
+        cbar[:, 0, 1] = -(df[f"{F1010}{REAL}"] - df[f"{F1001}{REAL}"]).to_numpy()
+        cbar[:, 1, 0] = -(df[f"{F1010}{REAL}"] + df[f"{F1001}{REAL}"]).to_numpy()
+        cbar[:, 1, 1] = (df[f"{F1001}{IMAG}"] - df[f"{F1010}{IMAG}"]).to_numpy()
         cbar = 2 * gamma.to_numpy()[:, None, None] * cbar
 
         # Gx^-1 * Cbar * Gy = C  (Eq. (5) inverted)
@@ -211,7 +213,7 @@ def rmatrix_from_coupling(df: DataFrame, complex_columns: bool = True) -> DataFr
 # Closest Tune Approach --------------------------------------------------------
 
 def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None,
-                          method: str = "calaga") -> TfsDataFrame:
+                          method: str = "teapot") -> TfsDataFrame:
     """Calculates the closest tune approach from coupling resonances.
 
     A complex F1001 column is assumed to be present in the DataFrame.
@@ -221,32 +223,46 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None,
     If F1010 is also present it is used, otherwise assumed 0.
 
     The closest tune approach is calculated by means of Eq. (27) in
-    [CalagaBetatronCoupling2005]_ (method='calaga') by default,
-    or approximated by Eq. (1) in [PerssonImprovedControlCoupling2014]_
-    (method='franchi') or Eq. (2) in [PerssonImprovedControlCoupling2014]_
-    (method='persson') or the latter without the exp(i(Qx-Qy)s/R) term
-    (method='persson_alt').
+    [CalagaBetatronCoupling2005]_ (method='teapot' or 'calaga') by default,
+    or approximated by
+    Eq. (1) in [PerssonImprovedControlCoupling2014]_ (method='franchi'),
+    Eq. (27) in [CalagaBetatronCoupling2005]_ with the Franchi appoximation (method='teapot_franchi'),
+    Eq. (2) in [PerssonImprovedControlCoupling2014]_ (method='persson'),
+    the latter without the exp(i(Qx-Qy)s/R) term (method='persson_alt'),
+    Eq. (14) in [HoydalsvikEvaluationOfTheClosestTuneApproach2021]_ (method='hoydalsvik'),
+    the latter without the exp(i(Qx-Qy)s/R) term (method='hoydalsvik_alt').
 
-    For the 'persson' and 'persson_alt' methods, also MUX and MUY columns
+    For 'persson[_alt]' and 'hoydalsvik[_alt]' methods, also MUX and MUY columns
     are needed in the DataFrame as well as LENGTH (of the machine) and S column
-    for the 'persson' method.
+    for the 'persson' and `hoydalsvik' methods.
 
     Args:
         df (TfsDataFrame): Twiss Dataframe, needs to have complex-valued F1001 column.
         qx (float): Tune in X-Plane (if not given, header df.Q1 is assumed present).
         qy (float): Tune in Y-Plane (if not given, header df.Q2 is assumed present).
         method (str): Which method to use for evaluation.
-                      Choices: 'calaga', 'franchi', 'persson' and 'persson_alt'.
+                      Choices: 'calaga', 'teapot', 'franchi', 'teapot_franchi',
+                      'persson', 'persson_alt', 'hoydalsvik' or 'hoydalsvik_alt'.
 
     Returns:
         New TfsDataFrame with closest tune approach (DELTAQMIN) column.
-        The value is real for 'calaga' and 'franchi' methods,
+        The value is real for 'calaga', 'teapot', 'teapot_franchi' and 'franchi'
+        methods. The actual closest tune approach value is the absolute value
+        of the mean of this column.
     """
+    if F1001 not in df.columns:
+        raise KeyError(f"'{F1001}' column not in dataframe. "
+                       f"Needed to calculated closest tune approach.")
+
     method_map = {
-        "calaga": _cta_calaga,
+        "teapot": _cta_teapot,  # as named in [HoydalsvikEvaluationOfTheClosestTuneApproach2021]_
+        "calaga": _cta_teapot,  # for compatibility reasons
+        "teapot_franchi": _cta_teapot_franchi,
         "franchi": _cta_franchi,
         "persson": _cta_persson,
         "persson_alt": _cta_persson_alt,
+        "hoydalsvik": _cta_hoydalsvik,
+        "hoydalsvik_alt": _cta_hoydalsvik_alt,
     }
     if qx is None:
         qx = df.headers[f"{TUNE}1"]
@@ -255,17 +271,19 @@ def closest_tune_approach(df: TfsDataFrame, qx: float = None, qy: float = None,
 
     qx_frac, qy_frac = qx % 1, qy % 1
 
+    check_resonance_relation(df)
+
     dqmin_str = f"{DELTA}{TUNE}{MINIMUM}"
     df_res = TfsDataFrame(index=df.index, columns=[dqmin_str])
     df_res[dqmin_str] = method_map[method.lower()](df, qx_frac, qy_frac)
 
-    LOG.info(f"({method}) |C-| = {np.abs(df_res[dqmin_str].mean())}")
+    LOG.info(f"({method}) |C-| = {np.abs(df_res[dqmin_str].dropna().mean())}")
     return df_res
 
 
 def _cta_franchi(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series:
     """ Closest tune approach calculated by Eq. (1) in [PerssonImprovedControlCoupling2014]_ . """
-    return 4 * (qx_frac - qy_frac) * df["F1001"].abs()
+    return 4 * (qx_frac - qy_frac) * df[F1001].abs()
 
 
 def _cta_persson_alt(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series:
@@ -275,31 +293,37 @@ def _cta_persson_alt(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series
     deltaq = qx_frac - qy_frac  # fractional tune split
     length_weights = _get_weights_from_lengths(df)
     phase_diff = df[f"{PHASE_ADV}{X}"] - df[f"{PHASE_ADV}{Y}"]
-    return 4 * deltaq * length_weights * df["F1001"] * np.exp(-1j * PI2 * phase_diff)
+    return 4 * deltaq * length_weights * df[F1001] * np.exp(-1j * PI2 * phase_diff)
 
 
 def _cta_persson(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series:
-    """ Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ . """
-    deltaq = qx_frac - qy_frac  # fractional tune split
-    length_weights = _get_weights_from_lengths(df)
-    exponential_term = (deltaq * df[S] / (df.headers[LENGTH] / PI2)) - (df[f"{PHASE_ADV}{X}"] - df[f"{PHASE_ADV}{Y}"])
-    return 4 * deltaq * length_weights * df["F1001"] * np.exp(1j * PI2 * exponential_term)
-
-
-def _cta_persson_test(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series:
     """ Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ . """
     deltaq = qx_frac - qy_frac  # fractional tune split
     location_term = np.exp(1j * PI2 * (deltaq * df[S] / (df.headers[LENGTH] / PI2)))
     return _cta_persson_alt(df, qx_frac, qy_frac) * location_term
 
 
-def _cta_calaga(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series:
+def _cta_hoydalsvik(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series:
+    """ Closest tune approach calculated by Eq. (14) in
+    [HoydalsvikEvaluationOfTheClosestTuneApproach2021]_ .
+    This is like the persson estimate but divided by 1 + 4|F1001|^2 ."""
+    return _cta_persson(df, qx_frac, qy_frac) / (1 + 4 * df[F1001].abs() ** 2)
+
+
+def _cta_hoydalsvik_alt(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series:
+    """ Closest tune approach calculated by Eq. (14) without the s-term in
+    [HoydalsvikEvaluationOfTheClosestTuneApproach2021]_ .
+    This is like the persson_alt estimate but divided by 1 + 4|F1001|^2 ."""
+    return _cta_persson_alt(df, qx_frac, qy_frac) / (1 + 4 * df[F1001].abs() ** 2)
+
+
+def _cta_teapot(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series:
     """Closest tune approach calculated by Eq. (27) in [CalagaBetatronCoupling2005]_ .
     If F1010 is not given, it is assumed to be zero.
     """
-    f_diff = df["F1001"].abs() ** 2
-    with suppress(KeyError):
-        f_diff -= df["1010"].abs() ** 2
+    f_diff = df[F1001].abs() ** 2
+    with suppress(KeyError):  # this is the only estimate that uses sum resonance
+        f_diff -= df[F1010].abs() ** 2
 
     return (
         (np.cos(PI2 * qx_frac) - np.cos(PI2 * qy_frac))
@@ -308,8 +332,15 @@ def _cta_calaga(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series:
     )
 
 
+def _cta_teapot_franchi(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Series:
+    """Closest tune approach calculated by Eq. (12) in
+    [HoydalsvikEvaluationOfTheClosestTuneApproach2021]_ .
+    This is the teapot approach with the Franchi approximation. """
+    return 4 * (qx_frac - qy_frac) * df[F1001].abs() / (1 + 4 * df[F1001].abs() ** 2)
+
+
 def _get_weights_from_lengths(df: TfsDataFrame) -> Tuple[float, np.array]:
-    """ Coefficients for the two `persson` methods. """
+    """Coefficients for the `persson` method. """
     # approximate length of each element (ds in integral)
     s_periodic = np.zeros(len(df) + 1)
     s_periodic[1:] = df[S].to_numpy()
@@ -318,3 +349,36 @@ def _get_weights_from_lengths(df: TfsDataFrame) -> Tuple[float, np.array]:
     # weight ds/(2*pi*R) * N (as we take the mean afterwards)
     weights = np.diff(s_periodic) / df.headers[LENGTH] * len(df)
     return weights
+
+
+def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
+    """Checks that F1001 >= F1010. If desired, sets the invalid points to NaN.
+    This is only used for checking in the
+    :func:`~optics_functions.coupling.closest_tune_approach` function,
+    but can be invoked by the user with ``to_nan = True`` and the resulting
+    DataFrame can then be passed to
+    :func:`~optics_functions.coupling.closest_tune_approach`
+
+    Args:
+        df (DataFrame): Dataframe containing the coupling columns.
+        to_nan (bool): If true, sets values where F1001 <= F1010 to NaN
+
+    Returns:
+        df, either as given or a copy with NaNs.
+    """
+    df = df.copy()
+    if F1010 not in df.columns:
+        LOG.debug("Sum-resonance not in df, skipping resonance relation check.")
+        return df
+
+    condition_not_fulfilled = df[F1001] < df[F1010]
+    if any(condition_not_fulfilled):
+        LOG.warning(f"At {sum(condition_not_fulfilled) / len(df.index) * 100}%"
+                    " of the data, the F1001 < F1010. Your closest tune"
+                    " approach estimates might not be accurate.")
+        if to_nan:
+            df.loc[condition_not_fulfilled, COUPLING_RDTS] = np.NaN
+    return df
+
+
+
