@@ -9,7 +9,19 @@ from pandas.testing import assert_frame_equal
 from test_rdt import arrays_are_close_almost_everywhere
 
 from optics_functions.constants import (
-    NAME, S, ALPHA, Y, BETA, X, GAMMA, REAL, IMAG, TUNE, PHASE_ADV, F1001, F1010
+    ALPHA,
+    BETA,
+    F1001,
+    F1010,
+    GAMMA,
+    IMAG,
+    NAME,
+    PHASE_ADV,
+    REAL,
+    TUNE,
+    S,
+    X,
+    Y,
 )
 from optics_functions.coupling import (
     COUPLING_RDTS,
@@ -93,38 +105,36 @@ def test_real_output():
 
 
 @pytest.mark.basic
-def test_closest_tune_approach(_coupling_bump_teapot_cta):
-    desired_result = namedtuple("desired_result", ["error", "is_real"])
-    functions_map = {
-        "teapot": desired_result(error=0, is_real=True),  # to compare to, a madx-match may be better
-        "calaga": desired_result(error=0, is_real=True),  # same method as teapot
-        "franchi": desired_result(error=0.001, is_real=True),
-        "teapot_franchi": desired_result(error=0.0005, is_real=True),
-        "persson": desired_result(error=0.25, is_real=False),  # Not sure why it is so high here
-        "persson_alt": desired_result(error=0.25, is_real=False),
-        "hoydalsvik": desired_result(error=0.25, is_real=False),
-        "hoydalsvik_alt": desired_result(error=0.25, is_real=False),
-    }
-
+@pytest.mark.parametrize(
+    "cta_method, max_relative_error_to_teapot, result_should_be_real",
+    [
+        ("calaga", 0, True),  # this is the same as teapot, hence 0 relative error
+        ("franchi", 0.001, True),
+        ("teapot_franchi", 0.0005, True),
+        ("persson", 0.25, False),  # not sure why it is so high from here
+        ("persson_alt", 0.25, False),
+        ("hoydalsvik", 0.25, False),
+        ("hoydalsvik_alt", 0.25, False),
+    ],
+)
+def test_closest_tune_approach(
+    cta_method, max_relative_error_to_teapot, result_should_be_real, _coupling_bump_teapot_cta
+):
     df_twiss = tfs.read(COUPLING_BUMP_TWISS_BEAM_1, index=NAME)
     df = prepare_twiss_dataframe(df_twiss=df_twiss, max_order=7)
     df_cmatrix = coupling_via_cmatrix(df)
     df_twiss[F1001] = df_cmatrix[F1001]  # ignoring F1010 in this test as it is bigger than F1001
 
-    res = {key: None for key in functions_map}
-    err = {key: None for key in functions_map}
+    cta = closest_tune_approach(df_twiss, method=cta_method)
+    result = np.abs(np.mean(cta))[0]
+    relative_error = _relative_error(result, _coupling_bump_teapot_cta)
 
-    for method, desired_result in functions_map.items():
-        cta = closest_tune_approach(df_twiss, method=method)
-        res[method] = np.abs(np.mean(cta))[0]
-        err[method] = _relative_error(res[method], _coupling_bump_teapot_cta)
-        assert err[method] <= desired_result.error
+    assert relative_error <= max_relative_error_to_teapot
+    assert not cta.isna().any().any()  # check no NaNs
+    assert all(cta[df_cmatrix[F1001] != 0] != 0)
 
-        assert not cta.isna().any().any()  # check no NaNs
-        assert all(cta[df_cmatrix[F1001] != 0] != 0)
-
-        if desired_result.is_real:
-            assert all(np.isreal(cta))
+    if result_should_be_real:
+        assert all(np.isreal(cta))
 
 
 @pytest.mark.basic
@@ -199,6 +209,7 @@ def generate_fake_data(n) -> tfs.TfsDataFrame:
 
 def _relative_error(a, b):
     return np.abs((a - b) / b)
+
 
 # ----- Fixtures ----- #
 
