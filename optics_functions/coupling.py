@@ -379,6 +379,3 @@ def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
         if to_nan:
             df.loc[condition_not_fulfilled, COUPLING_RDTS] = np.NaN
     return df
-
-
-
