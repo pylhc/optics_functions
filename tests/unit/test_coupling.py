@@ -9,19 +9,7 @@ from pandas.testing import assert_frame_equal
 from test_rdt import arrays_are_close_almost_everywhere
 
 from optics_functions.constants import (
-    ALPHA,
-    BETA,
-    F1001,
-    F1010,
-    GAMMA,
-    IMAG,
-    NAME,
-    PHASE_ADV,
-    REAL,
-    TUNE,
-    S,
-    X,
-    Y,
+    ALPHA, BETA, F1001, F1010, GAMMA, IMAG, NAME, PHASE_ADV, REAL, TUNE, S, X, Y
 )
 from optics_functions.coupling import (
     COUPLING_RDTS,
