@@ -12,7 +12,6 @@ from contextlib import suppress
 from typing import Sequence, Tuple
 
 import numpy as np
-import pandas as pd
 from pandas import DataFrame, Series
 from tfs import TfsDataFrame
 
@@ -55,7 +54,9 @@ def coupling_via_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs) 
     """
     df_res = calculate_rdts(df, rdts=COUPLING_RDTS, **kwargs)
     for rdt in COUPLING_RDTS:
-        df_res.loc[:, rdt].to_numpy().real *= -1  # definition, also: sets value in dataframe
+        rdt_array = df_res[rdt].to_numpy()  # might return a copy
+        rdt_array.real *= -1  # definition
+        df_res.loc[:, rdt] = rdt_array
 
     if not complex_columns:
         df_res = split_complex_columns(df_res, COUPLING_RDTS)
@@ -352,9 +353,9 @@ def _get_weights_from_lengths(df: TfsDataFrame) -> Tuple[float, np.array]:
 
 
 def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
-    """Checks that F1001 >= F1010. If desired, sets the invalid points to NaN.
-    This is only used for checking in the
-    :func:`~optics_functions.coupling.closest_tune_approach` function,
+    """Checks that |F1001| >= |F1010|.
+    If desired, sets the invalid points to NaN. This is only used for checking
+    in the :func:`~optics_functions.coupling.closest_tune_approach` function,
     but can be invoked by the user with ``to_nan = True`` and the resulting
     DataFrame can then be passed to
     :func:`~optics_functions.coupling.closest_tune_approach`
@@ -371,10 +372,10 @@ def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
         LOG.debug("Sum-resonance not in df, skipping resonance relation check.")
         return df
 
-    condition_not_fulfilled = df[F1001] < df[F1010]
+    condition_not_fulfilled = df[F1001].abs() < df[F1010].abs()
     if any(condition_not_fulfilled):
         LOG.warning(f"At {sum(condition_not_fulfilled) / len(df.index) * 100}%"
-                    " of the data, the F1001 < F1010. Your closest tune"
+                    " of the data, the |F1001| < |F1010|. Your closest tune"
                     " approach estimates might not be accurate.")
         if to_nan:
             df.loc[condition_not_fulfilled, COUPLING_RDTS] = np.NaN

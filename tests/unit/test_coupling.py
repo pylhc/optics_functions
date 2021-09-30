@@ -115,8 +115,7 @@ def test_closest_tune_approach():
         cta = closest_tune_approach(df_twiss, method=method)
         res[method] = np.abs(np.mean(cta))[0]
         err[method] = err_rel(res[method], res['teapot'])
-        print(f"{method}: {err} (relative error)")
-        # assert err[method] <= desired.err
+        assert err[method] <= desired.err
 
         assert not cta.isna().any().any()
         assert all(cta[df_cmatrix[F1001] != 0] != 0)
@@ -127,7 +126,7 @@ def test_closest_tune_approach():
 
 @pytest.mark.basic
 def test_check_resonance_relation_with_nan(caplog):
-    df = pd.DataFrame([[1, 2, 3, 4], [2, 1, 5, 1]], index=[F1001, F1010]).T
+    df = pd.DataFrame([[1, 2, 3, 4], [2, 1, -5, 1]], index=[F1001, F1010]).T
     df_nan = check_resonance_relation(df, to_nan=True)
 
     assert all(df_nan.loc[0, :].isna())
@@ -135,7 +134,7 @@ def test_check_resonance_relation_with_nan(caplog):
     assert all(df_nan.loc[1, :] == df.loc[1, :])
     assert all(df_nan.loc[3, :] == df.loc[3, :])
 
-    assert "F1001 < F1010" in caplog.text
+    assert "|F1001| < |F1010|" in caplog.text
 
 
 @pytest.mark.basic
@@ -145,7 +144,7 @@ def test_check_resonance_relation_without_nan(caplog):
 
     assert (df_out == df).all().all()
 
-    assert "F1001 < F1010" in caplog.text
+    assert "|F1001| < |F1010|" in caplog.text
 
 
 @pytest.mark.basic
@@ -155,7 +154,7 @@ def test_check_resonance_relation_all_good(caplog):
 
     assert (df_out == df).all().all()
 
-    assert "F1001 < F1010" not in caplog.text
+    assert "|F1001| < |F1010|" not in caplog.text
 
 
 @pytest.mark.extended
