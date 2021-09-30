@@ -126,13 +126,36 @@ def test_closest_tune_approach():
 
 
 @pytest.mark.basic
-def test_check_resonance_relation():
+def test_check_resonance_relation_with_nan(caplog):
     df = pd.DataFrame([[1, 2, 3, 4], [2, 1, 5, 1]], index=[F1001, F1010]).T
     df_nan = check_resonance_relation(df, to_nan=True)
+
     assert all(df_nan.loc[0, :].isna())
     assert all(df_nan.loc[2, :].isna())
     assert all(df_nan.loc[1, :] == df.loc[1, :])
     assert all(df_nan.loc[3, :] == df.loc[3, :])
+
+    assert "F1001 < F1010" in caplog.text
+
+
+@pytest.mark.basic
+def test_check_resonance_relation_without_nan(caplog):
+    df = pd.DataFrame([[1, 2, 3, 4], [2, 1, 5, 1]], index=[F1001, F1010]).T
+    df_out = check_resonance_relation(df, to_nan=False)
+
+    assert (df_out == df).all().all()
+
+    assert "F1001 < F1010" in caplog.text
+
+
+@pytest.mark.basic
+def test_check_resonance_relation_all_good(caplog):
+    df = pd.DataFrame([[2, 3, 4, 5], [1, 3, 3, 4]], index=[F1001, F1010]).T
+    df_out = check_resonance_relation(df, to_nan=True)
+
+    assert (df_out == df).all().all()
+
+    assert "F1001 < F1010" not in caplog.text
 
 
 @pytest.mark.extended
