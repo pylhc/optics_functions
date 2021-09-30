@@ -358,7 +358,7 @@ def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
     in the :func:`~optics_functions.coupling.closest_tune_approach` function,
     but can be invoked by the user with ``to_nan = True`` and the resulting
     DataFrame can then be passed to
-    :func:`~optics_functions.coupling.closest_tune_approach`
+    :func:`~optics_functions.coupling.closest_tune_approach`.
 
     Args:
         df (DataFrame): Dataframe containing the coupling columns.
