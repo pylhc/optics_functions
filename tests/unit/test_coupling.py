@@ -107,7 +107,7 @@ def test_closest_tune_approach():
     df_twiss = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b{beam:d}.coupling_bump.tfs", index=NAME)
     df = prepare_twiss_dataframe(df_twiss=df_twiss, max_order=7)
     df_cmatrix = coupling_via_cmatrix(df)
-    df_twiss[F1001] = df_cmatrix[F1001]  # ignoring F1010 in this test as it is bigger than F1010
+    df_twiss[F1001] = df_cmatrix[F1001]  # ignoring F1010 in this test as it is bigger than F1001
 
     res = dict().fromkeys(map.keys())
     err = dict().fromkeys(map.keys())
