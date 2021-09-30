@@ -113,16 +113,16 @@ def test_closest_tune_approach(
     df_cmatrix = coupling_via_cmatrix(df)
     df_twiss[F1001] = df_cmatrix[F1001]  # ignoring F1010 in this test as it is bigger than F1001
 
-    cta = closest_tune_approach(df_twiss, method=cta_method)
-    result = np.abs(np.mean(cta))[0]
+    cta_df = closest_tune_approach(df_twiss, method="teapot")  # only one column
+    result = cta_df.mean().abs()[0]  # this is the cminus
     relative_error = _relative_error(result, _coupling_bump_teapot_cta)
 
     assert relative_error <= max_relative_error_to_teapot
-    assert not cta.isna().any().any()  # check no NaNs
-    assert all(cta[df_cmatrix[F1001] != 0] != 0)
+    assert not cta_df.isna().any().any()  # check no NaNs
+    assert all(cta_df[df_cmatrix[F1001] != 0] != 0)
 
     if result_should_be_real:
-        assert all(np.isreal(cta))
+        assert all(np.isreal(cta_df))
 
 
 @pytest.mark.basic
@@ -210,5 +210,5 @@ def _coupling_bump_teapot_cta() -> float:
     df_cmatrix = coupling_via_cmatrix(df)
     df_twiss[F1001] = df_cmatrix[F1001]  # ignoring F1010 in this test as it is bigger than F1001
 
-    cta = closest_tune_approach(df_twiss, method="teapot")
-    return np.abs(np.mean(cta))[0]
+    cta_df = closest_tune_approach(df_twiss, method="teapot")  # only one column
+    return cta_df.mean().abs()[0]  # this is the cminus
