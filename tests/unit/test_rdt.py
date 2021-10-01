@@ -299,7 +299,7 @@ def get_df(n):
 
 
 def get_absdiff_and_jumps(df_rdts):
-    df_temp = df_rdts.append(pd.DataFrame(df_rdts.iloc[[0], :].to_numpy(), index=["temp"]))
+    df_temp = pd.DataFrame(df_rdts).append(pd.DataFrame(df_rdts.iloc[[0], :].to_numpy(), index=["temp"]))
     df_diff = df_temp.abs().diff().shift(-1).iloc[:-1, :]
     df_jump = df_diff.abs() > 1e-15
     return df_diff, df_jump
@@ -317,4 +317,4 @@ def arrays_are_close_almost_everywhere(array1, array2, rtol=1e-2, atol=None, per
     if atol is None:
         atol = rtol * np.mean(np.abs(array2))
     return sum(np.isclose(np.abs(array1), np.abs(array2), rtol=rtol, atol=0) |
-               np.isclose(np.abs(array1), np.abs(array2), rtol=0, atol=atol)) > percentile*len(array1)
+               np.isclose(np.abs(array1), np.abs(array2), rtol=0, atol=atol)) > percentile * len(array1)
