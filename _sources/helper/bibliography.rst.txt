@@ -19,3 +19,9 @@ Bibliography
    `Improved control of the betatron coupling in the Large Hadron Collider`,
    Phys. Rev. ST Accel. Beams **17**, 051004 (2014).
    http://cds.cern.ch/record/2135848/files/PhysRevSTAB.17.051004.pdf
+
+.. [HoydalsvikEvaluationOfTheClosestTuneApproach2021]
+   E. J. Hoydalsvik et al.,
+   `Evaluation of the closest tune approach and its MAD-X implementation`,
+   Report, CERN-ACC-NOTE-2021-0022, (2021)
+   https://cds.cern.ch/record/2778887/files/CERN-ACC-NOTE-2021-0022.pdf
