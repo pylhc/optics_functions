@@ -81,7 +81,7 @@ master_doc = "index"
 
 # General information about the project.
 project = ABOUT_OPTICS_FUNCTIONS["__title__"]
-copyright = "2019-2021, pyLHC/OMC-TEAM"
+copyright_ = "2019-2021, pyLHC/OMC-TEAM"
 author = ABOUT_OPTICS_FUNCTIONS["__author__"]
 
 # The version info for the project you're documenting, acts as replacement for
@@ -128,7 +128,7 @@ html_theme_options = {
 
 html_logo = "_static/img/omc_logo.svg"
 html_static_path = ["_static"]
-html_context = {"css_files": ["_static/css/custom.css"]}
+html_css_files = ["css/custom.css"]
 
 smartquotes_action = "qe"  # renders only quotes and ellipses (...) but not dashes (option: D)
 
