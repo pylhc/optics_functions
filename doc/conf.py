@@ -81,7 +81,7 @@ master_doc = "index"
 
 # General information about the project.
 project = ABOUT_OPTICS_FUNCTIONS["__title__"]
-copyright_ = "2019-2021, pyLHC/OMC-TEAM"
+copyright_ = "2019, pyLHC/OMC-TEAM"
 author = ABOUT_OPTICS_FUNCTIONS["__author__"]
 
 # The version info for the project you're documenting, acts as replacement for
