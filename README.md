@@ -4,7 +4,10 @@
 [![Code Climate coverage](https://img.shields.io/codeclimate/coverage/pylhc/optics_functions.svg?style=popout)](https://codeclimate.com/github/pylhc/optics_functions)
 [![Code Climate maintainability (percentage)](https://img.shields.io/codeclimate/maintainability-percentage/pylhc/optics_functions.svg?style=popout)](https://codeclimate.com/github/pylhc/optics_functions)
 [![GitHub last commit](https://img.shields.io/github/last-commit/pylhc/optics_functions.svg?style=popout)](https://github.com/pylhc/optics_functions)
-[![GitHub release](https://img.shields.io/github/release/pylhc/optics_functions.svg?style=popout)](https://github.com/pylhc/optics_functions)
+<!-- [![GitHub release](https://img.shields.io/github/release/pylhc/optics_functions.svg?style=popout)](https://github.com/pylhc/optics_functions) -->
+[![PyPI Version](https://img.shields.io/pypi/v/optics_functions?label=PyPI&logo=pypi)](https://pypi.org/project/optics_functions/)
+[![GitHub release](https://img.shields.io/github/v/release/pylhc/optics_functions?logo=github)](https://github.com/pylhc/optics_functions/)
+[![Conda-forge Version](https://img.shields.io/conda/vn/conda-forge/optics_functions?color=orange&logo=anaconda)](https://anaconda.org/conda-forge/optics_functions)
 [![DOI](https://zenodo.org/badge/215268186.svg)](https://zenodo.org/badge/latestdoi/215268186)
 
 This package provides functions to calculate various optics parameters from **MAD-X TWISS** outputs.
