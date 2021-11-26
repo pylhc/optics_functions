@@ -71,6 +71,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+doc_build/
 
 # PyBuilder
 target/
@@ -235,8 +236,16 @@ Temporary Items
 #   git rm -r .ipynb_checkpoints/
 #
 
+# VSCode
+.vscode
+.vscode/
+
+# Neovim
+.nvimlog
+
 /.idea/codeStyles/codeStyleConfig.xml
 /.idea/misc.xml
 /.idea/modules.xml
 /.idea/inspectionProfiles/profiles_settings.xml
 /.idea/vcs.xml
+/.idea/PyhDToolkit.iml
