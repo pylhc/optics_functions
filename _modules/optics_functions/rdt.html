@@ -108,6 +108,10 @@
     <span class="sd">&quot;&quot;&quot; Calculates the Resonance Driving Terms.</span>
 
 <span class="sd">    Eq. (A8) in [FranchiAnalyticFormulas2017]_ .</span>
+<span class="sd">    One might notice that this code implementation has a factor :math:`2 \pi` in the exponential</span>
+<span class="sd">    term of the numerator that is not found in Eq. (A8) of the reference. This is due to the fact</span>
+<span class="sd">    that in [FranchiAnalyticFormulas2017]_, phase advances are in radians whereas the expected</span>
+<span class="sd">    values for this code are output by ``MAD-X``, which makes them in units of :math:`2 \pi`.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        df (TfsDataFrame): Twiss Dataframe.</span>
