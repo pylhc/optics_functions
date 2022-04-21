@@ -30,6 +30,10 @@ def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
     """ Calculates the Resonance Driving Terms.
 
     Eq. (A8) in [FranchiAnalyticFormulas2017]_ .
+    One might notice that this code implementation has a factor :math:`2 \pi` in the exponential
+    term of the numerator that is not found in Eq. (A8) of the reference. This is due to the fact
+    that in [FranchiAnalyticFormulas2017]_, phase advances are in radians whereas the expected
+    values for this code are output by ``MAD-X``, which makes them in units of :math:`2 \pi`.
 
     Args:
         df (TfsDataFrame): Twiss Dataframe.
