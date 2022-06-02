@@ -341,7 +341,7 @@ def _get_weights_from_lengths(df: TfsDataFrame) -> Tuple[float, np.array]:
     # approximate length of each element (ds in integral)
     s_periodic = np.zeros(len(df) + 1)
     s_periodic[1:] = df[S].to_numpy()
-    s_periodic[0] = df[S][-1] - df.headers[LENGTH]
+    s_periodic[0] = df[S].to_numpy()[-1] - df.headers[LENGTH]
 
     # weight ds/(2*pi*R) * N (as we take the mean afterwards)
     weights = np.diff(s_periodic) / df.headers[LENGTH] * len(df)
