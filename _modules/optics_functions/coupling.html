@@ -45,31 +45,8 @@
               <p class="caption" role="heading"><span class="caption-text">Main Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html">Coupling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html#optics_functions.coupling.check_resonance_relation"><code class="docutils literal notranslate"><span class="pre">check_resonance_relation()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html#optics_functions.coupling.closest_tune_approach"><code class="docutils literal notranslate"><span class="pre">closest_tune_approach()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html#optics_functions.coupling.coupling_via_cmatrix"><code class="docutils literal notranslate"><span class="pre">coupling_via_cmatrix()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html#optics_functions.coupling.coupling_via_rdts"><code class="docutils literal notranslate"><span class="pre">coupling_via_rdts()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html#optics_functions.coupling.rmatrix_from_coupling"><code class="docutils literal notranslate"><span class="pre">rmatrix_from_coupling()</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html">Resonance Driving Terms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html#optics_functions.rdt.calculate_rdts"><code class="docutils literal notranslate"><span class="pre">calculate_rdts()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html#optics_functions.rdt.generator"><code class="docutils literal notranslate"><span class="pre">generator()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html#optics_functions.rdt.get_ac_dipole_rdts"><code class="docutils literal notranslate"><span class="pre">get_ac_dipole_rdts()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html#optics_functions.rdt.get_all_to_order"><code class="docutils literal notranslate"><span class="pre">get_all_to_order()</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html">Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.add_missing_columns"><code class="docutils literal notranslate"><span class="pre">add_missing_columns()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.dphi"><code class="docutils literal notranslate"><span class="pre">dphi()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.dphi_at_element"><code class="docutils literal notranslate"><span class="pre">dphi_at_element()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.get_all_phase_advances"><code class="docutils literal notranslate"><span class="pre">get_all_phase_advances()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.get_format_keys"><code class="docutils literal notranslate"><span class="pre">get_format_keys()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.i_pow"><code class="docutils literal notranslate"><span class="pre">i_pow()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.merge_complex_columns"><code class="docutils literal notranslate"><span class="pre">merge_complex_columns()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.prepare_twiss_dataframe"><code class="docutils literal notranslate"><span class="pre">prepare_twiss_dataframe()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.seq2str"><code class="docutils literal notranslate"><span class="pre">seq2str()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.set_name_index"><code class="docutils literal notranslate"><span class="pre">set_name_index()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.split_complex_columns"><code class="docutils literal notranslate"><span class="pre">split_complex_columns()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.switch_signs_for_beam4"><code class="docutils literal notranslate"><span class="pre">switch_signs_for_beam4()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.tau"><code class="docutils literal notranslate"><span class="pre">tau()</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.timeit"><code class="docutils literal notranslate"><span class="pre">timeit()</span></code></a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Helper</span></p>
 <ul>
@@ -239,7 +216,7 @@
 
 <div class="viewcode-block" id="rmatrix_from_coupling"><a class="viewcode-back" href="../../modules/coupling.html#optics_functions.coupling.rmatrix_from_coupling">[docs]</a><span class="k">def</span> <span class="nf">rmatrix_from_coupling</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">complex_columns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the R-matrix from a DataFrame containing the coupling columns</span>
-<span class="sd">     as well as alpha and beta columns. This is the inverse of</span>
+<span class="sd">    as well as alpha and beta columns. This is the inverse of</span>
 <span class="sd">    :func:`optics_functions.coupling.coupling_via_cmatrix`.</span>
 <span class="sd">    See [CalagaBetatronCoupling2005]_ .</span>
 
@@ -453,7 +430,7 @@
 
 
 <div class="viewcode-block" id="check_resonance_relation"><a class="viewcode-back" href="../../modules/coupling.html#optics_functions.coupling.check_resonance_relation">[docs]</a><span class="k">def</span> <span class="nf">check_resonance_relation</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">to_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks that |F1001| &gt;= |F1010|.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks that \|F1001| &gt;= \|F1010|.</span>
 <span class="sd">    If desired, sets the invalid points to NaN. This is only used for checking</span>
 <span class="sd">    in the :func:`~optics_functions.coupling.closest_tune_approach` function,</span>
 <span class="sd">    but can be invoked by the user with ``to_nan = True`` and the resulting</span>
@@ -462,7 +439,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        df (DataFrame): Dataframe containing the coupling columns.</span>
-<span class="sd">        to_nan (bool): If true, sets values where |F1001| &lt;= |F1010| to ``NaN``.</span>
+<span class="sd">        to_nan (bool): If true, sets values where \|F1001| &lt;= \|F1010| to ``NaN``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A copy of the input data frame, with or without NaNs.</span>
