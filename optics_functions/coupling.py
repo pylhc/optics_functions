@@ -135,7 +135,7 @@ def coupling_via_cmatrix(df: DataFrame, complex_columns: bool = True,
 
 def rmatrix_from_coupling(df: DataFrame, complex_columns: bool = True) -> DataFrame:
     """Calculates the R-matrix from a DataFrame containing the coupling columns
-     as well as alpha and beta columns. This is the inverse of
+    as well as alpha and beta columns. This is the inverse of
     :func:`optics_functions.coupling.coupling_via_cmatrix`.
     See [CalagaBetatronCoupling2005]_ .
 
@@ -349,7 +349,7 @@ def _get_weights_from_lengths(df: TfsDataFrame) -> Tuple[float, np.array]:
 
 
 def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
-    """Checks that |F1001| >= |F1010|.
+    """Checks that \|F1001| >= \|F1010|.
     If desired, sets the invalid points to NaN. This is only used for checking
     in the :func:`~optics_functions.coupling.closest_tune_approach` function,
     but can be invoked by the user with ``to_nan = True`` and the resulting
@@ -358,7 +358,7 @@ def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
 
     Args:
         df (DataFrame): Dataframe containing the coupling columns.
-        to_nan (bool): If true, sets values where |F1001| <= |F1010| to ``NaN``.
+        to_nan (bool): If true, sets values where \|F1001| <= \|F1010| to ``NaN``.
 
     Returns:
         A copy of the input data frame, with or without NaNs.
