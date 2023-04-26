@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Resonance Driving Terms &mdash; optics_functions 0.1.2 documentation</title>
@@ -13,10 +13,8 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -30,15 +28,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html">
-            <img src="../_static/omc_logo.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/omc_logo.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -47,8 +49,31 @@
               <p class="caption" role="heading"><span class="caption-text">Main Modules</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="coupling.html">Coupling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coupling.html#optics_functions.coupling.check_resonance_relation"><code class="docutils literal notranslate"><span class="pre">check_resonance_relation()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="coupling.html#optics_functions.coupling.closest_tune_approach"><code class="docutils literal notranslate"><span class="pre">closest_tune_approach()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="coupling.html#optics_functions.coupling.coupling_via_cmatrix"><code class="docutils literal notranslate"><span class="pre">coupling_via_cmatrix()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="coupling.html#optics_functions.coupling.coupling_via_rdts"><code class="docutils literal notranslate"><span class="pre">coupling_via_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="coupling.html#optics_functions.coupling.rmatrix_from_coupling"><code class="docutils literal notranslate"><span class="pre">rmatrix_from_coupling()</span></code></a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Resonance Driving Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.rdt.calculate_rdts"><code class="docutils literal notranslate"><span class="pre">calculate_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.rdt.generator"><code class="docutils literal notranslate"><span class="pre">generator()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.rdt.get_ac_dipole_rdts"><code class="docutils literal notranslate"><span class="pre">get_ac_dipole_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.rdt.get_all_to_order"><code class="docutils literal notranslate"><span class="pre">get_all_to_order()</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.add_missing_columns"><code class="docutils literal notranslate"><span class="pre">add_missing_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.dphi"><code class="docutils literal notranslate"><span class="pre">dphi()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.dphi_at_element"><code class="docutils literal notranslate"><span class="pre">dphi_at_element()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.get_all_phase_advances"><code class="docutils literal notranslate"><span class="pre">get_all_phase_advances()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.get_format_keys"><code class="docutils literal notranslate"><span class="pre">get_format_keys()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.i_pow"><code class="docutils literal notranslate"><span class="pre">i_pow()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.merge_complex_columns"><code class="docutils literal notranslate"><span class="pre">merge_complex_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.prepare_twiss_dataframe"><code class="docutils literal notranslate"><span class="pre">prepare_twiss_dataframe()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.seq2str"><code class="docutils literal notranslate"><span class="pre">seq2str()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.set_name_index"><code class="docutils literal notranslate"><span class="pre">set_name_index()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.split_complex_columns"><code class="docutils literal notranslate"><span class="pre">split_complex_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.switch_signs_for_beam4"><code class="docutils literal notranslate"><span class="pre">switch_signs_for_beam4()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.tau"><code class="docutils literal notranslate"><span class="pre">tau()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.timeit"><code class="docutils literal notranslate"><span class="pre">timeit()</span></code></a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Helper</span></p>
 <ul>
@@ -69,8 +94,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Resonance Driving Terms</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Resonance Driving Terms</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/modules/rdt.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -84,9 +109,10 @@
 <h1>Resonance Driving Terms<a class="headerlink" href="#resonance-driving-terms" title="Permalink to this heading"></a></h1>
 <p>Functions for the calculations of Resonance Driving Terms, as well as
 getting lists of valid driving term indices for certain orders.</p>
+</section>
 <dl class="py function">
 <dt class="sig sig-object py" id="optics_functions.rdt.calculate_rdts">
-<span class="sig-prename descclassname"><span class="pre">optics_functions.rdt.</span></span><span class="sig-name descname"><span class="pre">calculate_rdts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TfsDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feeddown</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loop_phases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hamiltionian_terms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">TfsDataFrame</span></span></span><a class="reference internal" href="../_modules/optics_functions/rdt.html#calculate_rdts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.rdt.calculate_rdts" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">optics_functions.rdt.</span></span><span class="sig-name descname"><span class="pre">calculate_rdts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TfsDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feeddown</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex_columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loop_phases</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hamiltionian_terms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">TfsDataFrame</span></span></span><a class="reference internal" href="../_modules/optics_functions/rdt.html#calculate_rdts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.rdt.calculate_rdts" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the Resonance Driving Terms.</p>
 <p>Eq. (A8) in <a class="reference internal" href="../helper/bibliography.html#franchianalyticformulas2017" id="id1"><span>[FranchiAnalyticFormulas2017]</span></a> .
 One might notice that this code implementation has a factor <span class="math notranslate nohighlight">\(2 \pi\)</span> in the exponential
@@ -94,7 +120,7 @@ term of the numerator that is not found in Eq. (A8) of the reference. This is du
 that in <a class="reference internal" href="../helper/bibliography.html#franchianalyticformulas2017" id="id2"><span>[FranchiAnalyticFormulas2017]</span></a>, phase advances are in radians whereas the expected
 values for this code are output by <code class="docutils literal notranslate"><span class="pre">MAD-X</span></code>, which makes them in units of <span class="math notranslate nohighlight">\(2 \pi\)</span>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>TfsDataFrame</em>) -- Twiss Dataframe.</p></li>
 <li><p><strong>rdts</strong> (<em>Sequence</em>) -- List of rdt-names to calculate.</p></li>
@@ -109,7 +135,7 @@ allows for large (e.g. sliced) optics.</p></li>
 <li><p><strong>hamiltionian_terms</strong> (<em>bool</em>) -- Add the hamiltonian terms to the result dataframe.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>New TfsDataFrame with RDT columns.</p>
 </dd>
 </dl>
@@ -120,7 +146,7 @@ allows for large (e.g. sliced) optics.</p></li>
 <span class="sig-prename descclassname"><span class="pre">optics_functions.rdt.</span></span><span class="sig-name descname"><span class="pre">generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orders</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normal</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skew</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">complex_conj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/optics_functions/rdt.html#generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.rdt.generator" title="Permalink to this definition"></a></dt>
 <dd><p>Generates lists of RDT-4-tuples sorted into a dictionary by order.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>orders</strong> (<em>list</em>) -- list of orders to be generated. Orders &lt; 2 raise errors.</p></li>
 <li><p><strong>normal</strong> (<em>bool</em>) -- generate normal RDTs (default: True).</p></li>
@@ -129,7 +155,7 @@ allows for large (e.g. sliced) optics.</p></li>
 (default: True).</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dictionary with keys of orders containing lists of 4-Tuples for the RDTs of that order.</p>
 </dd>
 </dl>
@@ -137,10 +163,10 @@ allows for large (e.g. sliced) optics.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="optics_functions.rdt.get_ac_dipole_rdts">
-<span class="sig-prename descclassname"><span class="pre">optics_functions.rdt.</span></span><span class="sig-name descname"><span class="pre">get_ac_dipole_rdts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order_or_terms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac_tunes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acd_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optics_functions/rdt.html#get_ac_dipole_rdts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.rdt.get_ac_dipole_rdts" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">optics_functions.rdt.</span></span><span class="sig-name descname"><span class="pre">get_ac_dipole_rdts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">order_or_terms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral_line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plane</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ac_tunes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acd_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optics_functions/rdt.html#get_ac_dipole_rdts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.rdt.get_ac_dipole_rdts" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the Hamiltonian Terms under Forced Motion.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>order_or_terms</strong> (<em>Union</em><em>[</em><em>int</em><em>, </em><em>str</em><em>, </em><em>Sequence</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- If an int is given all Resonance Driving
 Terms up to this order will be calculated. The strings are assumed to be the desired
@@ -162,7 +188,6 @@ ACD location.</p></li>
 <dd><p>Returns list of all valid RDT jklm-tuple of order 2 to n</p>
 </dd></dl>
 
-</section>
 
 
            </div>

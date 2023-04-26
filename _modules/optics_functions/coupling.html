@@ -12,10 +12,8 @@
   <![endif]-->
   
         <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/jquery.js"></script>
-        <script src="../../_static/underscore.js"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -26,15 +24,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../../index.html">
-            <img src="../../_static/omc_logo.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../../index.html">
+            
+              <img src="../../_static/omc_logo.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -43,8 +45,31 @@
               <p class="caption" role="heading"><span class="caption-text">Main Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html">Coupling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html#optics_functions.coupling.check_resonance_relation"><code class="docutils literal notranslate"><span class="pre">check_resonance_relation()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html#optics_functions.coupling.closest_tune_approach"><code class="docutils literal notranslate"><span class="pre">closest_tune_approach()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html#optics_functions.coupling.coupling_via_cmatrix"><code class="docutils literal notranslate"><span class="pre">coupling_via_cmatrix()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html#optics_functions.coupling.coupling_via_rdts"><code class="docutils literal notranslate"><span class="pre">coupling_via_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/coupling.html#optics_functions.coupling.rmatrix_from_coupling"><code class="docutils literal notranslate"><span class="pre">rmatrix_from_coupling()</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html">Resonance Driving Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html#optics_functions.rdt.calculate_rdts"><code class="docutils literal notranslate"><span class="pre">calculate_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html#optics_functions.rdt.generator"><code class="docutils literal notranslate"><span class="pre">generator()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html#optics_functions.rdt.get_ac_dipole_rdts"><code class="docutils literal notranslate"><span class="pre">get_ac_dipole_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/rdt.html#optics_functions.rdt.get_all_to_order"><code class="docutils literal notranslate"><span class="pre">get_all_to_order()</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.add_missing_columns"><code class="docutils literal notranslate"><span class="pre">add_missing_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.dphi"><code class="docutils literal notranslate"><span class="pre">dphi()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.dphi_at_element"><code class="docutils literal notranslate"><span class="pre">dphi_at_element()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.get_all_phase_advances"><code class="docutils literal notranslate"><span class="pre">get_all_phase_advances()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.get_format_keys"><code class="docutils literal notranslate"><span class="pre">get_format_keys()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.i_pow"><code class="docutils literal notranslate"><span class="pre">i_pow()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.merge_complex_columns"><code class="docutils literal notranslate"><span class="pre">merge_complex_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.prepare_twiss_dataframe"><code class="docutils literal notranslate"><span class="pre">prepare_twiss_dataframe()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.seq2str"><code class="docutils literal notranslate"><span class="pre">seq2str()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.set_name_index"><code class="docutils literal notranslate"><span class="pre">set_name_index()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.split_complex_columns"><code class="docutils literal notranslate"><span class="pre">split_complex_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.switch_signs_for_beam4"><code class="docutils literal notranslate"><span class="pre">switch_signs_for_beam4()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.tau"><code class="docutils literal notranslate"><span class="pre">tau()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules/utils.html#optics_functions.utils.timeit"><code class="docutils literal notranslate"><span class="pre">timeit()</span></code></a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Helper</span></p>
 <ul>
@@ -65,9 +90,9 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../index.html">Module code</a> &raquo;</li>
-      <li>optics_functions.coupling</li>
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">optics_functions.coupling</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -106,7 +131,7 @@
 
 
 <div class="viewcode-block" id="coupling_via_rdts"><a class="viewcode-back" href="../../modules/coupling.html#optics_functions.coupling.coupling_via_rdts">[docs]</a><span class="k">def</span> <span class="nf">coupling_via_rdts</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">complex_columns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TfsDataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Returns the coupling terms.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the coupling terms.</span>
 
 <span class="sd">    .. warning::</span>
 <span class="sd">        This function changes sign of the real part of the RDTs compared to</span>
@@ -140,7 +165,7 @@
 
 <div class="viewcode-block" id="coupling_via_cmatrix"><a class="viewcode-back" href="../../modules/coupling.html#optics_functions.coupling.coupling_via_cmatrix">[docs]</a><span class="k">def</span> <span class="nf">coupling_via_cmatrix</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">complex_columns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                          <span class="n">output</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;rdts&quot;</span><span class="p">,</span> <span class="s2">&quot;gamma&quot;</span><span class="p">,</span> <span class="s2">&quot;cmatrix&quot;</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Calculates C matrix then Coupling and Gamma from it.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates C matrix then Coupling and Gamma from it.</span>
 <span class="sd">    See [CalagaBetatronCoupling2005]_ .</span>
 
 <span class="sd">    Args:</span>
@@ -213,7 +238,7 @@
 
 
 <div class="viewcode-block" id="rmatrix_from_coupling"><a class="viewcode-back" href="../../modules/coupling.html#optics_functions.coupling.rmatrix_from_coupling">[docs]</a><span class="k">def</span> <span class="nf">rmatrix_from_coupling</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">complex_columns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Calculates the R-matrix from a DataFrame containing the coupling columns</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the R-matrix from a DataFrame containing the coupling columns</span>
 <span class="sd">     as well as alpha and beta columns. This is the inverse of</span>
 <span class="sd">    :func:`optics_functions.coupling.coupling_via_cmatrix`.</span>
 <span class="sd">    See [CalagaBetatronCoupling2005]_ .</span>
@@ -291,7 +316,7 @@
 <div class="viewcode-block" id="closest_tune_approach"><a class="viewcode-back" href="../../modules/coupling.html#optics_functions.coupling.closest_tune_approach">[docs]</a><span class="k">def</span> <span class="nf">closest_tune_approach</span><span class="p">(</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">qx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">qy</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;teapot&quot;</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TfsDataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Calculates the closest tune approach from coupling resonances.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculates the closest tune approach from coupling resonances.</span>
 
 <span class="sd">    A complex F1001 column is assumed to be present in the DataFrame.</span>
 <span class="sd">    This can be calculated by :func:`~optics_functions.rdt.rdts`</span>
@@ -358,12 +383,12 @@
 
 
 <span class="k">def</span> <span class="nf">_cta_franchi</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">qx_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">qy_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Closest tune approach calculated by Eq. (1) in [PerssonImprovedControlCoupling2014]_ . &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Closest tune approach calculated by Eq. (1) in [PerssonImprovedControlCoupling2014]_ . &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">qx_frac</span> <span class="o">-</span> <span class="n">qy_frac</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="n">F1001</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">_cta_persson_alt</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">qx_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">qy_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ .</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ .</span>
 <span class="sd">    The exp(i(Qx-Qy)s/R) term is omitted.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">deltaq</span> <span class="o">=</span> <span class="n">qx_frac</span> <span class="o">-</span> <span class="n">qy_frac</span>  <span class="c1"># fractional tune split</span>
@@ -373,28 +398,28 @@
 
 
 <span class="k">def</span> <span class="nf">_cta_persson</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">qx_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">qy_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ . &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Closest tune approach calculated by Eq. (2) in [PerssonImprovedControlCoupling2014]_ . &quot;&quot;&quot;</span>
     <span class="n">deltaq</span> <span class="o">=</span> <span class="n">qx_frac</span> <span class="o">-</span> <span class="n">qy_frac</span>  <span class="c1"># fractional tune split</span>
     <span class="n">location_term</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">PI2</span> <span class="o">*</span> <span class="p">(</span><span class="n">deltaq</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="n">S</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="n">LENGTH</span><span class="p">]</span> <span class="o">/</span> <span class="n">PI2</span><span class="p">)))</span>
     <span class="k">return</span> <span class="n">_cta_persson_alt</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">qx_frac</span><span class="p">,</span> <span class="n">qy_frac</span><span class="p">)</span> <span class="o">*</span> <span class="n">location_term</span>
 
 
 <span class="k">def</span> <span class="nf">_cta_hoydalsvik</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">qx_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">qy_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Closest tune approach calculated by Eq. (14) in</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Closest tune approach calculated by Eq. (14) in</span>
 <span class="sd">    [HoydalsvikEvaluationOfTheClosestTuneApproach2021]_ .</span>
 <span class="sd">    This is like the persson estimate but divided by 1 + 4|F1001|^2 .&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_cta_persson</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">qx_frac</span><span class="p">,</span> <span class="n">qy_frac</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="n">F1001</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_cta_hoydalsvik_alt</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">qx_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">qy_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot; Closest tune approach calculated by Eq. (14) without the s-term in</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Closest tune approach calculated by Eq. (14) without the s-term in</span>
 <span class="sd">    [HoydalsvikEvaluationOfTheClosestTuneApproach2021]_ .</span>
 <span class="sd">    This is like the persson_alt estimate but divided by 1 + 4|F1001|^2 .&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">_cta_persson_alt</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">qx_frac</span><span class="p">,</span> <span class="n">qy_frac</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="n">F1001</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_cta_teapot</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">qx_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">qy_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Closest tune approach calculated by Eq. (27) in [CalagaBetatronCoupling2005]_ .</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Closest tune approach calculated by Eq. (27) in [CalagaBetatronCoupling2005]_ .</span>
 <span class="sd">    If F1010 is not given, it is assumed to be zero.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">f_diff</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">F1001</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">**</span> <span class="mi">2</span>
@@ -409,14 +434,14 @@
 
 
 <span class="k">def</span> <span class="nf">_cta_teapot_franchi</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">,</span> <span class="n">qx_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">qy_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Series</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Closest tune approach calculated by Eq. (12) in</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Closest tune approach calculated by Eq. (12) in</span>
 <span class="sd">    [HoydalsvikEvaluationOfTheClosestTuneApproach2021]_ .</span>
 <span class="sd">    This is the teapot approach with the Franchi approximation. &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">qx_frac</span> <span class="o">-</span> <span class="n">qy_frac</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="n">F1001</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="n">F1001</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_weights_from_lengths</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">TfsDataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Coefficients for the `persson` method. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coefficients for the `persson` method. &quot;&quot;&quot;</span>
     <span class="c1"># approximate length of each element (ds in integral)</span>
     <span class="n">s_periodic</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">s_periodic</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">S</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
@@ -428,7 +453,7 @@
 
 
 <div class="viewcode-block" id="check_resonance_relation"><a class="viewcode-back" href="../../modules/coupling.html#optics_functions.coupling.check_resonance_relation">[docs]</a><span class="k">def</span> <span class="nf">check_resonance_relation</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">to_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Checks that |F1001| &gt;= |F1010|.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Checks that |F1001| &gt;= |F1010|.</span>
 <span class="sd">    If desired, sets the invalid points to NaN. This is only used for checking</span>
 <span class="sd">    in the :func:`~optics_functions.coupling.closest_tune_approach` function,</span>
 <span class="sd">    but can be invoked by the user with ``to_nan = True`` and the resulting</span>
@@ -449,7 +474,7 @@
 
     <span class="n">condition_not_fulfilled</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">F1001</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">df</span><span class="p">[</span><span class="n">F1010</span><span class="p">]</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span>  <span class="c1"># comparison with NaN always yields False</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">condition_not_fulfilled</span><span class="p">):</span>
-        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">condition_not_fulfilled</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="si">}</span><span class="s2">% &quot;</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">condition_not_fulfilled</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="si">}</span><span class="s2">% &quot;</span>
                     <span class="s2">&quot;of the data points |F1001| &lt; |F1010|. Your closest tune &quot;</span>
                     <span class="s2">&quot;approach estimates might not be accurate.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">to_nan</span><span class="p">:</span>

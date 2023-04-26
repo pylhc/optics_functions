@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Utilities &mdash; optics_functions 0.1.2 documentation</title>
@@ -13,10 +13,8 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -29,15 +27,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html">
-            <img src="../_static/omc_logo.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/omc_logo.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -46,8 +48,31 @@
               <p class="caption" role="heading"><span class="caption-text">Main Modules</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="coupling.html">Coupling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coupling.html#optics_functions.coupling.check_resonance_relation"><code class="docutils literal notranslate"><span class="pre">check_resonance_relation()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="coupling.html#optics_functions.coupling.closest_tune_approach"><code class="docutils literal notranslate"><span class="pre">closest_tune_approach()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="coupling.html#optics_functions.coupling.coupling_via_cmatrix"><code class="docutils literal notranslate"><span class="pre">coupling_via_cmatrix()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="coupling.html#optics_functions.coupling.coupling_via_rdts"><code class="docutils literal notranslate"><span class="pre">coupling_via_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="coupling.html#optics_functions.coupling.rmatrix_from_coupling"><code class="docutils literal notranslate"><span class="pre">rmatrix_from_coupling()</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="rdt.html">Resonance Driving Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdt.html#optics_functions.rdt.calculate_rdts"><code class="docutils literal notranslate"><span class="pre">calculate_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdt.html#optics_functions.rdt.generator"><code class="docutils literal notranslate"><span class="pre">generator()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdt.html#optics_functions.rdt.get_ac_dipole_rdts"><code class="docutils literal notranslate"><span class="pre">get_ac_dipole_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdt.html#optics_functions.rdt.get_all_to_order"><code class="docutils literal notranslate"><span class="pre">get_all_to_order()</span></code></a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.add_missing_columns"><code class="docutils literal notranslate"><span class="pre">add_missing_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.dphi"><code class="docutils literal notranslate"><span class="pre">dphi()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.dphi_at_element"><code class="docutils literal notranslate"><span class="pre">dphi_at_element()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.get_all_phase_advances"><code class="docutils literal notranslate"><span class="pre">get_all_phase_advances()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.get_format_keys"><code class="docutils literal notranslate"><span class="pre">get_format_keys()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.i_pow"><code class="docutils literal notranslate"><span class="pre">i_pow()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.merge_complex_columns"><code class="docutils literal notranslate"><span class="pre">merge_complex_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.prepare_twiss_dataframe"><code class="docutils literal notranslate"><span class="pre">prepare_twiss_dataframe()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.seq2str"><code class="docutils literal notranslate"><span class="pre">seq2str()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.set_name_index"><code class="docutils literal notranslate"><span class="pre">set_name_index()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.split_complex_columns"><code class="docutils literal notranslate"><span class="pre">split_complex_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.switch_signs_for_beam4"><code class="docutils literal notranslate"><span class="pre">switch_signs_for_beam4()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.tau"><code class="docutils literal notranslate"><span class="pre">tau()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.utils.timeit"><code class="docutils literal notranslate"><span class="pre">timeit()</span></code></a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Helper</span></p>
 <ul>
@@ -68,8 +93,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Utilities</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Utilities</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/modules/utils.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -84,6 +109,7 @@
 <p>Helper functions to prepare the twiss dataframes for use with the optics
 functions as well as reusable utilities,
 that are needed within multiple optics calculations.</p>
+</section>
 <dl class="py function">
 <dt class="sig sig-object py" id="optics_functions.utils.add_missing_columns">
 <span class="sig-prename descclassname"><span class="pre">optics_functions.utils.</span></span><span class="sig-name descname"><span class="pre">add_missing_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/optics_functions/utils.html#add_missing_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.utils.add_missing_columns" title="Permalink to this definition"></a></dt>
@@ -95,13 +121,13 @@ that are needed within multiple optics calculations.</p>
 <span class="sig-prename descclassname"><span class="pre">optics_functions.utils.</span></span><span class="sig-name descname"><span class="pre">dphi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/optics_functions/utils.html#dphi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.utils.dphi" title="Permalink to this definition"></a></dt>
 <dd><p>Return dphi from phase advances in data, see Eq. (8) in <a class="reference internal" href="../helper/bibliography.html#franchianalyticformulas2017" id="id1"><span>[FranchiAnalyticFormulas2017]</span></a> .</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>DataFrame</em><em>, </em><em>Series</em>) -- Phase-Advance data.</p></li>
 <li><p><strong>q</strong> -- Tune.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>dphi’s in matrix of shape of data.</p>
 </dd>
 </dl>
@@ -113,7 +139,7 @@ that are needed within multiple optics calculations.</p>
 <dd><p>Return dphis for both planes at the given element.
 See Eq. (8) in <a class="reference internal" href="../helper/bibliography.html#franchianalyticformulas2017" id="id2"><span>[FranchiAnalyticFormulas2017]</span></a> .</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>DataFrame</em>) -- DataFrame containing the Phase-Advance columns for both planes.</p></li>
 <li><p><strong>element</strong> -- Element at which dphi is calculated (must be in the index of df).</p></li>
@@ -121,7 +147,7 @@ See Eq. (8) in <a class="reference internal" href="../helper/bibliography.html#f
 <li><p><strong>qy</strong> (<em>float</em>) -- Tune in Y-Plane.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict of planes with DPhi[i] = Phi[element] - Phi[i] (+ Tune if Phi[i] &gt; Phi[element])</p>
 </dd>
 </dl>
@@ -133,10 +159,10 @@ See Eq. (8) in <a class="reference internal" href="../helper/bibliography.html#f
 <dd><p>Calculate phase advances between all elements.
 Will result in a elements x elements matrix, that might be very large!</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>df</strong> (<em>DataFrame</em>) -- DataFrame with phase advance columns (MUX, MUY).</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dictionary with DataFrame matrices similar to dmu(i,j) = mu(j) - mu(i).</p>
 </dd>
 </dl>
@@ -159,14 +185,14 @@ Will result in a elements x elements matrix, that might be very large!</p>
 <span class="sig-prename descclassname"><span class="pre">optics_functions.utils.</span></span><span class="sig-name descname"><span class="pre">merge_complex_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">TfsDataFrame</span></span></span><a class="reference internal" href="../_modules/optics_functions/utils.html#merge_complex_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.utils.merge_complex_columns" title="Permalink to this definition"></a></dt>
 <dd><p>Merges the given real and imag columns into complex columns.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>pd.DataFrame</em>) -- DataFrame containing the original columns.</p></li>
 <li><p><strong>columns</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>) -- List of complex columns names to be created.</p></li>
 <li><p><strong>drop</strong> (<em>bool</em>) -- Original columns are not present in resulting DataFrame.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Original TfsDataFrame with added columns.</p>
 </dd>
 </dl>
@@ -174,7 +200,7 @@ Will result in a elements x elements matrix, that might be very large!</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="optics_functions.utils.prepare_twiss_dataframe">
-<span class="sig-prename descclassname"><span class="pre">optics_functions.utils.</span></span><span class="sig-name descname"><span class="pre">prepare_twiss_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_twiss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TfsDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_signs_madx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'inner'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">TfsDataFrame</span></span></span><a class="reference internal" href="../_modules/optics_functions/utils.html#prepare_twiss_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.utils.prepare_twiss_dataframe" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">optics_functions.utils.</span></span><span class="sig-name descname"><span class="pre">prepare_twiss_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_twiss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TfsDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">invert_signs_madx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_order</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'inner'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">TfsDataFrame</span></span></span><a class="reference internal" href="../_modules/optics_functions/utils.html#prepare_twiss_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.utils.prepare_twiss_dataframe" title="Permalink to this definition"></a></dt>
 <dd><p>Prepare dataframe to use with the optics functions.</p>
 <ul class="simple">
 <li><p>Adapt Beam 4 signs.</p></li>
@@ -182,7 +208,7 @@ Will result in a elements x elements matrix, that might be very large!</p>
 <li><p>Merge optics and error dataframes (add values).</p></li>
 </ul>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df_twiss</strong> (<em>TfsDataFrame</em>) -- Twiss-optics DataFrame.</p></li>
 <li><p><strong>df_errors</strong> (<em>DataFrame</em>) -- Twiss-errors DataFrame (optional).</p></li>
@@ -193,7 +219,7 @@ flag to True to convert beam 4 to beam 2 signs.</p></li>
 <li><p><strong>join</strong> (<em>str</em>) -- How to join elements of optics and errors. “inner” or “outer”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>TfsDataFrame with necessary columns added. If a merge happened, only the
 necessary columns are present.</p>
 </dd>
@@ -218,14 +244,14 @@ necessary columns are present.</p>
 <dd><p>Splits the given complex columns into two real-values columns containing the
 real and imaginary parts of the original columns.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>TfsDataFrame</em>) -- DataFrame containing the original columns.</p></li>
 <li><p><strong>columns</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>) -- List of column names to be replaced.</p></li>
 <li><p><strong>drop</strong> (<em>bool</em>) -- Original columns are not present in resulting DataFrame.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Original TfsDataFrame with added columns.</p>
 </dd>
 </dl>
@@ -233,7 +259,7 @@ real and imaginary parts of the original columns.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="optics_functions.utils.switch_signs_for_beam4">
-<span class="sig-prename descclassname"><span class="pre">optics_functions.utils.</span></span><span class="sig-name descname"><span class="pre">switch_signs_for_beam4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_twiss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">DataFrame</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">TfsDataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">TfsDataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/optics_functions/utils.html#switch_signs_for_beam4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.utils.switch_signs_for_beam4" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">optics_functions.utils.</span></span><span class="sig-name descname"><span class="pre">switch_signs_for_beam4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_twiss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df_errors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">TfsDataFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">TfsDataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/optics_functions/utils.html#switch_signs_for_beam4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.utils.switch_signs_for_beam4" title="Permalink to this definition"></a></dt>
 <dd><p>Switch the signs for Beam 4 optics.
 This is due to the switch in direction for this beam and
 (anti-) symmetry after a rotation of 180deg around the y-axis of magnets,
@@ -248,13 +274,13 @@ Also the sign for (delta) X is switched back to have the same orientation as bea
 <span class="sig-prename descclassname"><span class="pre">optics_functions.utils.</span></span><span class="sig-name descname"><span class="pre">tau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/optics_functions/utils.html#tau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.utils.tau" title="Permalink to this definition"></a></dt>
 <dd><p>Return tau from phase advances in data, see Eq. (16) in <a class="reference internal" href="../helper/bibliography.html#franchianalyticformulas2017" id="id3"><span>[FranchiAnalyticFormulas2017]</span></a> .</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>DataFrame</em><em>, </em><em>Series</em><em>, </em><em>Array</em>) -- Phase-Advance data.</p></li>
 <li><p><strong>q</strong> -- Tune.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>tau’s in matrix of shape of data.</p>
 </dd>
 </dl>
@@ -265,7 +291,7 @@ Also the sign for (delta) X is switched back to have the same orientation as bea
 <span class="sig-prename descclassname"><span class="pre">optics_functions.utils.</span></span><span class="sig-name descname"><span class="pre">timeit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'Time</span> <span class="pre">used</span> <span class="pre">{:.3f}s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_fun=&lt;bound</span> <span class="pre">method</span> <span class="pre">Logger.debug</span> <span class="pre">of</span> <span class="pre">&lt;Logger</span> <span class="pre">optics_functions.utils</span> <span class="pre">(WARNING)&gt;&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/optics_functions/utils.html#timeit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.utils.timeit" title="Permalink to this definition"></a></dt>
 <dd><p>Timing context with logging/printing output.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>text</strong> (<em>str</em>) -- Text to print. If it contains an unnamed format key, this
 is filled with the time. Otherwise <cite>text</cite> is assumed to be
@@ -276,7 +302,6 @@ description of what is happening in this context.</p></li>
 </dl>
 </dd></dl>
 
-</section>
 
 
            </div>

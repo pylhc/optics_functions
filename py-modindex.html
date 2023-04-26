@@ -12,10 +12,8 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -29,15 +27,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html">
-            <img src="_static/omc_logo.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/omc_logo.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -46,8 +48,31 @@
               <p class="caption" role="heading"><span class="caption-text">Main Modules</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules/coupling.html">Coupling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/coupling.html#optics_functions.coupling.check_resonance_relation"><code class="docutils literal notranslate"><span class="pre">check_resonance_relation()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/coupling.html#optics_functions.coupling.closest_tune_approach"><code class="docutils literal notranslate"><span class="pre">closest_tune_approach()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/coupling.html#optics_functions.coupling.coupling_via_cmatrix"><code class="docutils literal notranslate"><span class="pre">coupling_via_cmatrix()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/coupling.html#optics_functions.coupling.coupling_via_rdts"><code class="docutils literal notranslate"><span class="pre">coupling_via_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/coupling.html#optics_functions.coupling.rmatrix_from_coupling"><code class="docutils literal notranslate"><span class="pre">rmatrix_from_coupling()</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/rdt.html">Resonance Driving Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/rdt.html#optics_functions.rdt.calculate_rdts"><code class="docutils literal notranslate"><span class="pre">calculate_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/rdt.html#optics_functions.rdt.generator"><code class="docutils literal notranslate"><span class="pre">generator()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/rdt.html#optics_functions.rdt.get_ac_dipole_rdts"><code class="docutils literal notranslate"><span class="pre">get_ac_dipole_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/rdt.html#optics_functions.rdt.get_all_to_order"><code class="docutils literal notranslate"><span class="pre">get_all_to_order()</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.add_missing_columns"><code class="docutils literal notranslate"><span class="pre">add_missing_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.dphi"><code class="docutils literal notranslate"><span class="pre">dphi()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.dphi_at_element"><code class="docutils literal notranslate"><span class="pre">dphi_at_element()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.get_all_phase_advances"><code class="docutils literal notranslate"><span class="pre">get_all_phase_advances()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.get_format_keys"><code class="docutils literal notranslate"><span class="pre">get_format_keys()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.i_pow"><code class="docutils literal notranslate"><span class="pre">i_pow()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.merge_complex_columns"><code class="docutils literal notranslate"><span class="pre">merge_complex_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.prepare_twiss_dataframe"><code class="docutils literal notranslate"><span class="pre">prepare_twiss_dataframe()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.seq2str"><code class="docutils literal notranslate"><span class="pre">seq2str()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.set_name_index"><code class="docutils literal notranslate"><span class="pre">set_name_index()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.split_complex_columns"><code class="docutils literal notranslate"><span class="pre">split_complex_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.switch_signs_for_beam4"><code class="docutils literal notranslate"><span class="pre">switch_signs_for_beam4()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.tau"><code class="docutils literal notranslate"><span class="pre">tau()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/utils.html#optics_functions.utils.timeit"><code class="docutils literal notranslate"><span class="pre">timeit()</span></code></a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Helper</span></p>
 <ul>
@@ -68,8 +93,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Python Module Index</li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Python Module Index</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>

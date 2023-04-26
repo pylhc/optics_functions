@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Coupling &mdash; optics_functions 0.1.2 documentation</title>
@@ -13,10 +13,8 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -29,15 +27,19 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="../index.html">
-            <img src="../_static/omc_logo.svg" class="logo" alt="Logo"/>
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/omc_logo.svg" class="logo" alt="Logo"/>
           </a>
               <div class="version">
                 0.1
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -46,8 +48,31 @@
               <p class="caption" role="heading"><span class="caption-text">Main Modules</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Coupling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.coupling.check_resonance_relation"><code class="docutils literal notranslate"><span class="pre">check_resonance_relation()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.coupling.closest_tune_approach"><code class="docutils literal notranslate"><span class="pre">closest_tune_approach()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.coupling.coupling_via_cmatrix"><code class="docutils literal notranslate"><span class="pre">coupling_via_cmatrix()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.coupling.coupling_via_rdts"><code class="docutils literal notranslate"><span class="pre">coupling_via_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="#optics_functions.coupling.rmatrix_from_coupling"><code class="docutils literal notranslate"><span class="pre">rmatrix_from_coupling()</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="rdt.html">Resonance Driving Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdt.html#optics_functions.rdt.calculate_rdts"><code class="docutils literal notranslate"><span class="pre">calculate_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdt.html#optics_functions.rdt.generator"><code class="docutils literal notranslate"><span class="pre">generator()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdt.html#optics_functions.rdt.get_ac_dipole_rdts"><code class="docutils literal notranslate"><span class="pre">get_ac_dipole_rdts()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="rdt.html#optics_functions.rdt.get_all_to_order"><code class="docutils literal notranslate"><span class="pre">get_all_to_order()</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="utils.html">Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.add_missing_columns"><code class="docutils literal notranslate"><span class="pre">add_missing_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.dphi"><code class="docutils literal notranslate"><span class="pre">dphi()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.dphi_at_element"><code class="docutils literal notranslate"><span class="pre">dphi_at_element()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.get_all_phase_advances"><code class="docutils literal notranslate"><span class="pre">get_all_phase_advances()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.get_format_keys"><code class="docutils literal notranslate"><span class="pre">get_format_keys()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.i_pow"><code class="docutils literal notranslate"><span class="pre">i_pow()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.merge_complex_columns"><code class="docutils literal notranslate"><span class="pre">merge_complex_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.prepare_twiss_dataframe"><code class="docutils literal notranslate"><span class="pre">prepare_twiss_dataframe()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.seq2str"><code class="docutils literal notranslate"><span class="pre">seq2str()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.set_name_index"><code class="docutils literal notranslate"><span class="pre">set_name_index()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.split_complex_columns"><code class="docutils literal notranslate"><span class="pre">split_complex_columns()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.switch_signs_for_beam4"><code class="docutils literal notranslate"><span class="pre">switch_signs_for_beam4()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.tau"><code class="docutils literal notranslate"><span class="pre">tau()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html#optics_functions.utils.timeit"><code class="docutils literal notranslate"><span class="pre">timeit()</span></code></a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Helper</span></p>
 <ul>
@@ -68,8 +93,8 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-      <li>Coupling</li>
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Coupling</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/modules/coupling.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -83,6 +108,7 @@
 <h1>Coupling<a class="headerlink" href="#coupling" title="Permalink to this heading"></a></h1>
 <p>Functions to estimate coupling from twiss dataframes and different methods to calculate the closest tune
 approach from the calculated coupling RDTs.</p>
+</section>
 <dl class="py function">
 <dt class="sig sig-object py" id="optics_functions.coupling.check_resonance_relation">
 <span class="sig-prename descclassname"><span class="pre">optics_functions.coupling.</span></span><span class="sig-name descname"><span class="pre">check_resonance_relation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_nan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/optics_functions/coupling.html#check_resonance_relation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.coupling.check_resonance_relation" title="Permalink to this definition"></a></dt>
@@ -93,13 +119,13 @@ but can be invoked by the user with <code class="docutils literal notranslate"><
 DataFrame can then be passed to
 <a class="reference internal" href="#optics_functions.coupling.closest_tune_approach" title="optics_functions.coupling.closest_tune_approach"><code class="xref py py-func docutils literal notranslate"><span class="pre">closest_tune_approach()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>DataFrame</em>) -- Dataframe containing the coupling columns.</p></li>
 <li><p><strong>to_nan</strong> (<em>bool</em>) -- If true, sets values where <a href="#id14"><span class="problematic" id="id15">|F1001|</span></a> &lt;= <a href="#id16"><span class="problematic" id="id17">|F1010|</span></a> to <code class="docutils literal notranslate"><span class="pre">NaN</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A copy of the input data frame, with or without NaNs.</p>
 </dd>
 </dl>
@@ -107,7 +133,7 @@ DataFrame can then be passed to
 
 <dl class="py function">
 <dt class="sig sig-object py" id="optics_functions.coupling.closest_tune_approach">
-<span class="sig-prename descclassname"><span class="pre">optics_functions.coupling.</span></span><span class="sig-name descname"><span class="pre">closest_tune_approach</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TfsDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'teapot'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">TfsDataFrame</span></span></span><a class="reference internal" href="../_modules/optics_functions/coupling.html#closest_tune_approach"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.coupling.closest_tune_approach" title="Permalink to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">optics_functions.coupling.</span></span><span class="sig-name descname"><span class="pre">closest_tune_approach</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">TfsDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'teapot'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">TfsDataFrame</span></span></span><a class="reference internal" href="../_modules/optics_functions/coupling.html#closest_tune_approach"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#optics_functions.coupling.closest_tune_approach" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the closest tune approach from coupling resonances.</p>
 <p>A complex F1001 column is assumed to be present in the DataFrame.
 This can be calculated by <code class="xref py py-func docutils literal notranslate"><span class="pre">rdts()</span></code>
@@ -127,7 +153,7 @@ or the latter without the exp(i(Qx-Qy)s/R) term (method=”hoydalsvik_alt”).</
 are needed in the DataFrame as well as LENGTH (of the machine) and S column
 for the “persson” and “hoydalsvik” methods.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>TfsDataFrame</em>) -- Twiss Dataframe, needs to have complex-valued F1001 column.</p></li>
 <li><p><strong>qx</strong> (<em>float</em>) -- Tune in X-Plane (if not given, header df.Q1 is assumed present).</p></li>
@@ -137,7 +163,7 @@ Choices: “calaga”, “teapot”, “franchi”, “teapot_franchi”,
 “persson”, “persson_alt”, “hoydalsvik” or “hoydalsvik_alt”.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A new <code class="docutils literal notranslate"><span class="pre">TfsDataFrame</span></code> with a closest tune approach (DELTAQMIN) column.
 The value is real for “calaga”, “teapot”, “teapot_franchi” and “franchi”
 methods. The actual closest tune approach value is the absolute value
@@ -152,7 +178,7 @@ of the mean of this column.</p>
 <dd><p>Calculates C matrix then Coupling and Gamma from it.
 See <a class="reference internal" href="../helper/bibliography.html#calagabetatroncoupling2005" id="id6"><span>[CalagaBetatronCoupling2005]</span></a> .</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>DataFrame</em>) -- Twiss Dataframe</p></li>
 <li><p><strong>complex_columns</strong> (<em>bool</em>) -- Output complex values in single column of type complex.
@@ -162,7 +188,7 @@ real-valued columns.</p></li>
 Specifies which parameters one wants to output.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>New TfsDataFrame with columns as specified in ‘output’.</p>
 </dd>
 </dl>
@@ -179,7 +205,7 @@ Specifies which parameters one wants to output.</p></li>
 calculations from <a class="reference internal" href="../helper/bibliography.html#calagabetatroncoupling2005" id="id8"><span>[CalagaBetatronCoupling2005]</span></a> .</p>
 </div>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>TfsDataFrame</em>) -- Twiss Dataframe.</p></li>
 <li><p><strong>complex_columns</strong> (<em>bool</em>) -- Output complex values in single column of type complex.
@@ -187,12 +213,12 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 two real-valued columns.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Keyword Arguments</dt>
+<dt class="field-even">Keyword Arguments<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>**kwargs</strong> -- Remaining arguments from <code class="xref py py-func docutils literal notranslate"><span class="pre">rdts()</span></code>
 i.e. <code class="docutils literal notranslate"><span class="pre">qx</span></code>, <code class="docutils literal notranslate"><span class="pre">qy</span></code>, <code class="docutils literal notranslate"><span class="pre">feeddown</span></code>, <code class="docutils literal notranslate"><span class="pre">loop_phases</span></code>
 and <code class="docutils literal notranslate"><span class="pre">hamiltionian_terms</span></code>.</p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A new <code class="docutils literal notranslate"><span class="pre">TfsDataFrame</span></code> with Coupling Columns.</p>
 </dd>
 </dl>
@@ -208,7 +234,7 @@ and <code class="docutils literal notranslate"><span class="pre">hamiltionian_te
 <p><a class="reference internal" href="#optics_functions.coupling.coupling_via_cmatrix" title="optics_functions.coupling.coupling_via_cmatrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">optics_functions.coupling.coupling_via_cmatrix()</span></code></a>.
 See <a class="reference internal" href="../helper/bibliography.html#calagabetatroncoupling2005" id="id9"><span>[CalagaBetatronCoupling2005]</span></a> .</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>df</strong> (<em>DataFrame</em>) -- Twiss Dataframe.</p></li>
 <li><p><strong>complex_columns</strong> (<em>bool</em>) -- Tells the function if the coupling input columns
@@ -216,13 +242,12 @@ are complex-valued or split into real and
 imaginary parts.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A new <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> containing the R-columns.</p>
 </dd>
 </dl>
 </dd></dl>
 
-</section>
 
 
            </div>
