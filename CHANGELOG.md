@@ -1,10 +1,5 @@
 # optics_functions Changelog
 
-## Version 0.1.3
- 
-- Fixed:
-  - Replaced `append` with `concat` to be compatible with new `pandas` versions.
-
 ## Version 0.1.2
 
 - Fixed:
