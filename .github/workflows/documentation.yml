@@ -55,6 +55,6 @@ jobs:
 
       - name: Upload documentation to gh-pages
         if: success() && github.ref == 'refs/heads/master'  # only for pushes to master
-        uses: JamesIves/github-pages-deploy-action@4
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: doc_build
