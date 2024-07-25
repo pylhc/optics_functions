@@ -1,0 +1,86 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "optics_functions/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+  "/doc",
+  "/tests",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["optics_functions"]
+
+[project]
+name = "optics_functions"
+readme = "README.md"
+description = "Calculate optics parameters from TWISS outputs."
+authors = [
+    {name = "PyLHC", email = "pylhc@github.com"},
+    {name = "Felix Soubelet", email = "felix.soubelet@cern.ch"},
+    {name = "Joschua Dilly", email = "joschua.dilly@cern.ch"},
+    {name = "Andreas Wegscheider"},
+    {name = "Michael Hofer"},
+]
+license = "MIT"
+dynamic = ["version"]
+requires-python = ">=3.9"
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "numpy >= 1.24",
+    "pandas >= 2.1",
+    "tfs-pandas >= 3.8",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=2.9",
+]
+doc = [
+    "sphinx >= 7.0",
+    "sphinx_rtd_theme >= 2.0",
+]
+
+all = [
+    "optics_functions[test]",
+    "optics_functions[doc]",
+]
+
+[project.urls]
+homepage = "https://github.com/pylhc/optics_functions"
+repository = "https://github.com/pylhc/optics_functions"
+documentation = "https://pylhc.github.io/optics_functions/"
+changelog = "https://github.com/pylhc/optics_functions/blob/master/CHANGELOG.md"
+
+# ----- Testing ----- #
+
+[tool.pytest.ini_options]
+markers = [
+    "basic: basic tests run for every commit",
+    "extended: test run on PRs",
+]
+# Helpful for pytest-debugging (leave commented out on commit):
+# log_cli=true
+# log_level=DEBUG
