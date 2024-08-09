@@ -148,7 +148,7 @@ def switch_signs_for_beam4(
     but in the errors they do (otherwise it would compensate).
     Magnet orders that show anti-symmetry are: a1 (K0SL), b2 (K1L), a3 (K2SL), b4 (K3L) etc.
     Also the sign for (delta) X is switched back to have the same orientation as beam2."""
-    LOG.debug(f"Switching signs for X and K(S)L values when needed, to match Beam 4 to Beam 2.")
+    LOG.debug("Switching signs for X and K(S)L values when needed, to match Beam 4 to Beam 2.")
     df_twiss, df_errors = df_twiss.copy(), df_errors.copy()
     df_twiss[X] = -df_twiss[X]
 
