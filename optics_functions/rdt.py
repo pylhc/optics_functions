@@ -197,7 +197,7 @@ def generator(orders: Sequence[int], normal: bool = True,
         if ((order in orders)  # check for order
             and not (x[0] == x[1] and x[2] == x[3])  # rdt index rule
             and ((skew and sum(x[2:4]) % 2) or (normal and not sum(x[2:4]) % 2))  # skew or normal
-            and (complex_conj or not((x[1], x[0], x[3], x[2]) in permut[order]))  # filter conj
+            and (complex_conj or (x[1], x[0], x[3], x[2]) not in permut[order])  # filter conj
         ):
             permut[order].append(x)
     return permut
