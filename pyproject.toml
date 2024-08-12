@@ -20,11 +20,7 @@ name = "optics_functions"
 readme = "README.md"
 description = "Calculate optics parameters from TWISS outputs."
 authors = [
-    {name = "PyLHC", email = "pylhc@github.com"},
-    {name = "Felix Soubelet", email = "felix.soubelet@cern.ch"},
-    {name = "Joschua Dilly", email = "joschua.dilly@cern.ch"},
-    {name = "Andreas Wegscheider"},
-    {name = "Michael Hofer"},
+    {name = "OMC Team", email = "pylhc@github.com"},  # see zenodo file / commits for details
 ]
 license = "MIT"
 dynamic = ["version"]
