@@ -374,5 +374,5 @@ def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
                     "of the data points |F1001| < |F1010|. Your closest tune "
                     "approach estimates might not be accurate.")
         if to_nan:
-            df.loc[condition_not_fulfilled, COUPLING_RDTS] = np.NaN
+            df.loc[condition_not_fulfilled, COUPLING_RDTS] = np.nan
     return df

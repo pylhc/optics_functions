@@ -1,11 +1,16 @@
 # optics_functions Changelog
 
+## Version 0.1.3
+
+- Fixed use of `np.NaN` to ensure compatibility with `numpy 2.0`.
+
 ## Version 0.1.2
 
 - Fixed:
   - an issue that could lead to an indexing error in the closest tune approach calculation for some of the available methods.
 
 ## Version 0.1.1
+
 A patch for some closest tune approach methods, and the addition of new methods.
 
 - Fixed:
