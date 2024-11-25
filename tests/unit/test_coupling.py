@@ -176,12 +176,13 @@ def test_coupling_rdt_bump_cmatrix_compare():
 
 def generate_fake_data(n) -> tfs.TfsDataFrame:
     qx, qy = 1.31, 1.32
-    df = tfs.TfsDataFrame(0,
-                          index=[str(i) for i in range(n)],
-                          columns=[S, f"{ALPHA}{X}", f"{ALPHA}{Y}", f"{BETA}{X}", f"{BETA}{Y}",
-                                   f"{PHASE_ADV}{X}", f"{PHASE_ADV}{Y}", "R11", "R12", "R21", "R22"],
-                          headers={f"{TUNE}1": qx, f"{TUNE}2": qy}
-                          )
+    df = tfs.TfsDataFrame(
+        0.0,
+        index=[str(i) for i in range(n)],
+        columns=[S, f"{ALPHA}{X}", f"{ALPHA}{Y}", f"{BETA}{X}", f"{BETA}{Y}",
+                f"{PHASE_ADV}{X}", f"{PHASE_ADV}{Y}", "R11", "R12", "R21", "R22"],
+        headers={f"{TUNE}1": qx, f"{TUNE}2": qy},
+    )
 
     r = np.random.rand(n)
     df[S] = np.linspace(0, n, n)
