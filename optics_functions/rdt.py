@@ -27,7 +27,7 @@ def calculate_rdts(df: TfsDataFrame, rdts: Sequence[str],
                    qx: float = None, qy: float = None, feeddown: int = 0,
                    complex_columns: bool = True, loop_phases: bool = False,
                    hamiltionian_terms: bool = False) -> TfsDataFrame:
-    """ Calculates the Resonance Driving Terms.
+    r"""Calculates the Resonance Driving Terms.
 
     Eq. (A8) in [FranchiAnalyticFormulas2017]_ .
     One might notice that this code implementation has a factor :math:`2 \pi` in the exponential

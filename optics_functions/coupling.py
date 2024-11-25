@@ -349,7 +349,7 @@ def _get_weights_from_lengths(df: TfsDataFrame) -> Tuple[float, np.array]:
 
 
 def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
-    """Checks that \|F1001| >= \|F1010|.
+    r"""Checks that \|F1001| >= \|F1010|.
     If desired, sets the invalid points to NaN. This is only used for checking
     in the :func:`~optics_functions.coupling.closest_tune_approach` function,
     but can be invoked by the user with ``to_nan = True`` and the resulting
