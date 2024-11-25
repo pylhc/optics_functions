@@ -1,5 +1,9 @@
 # optics_functions Changelog
 
+## Version 0.1.4
+
+- Fixed invalid escape sequences in docstrings that would warn in all calling code.
+
 ## Version 0.1.3
 
 - Fixed use of `np.NaN` to ensure compatibility with `numpy 2.0`.
