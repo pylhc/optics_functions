@@ -114,7 +114,7 @@ def test_closest_tune_approach(
     df_twiss[F1001] = df_cmatrix[F1001]  # ignoring F1010 in this test as it is bigger than F1001
 
     cta_df = closest_tune_approach(df_twiss, method=cta_method)  # only one column
-    cminus = cta_df.mean().abs()[0]
+    cminus = cta_df.mean().abs().iloc[0]
     relative_error = _relative_error(cminus, _coupling_bump_teapot_cta)
 
     assert relative_error <= max_relative_error_to_teapot
@@ -212,4 +212,4 @@ def _coupling_bump_teapot_cta() -> float:
     df_twiss[F1001] = df_cmatrix[F1001]  # ignoring F1010 in this test as it is bigger than F1001
 
     cta_df = closest_tune_approach(df_twiss, method="teapot")  # only one column
-    return cta_df.mean().abs()[0]  # this is the cminus
+    return cta_df.mean().abs().iloc[0]  # this is the cminus
