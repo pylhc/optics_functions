@@ -225,7 +225,7 @@ def generator(
     Returns:
         Dictionary with keys of orders containing lists of 4-Tuples for the RDTs of that order.
     """
-    if any([n <= 1 for n in orders]):
+    if any(n <= 1 for n in orders):
         raise ValueError("All order must be greater 1 for resonance driving terms.")
 
     if not (normal or skew):
