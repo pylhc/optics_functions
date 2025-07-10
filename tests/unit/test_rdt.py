@@ -38,7 +38,7 @@ def test_generator():
     rdt_normal = generator(list(range(2, n + 1)), skew=False)
     rdt_cc = generator(list(range(2, n + 1)), complex_conj=False)
 
-    for o in rdt_all.keys():
+    for o in rdt_all:
         assert len(rdt_all[o]) == 2 * len(rdt_skew[o])
         assert len(rdt_all[o]) == 2 * len(rdt_normal[o])
         assert len(rdt_all[o]) == 2 * len(rdt_cc[o])
