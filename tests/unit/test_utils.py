@@ -6,20 +6,20 @@ import pandas as pd
 import pytest
 import tfs
 
-from optics_functions.constants import PHASE_ADV, Y, X, REAL, IMAG, NAME, DELTA_ORBIT, PLANES, S
+from optics_functions.constants import DELTA_ORBIT, IMAG, NAME, PHASE_ADV, PLANES, REAL, S, X, Y
 from optics_functions.utils import (
     add_missing_columns,
     dphi,
-    get_all_phase_advances,
-    tau,
-    seq2str,
-    i_pow,
-    prepare_twiss_dataframe,
-    switch_signs_for_beam4,
-    get_format_keys,
     dphi_at_element,
-    split_complex_columns,
+    get_all_phase_advances,
+    get_format_keys,
+    i_pow,
     merge_complex_columns,
+    prepare_twiss_dataframe,
+    seq2str,
+    split_complex_columns,
+    switch_signs_for_beam4,
+    tau,
 )
 
 INPUT = Path(__file__).parent.parent / "inputs"
@@ -46,10 +46,10 @@ def test_i_pow():
     for i in range(10):
         assert 1j**i == i_pow(i)
 
-    assert 1j**0 == i_pow(1000)
-    assert 1j**1 == i_pow(1001)
-    assert 1j**2 == i_pow(1002)
-    assert 1j**3 == i_pow(1003)
+    assert i_pow(1000) == 1j**0
+    assert i_pow(1001) == 1j**1
+    assert i_pow(1002) == 1j**2
+    assert i_pow(1003) == 1j**3
     assert i_pow(1) != i_pow(2)
     assert i_pow(0) == -i_pow(2)
     assert i_pow(1) == -i_pow(3)

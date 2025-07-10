@@ -1,4 +1,3 @@
-from collections import namedtuple
 from pathlib import Path
 
 import numpy as np
@@ -67,7 +66,7 @@ def test_rmatrix_to_coupling_to_rmatrix(source):
         np.random.seed(487423872)
         df = generate_fake_data(5)
     else:
-        df = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b1.coupling_bump.tfs", index=NAME)
+        df = tfs.read(INPUT / "coupling_bump" / "twiss.lhc.b1.coupling_bump.tfs", index=NAME)
 
     df_coupling = coupling_via_cmatrix(df)
     for col in (f"{ALPHA}X", f"{BETA}X", f"{ALPHA}Y", f"{BETA}Y"):

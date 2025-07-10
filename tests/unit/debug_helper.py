@@ -2,11 +2,13 @@
 Not at all needed for package, but helps for debugging.
 """
 
-from matplotlib import pyplot as plt  # not in requirements
-import numpy as np
-from optics_functions.constants import S, REAL, IMAG
+import logging
+import sys
 
-import logging, sys
+import numpy as np
+from matplotlib import pyplot as plt  # not in requirements
+
+from optics_functions.constants import IMAG, REAL, S
 
 
 def plot_rdts_vs_ptc(df_rdt, df_ptc_rdt, df_twiss, rdt_names):
@@ -33,7 +35,7 @@ def plot_rdts_vs_ptc(df_rdt, df_ptc_rdt, df_twiss, rdt_names):
         )
         axs[2].plot(df_twiss[S], np.abs(df_rdt[f"{rdt}"]), color="C1", label="Analytical")
         axs[2].set_ylabel(f"abs {rdt}")
-        axs[2].set_xlabel(f"Location [m]")
+        axs[2].set_xlabel("Location [m]")
     plt.show()
 
 
@@ -52,7 +54,7 @@ def plot_rdts_vs(df_rdt1, label1, df_rdt2, label2, df_twiss, rdt_names):
         axs[2].plot(df_twiss[S], np.abs(df_rdt1[f"{rdt}"]), color="C0", label=label1)
         axs[2].plot(df_twiss[S], np.abs(df_rdt2[f"{rdt}"]), color="C1", label=label2)
         axs[2].set_ylabel(f"abs {rdt}")
-        axs[2].set_xlabel(f"Location [m]")
+        axs[2].set_xlabel("Location [m]")
     plt.show()
 
 

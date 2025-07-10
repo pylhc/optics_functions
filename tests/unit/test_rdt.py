@@ -5,8 +5,8 @@ import pandas as pd
 import pytest
 import tfs
 
-from optics_functions.constants import PHASE_ADV, X, Y, BETA, S, TUNE, NAME, REAL, IMAG
-from optics_functions.rdt import calculate_rdts, generator, get_all_to_order, str2jklm, jklm2str
+from optics_functions.constants import BETA, IMAG, NAME, PHASE_ADV, REAL, TUNE, S, X, Y
+from optics_functions.rdt import calculate_rdts, generator, get_all_to_order, jklm2str, str2jklm
 from optics_functions.utils import prepare_twiss_dataframe
 
 INPUT = Path(__file__).parent.parent / "inputs"

@@ -10,9 +10,9 @@ that are needed within multiple optics calculations.
 
 import logging
 import string
+from collections.abc import Iterable, Sequence
 from contextlib import contextmanager
 from time import time
-from typing import Iterable, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -143,7 +143,7 @@ def merge_complex_columns(
 
 def switch_signs_for_beam4(
     df_twiss: pd.DataFrame, df_errors: pd.DataFrame = None
-) -> Tuple[TfsDataFrame, TfsDataFrame]:
+) -> tuple[TfsDataFrame, TfsDataFrame]:
     """Switch the signs for Beam 4 optics.
     This is due to the switch in direction for this beam and
     (anti-) symmetry after a rotation of 180deg around the y-axis of magnets,

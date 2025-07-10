@@ -9,22 +9,22 @@ getting lists of valid driving term indices for certain orders.
 
 import itertools
 import logging
+from collections.abc import Sequence
 from math import factorial
-from typing import Tuple, Sequence, List, Union
 
 import numpy as np
 import pandas as pd
 from tfs import TfsDataFrame
 
-from optics_functions.constants import PI2I, X, Y, BETA, TUNE
+from optics_functions.constants import BETA, PI2I, TUNE, X, Y
 from optics_functions.utils import (
-    seq2str,
-    timeit,
-    get_all_phase_advances,
-    dphi_at_element,
     dphi,
+    dphi_at_element,
+    get_all_phase_advances,
     i_pow,
+    seq2str,
     split_complex_columns,
+    timeit,
 )
 
 LOG = logging.getLogger(__name__)
@@ -169,10 +169,10 @@ def calculate_rdts(
 
 
 def get_ac_dipole_rdts(
-    order_or_terms: Union[int, str, Sequence[str]],
-    spectral_line: Tuple[int],
+    order_or_terms: int | str | Sequence[str],
+    spectral_line: tuple[int],
     plane: str,
-    ac_tunes: Tuple[float, float],
+    ac_tunes: tuple[float, float],
     acd_name: str,
 ):
     """Calculates the Hamiltonian Terms under Forced Motion.
@@ -197,7 +197,7 @@ def get_ac_dipole_rdts(
 # RDT Definition Generation Functions ------------------------------------------
 
 
-def get_all_to_order(n: int) -> List[Tuple[int, int, int, int]]:
+def get_all_to_order(n: int) -> list[tuple[int, int, int, int]]:
     """Returns list of all valid RDT jklm-tuple of order 2 to n"""
     if n <= 1:
         raise ValueError("'n' must be greater 1 for resonance driving terms.")
@@ -207,7 +207,7 @@ def get_all_to_order(n: int) -> List[Tuple[int, int, int, int]]:
         for x in itertools.product(range(n + 1), repeat=4)
         if 1 < sum(x) <= n and not (x[0] == x[1] and x[2] == x[3])
     ]
-    return list(sorted(permut, key=sum))
+    return sorted(permut, key=sum)
 
 
 def generator(
@@ -251,7 +251,7 @@ def jklm2str(j: int, k: int, l: int, m: int) -> str:
     return f"F{j:d}{k:d}{l:d}{m:d}"
 
 
-def str2jklm(rdt: str) -> Tuple[int, ...]:
+def str2jklm(rdt: str) -> tuple[int, ...]:
     return tuple(int(i) for i in rdt[1:])
 
 

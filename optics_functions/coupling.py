@@ -7,8 +7,8 @@ approach from the calculated coupling RDTs.
 """
 
 import logging
+from collections.abc import Sequence
 from contextlib import suppress
-from typing import Sequence, Tuple
 
 import numpy as np
 from pandas import DataFrame, Series
@@ -17,20 +17,20 @@ from tfs import TfsDataFrame
 from optics_functions.constants import (
     ALPHA,
     BETA,
+    DELTA,
+    F1001,
+    F1010,
     GAMMA,
+    IMAG,
+    LENGTH,
+    MINIMUM,
+    PHASE_ADV,
+    PI2,
+    REAL,
+    TUNE,
+    S,
     X,
     Y,
-    TUNE,
-    DELTA,
-    MINIMUM,
-    PI2,
-    PHASE_ADV,
-    S,
-    LENGTH,
-    IMAG,
-    REAL,
-    F1010,
-    F1001,
 )
 from optics_functions.rdt import calculate_rdts
 from optics_functions.utils import split_complex_columns, timeit
@@ -362,7 +362,7 @@ def _cta_teapot_franchi(df: TfsDataFrame, qx_frac: float, qy_frac: float) -> Ser
     return 4 * (qx_frac - qy_frac) * df[F1001].abs() / (1 + 4 * df[F1001].abs() ** 2)
 
 
-def _get_weights_from_lengths(df: TfsDataFrame) -> Tuple[float, np.array]:
+def _get_weights_from_lengths(df: TfsDataFrame) -> tuple[float, np.ndarray]:
     """Coefficients for the `persson` method."""
     # approximate length of each element (ds in integral)
     s_periodic = np.zeros(len(df) + 1)
