@@ -4,6 +4,7 @@ Constants
 
 Constants for the optics functions.
 """
+
 import numpy as np
 
 PI = np.pi

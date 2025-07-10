@@ -7,10 +7,20 @@ import pytest
 import tfs
 
 from optics_functions.constants import PHASE_ADV, Y, X, REAL, IMAG, NAME, DELTA_ORBIT, PLANES, S
-from optics_functions.utils import (add_missing_columns, dphi,
-                                    get_all_phase_advances, tau, seq2str, i_pow,
-                                    prepare_twiss_dataframe, switch_signs_for_beam4,
-                                    get_format_keys, dphi_at_element, split_complex_columns, merge_complex_columns)
+from optics_functions.utils import (
+    add_missing_columns,
+    dphi,
+    get_all_phase_advances,
+    tau,
+    seq2str,
+    i_pow,
+    prepare_twiss_dataframe,
+    switch_signs_for_beam4,
+    get_format_keys,
+    dphi_at_element,
+    split_complex_columns,
+    merge_complex_columns,
+)
 
 INPUT = Path(__file__).parent.parent / "inputs"
 
@@ -81,7 +91,7 @@ def test_get_all_phaseadvances():
 
 @pytest.mark.basic
 def test_split_complex_columns():
-    df = pd.DataFrame([1+2j, 3j + 4], columns=["Col"], index=["A", "B"])
+    df = pd.DataFrame([1 + 2j, 3j + 4], columns=["Col"], index=["A", "B"])
     df_split = split_complex_columns(df, df.columns, drop=False)
     assert len(df_split.columns) == 3
 
@@ -95,7 +105,7 @@ def test_split_complex_columns():
 
 @pytest.mark.basic
 def test_merge_complex_columns():
-    df = pd.DataFrame([1+2j, 3j + 4], columns=["Col"], index=["A", "B"])
+    df = pd.DataFrame([1 + 2j, 3j + 4], columns=["Col"], index=["A", "B"])
     df_split = split_complex_columns(df, df.columns, drop=True)
 
     df_merged = merge_complex_columns(df_split, df.columns, drop=False)
@@ -115,7 +125,7 @@ def test_dphi():
     phs_adv_dict = get_all_phase_advances(df)
     for q, adv in zip((qx, qy), phs_adv_dict.values()):
         dp = dphi(adv, q)
-        diff = dp-adv
+        diff = dp - adv
         assert (dp >= 0).all().all()
         assert (dp <= q).all().all()
         assert ((diff == 0) | (diff == q)).all().all()
@@ -129,11 +139,11 @@ def test_tau():
     phs_adv_dict = get_all_phase_advances(df)
     for q, adv in zip((qx, qy), phs_adv_dict.values()):
         dp = tau(adv, q)
-        diff = dp-adv
-        assert (dp >= -q/2).all().all()
-        assert (dp <= q/2).all().all()
-        assert ((diff == -q/2) | (diff == q/2)).all().all()
-        assert all(dp.loc[i, i] == q/2 for i in range(n))
+        diff = dp - adv
+        assert (dp >= -q / 2).all().all()
+        assert (dp <= q / 2).all().all()
+        assert ((diff == -q / 2) | (diff == q / 2)).all().all()
+        assert all(dp.loc[i, i] == q / 2 for i in range(n))
 
 
 @pytest.mark.basic
@@ -179,14 +189,15 @@ def test_prepare_twiss_dataframe_inner():
     n_index, n_kmax, n_valmax = 5, 6, 10
     n_kmax_prepare = 5
     df_twiss, _ = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
-    _, df_errors_1 = get_twiss_and_error_df(n_index+3, n_kmax, n_valmax)
-    df = prepare_twiss_dataframe(df_twiss=df_twiss, df_errors=df_errors_1.iloc[3:, :], max_order=n_kmax_prepare,
-                                 join="inner")
+    _, df_errors_1 = get_twiss_and_error_df(n_index + 3, n_kmax, n_valmax)
+    df = prepare_twiss_dataframe(
+        df_twiss=df_twiss, df_errors=df_errors_1.iloc[3:, :], max_order=n_kmax_prepare, join="inner"
+    )
 
     k_columns = df.columns[df.columns.str.match(r"^K\d+S?L")]
     assert len(k_columns) == n_kmax * 2
 
-    assert len(df.index) == n_index-3
+    assert len(df.index) == n_index - 3
     assert all(df[S] == df_twiss.loc[df.index, S])
 
     assert df.headers == df_twiss.headers
@@ -198,9 +209,13 @@ def test_prepare_twiss_dataframe_outer():
     n_index, n_kmax, n_valmax = 8, 6, 10
     n_kmax_prepare = 16
     _, df_errors = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
-    df_twiss_1, _ = get_twiss_and_error_df(n_index, n_kmax+2, n_valmax)
-    df = prepare_twiss_dataframe(df_twiss=df_twiss_1.iloc[3:, :], df_errors=df_errors.iloc[:-3, :],
-                                 max_order=n_kmax_prepare, join="outer")
+    df_twiss_1, _ = get_twiss_and_error_df(n_index, n_kmax + 2, n_valmax)
+    df = prepare_twiss_dataframe(
+        df_twiss=df_twiss_1.iloc[3:, :],
+        df_errors=df_errors.iloc[:-3, :],
+        max_order=n_kmax_prepare,
+        join="outer",
+    )
 
     k_columns = df.columns[df.columns.str.match(r"^K\d+S?L")]
     assert len(k_columns) == n_kmax_prepare * 2
@@ -238,15 +253,19 @@ def test_switch_signs_for_beam4():
     df_twiss_b4, df_errors_b4 = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
     df_twiss_b2, df_errors_b2 = switch_signs_for_beam4(df_twiss_b4, df_errors_b4)
 
-    switch_columns = [X,]  # this needs to be correct!!!
+    switch_columns = [
+        X,
+    ]  # this needs to be correct!!!
     for col in df_twiss_b4.columns:
         sign = -1 if col in switch_columns else 1
-        assert df_twiss_b2[col].equals(sign*df_twiss_b4[col])
+        assert df_twiss_b2[col].equals(sign * df_twiss_b4[col])
 
-    switch_columns = [f"{DELTA_ORBIT}{X}"] + [f"K{o:d}{'' if o % 2 else 'S'}L" for o in range(n_kmax)]  # this needs to be correct!!!
+    switch_columns = [f"{DELTA_ORBIT}{X}"] + [
+        f"K{o:d}{'' if o % 2 else 'S'}L" for o in range(n_kmax)
+    ]  # this needs to be correct!!!
     for col in df_errors_b4.columns:
         sign = -1 if col in switch_columns else 1
-        assert df_errors_b2[col].equals(sign*df_errors_b4[col])
+        assert df_errors_b2[col].equals(sign * df_errors_b4[col])
 
 
 @pytest.mark.extended
@@ -268,13 +287,18 @@ def test_switch_signs_for_beam4_madx_data():
 
     # as the values are not exact and not all signs perfect: check if more signs are equal than before...
     # Not the most impressive test. Other ideas welcome.
-    assert ((np.sign(df_twiss_b4switched[twiss_cols]) == np.sign(df_twiss_b2[twiss_cols])).sum().sum()
-            >
-            (np.sign(df_twiss_b4[twiss_cols]) == np.sign(df_twiss_b2[twiss_cols])).sum().sum() + 0.9*len(df_twiss_b2))
+    assert (
+        np.sign(df_twiss_b4switched[twiss_cols]) == np.sign(df_twiss_b2[twiss_cols])
+    ).sum().sum() > (
+        np.sign(df_twiss_b4[twiss_cols]) == np.sign(df_twiss_b2[twiss_cols])
+    ).sum().sum() + 0.9 * len(df_twiss_b2)
 
-    assert ((np.sign(df_errors_b4switched[err_cols]) == np.sign(df_errors_b2[err_cols])).sum().sum()
-            >
-            (np.sign(df_errors_b4[err_cols]) == np.sign(df_errors_b2[err_cols])).sum().sum() + len(df_twiss_b2))
+    assert (
+        np.sign(df_errors_b4switched[err_cols]) == np.sign(df_errors_b2[err_cols])
+    ).sum().sum() > (
+        np.sign(df_errors_b4[err_cols]) == np.sign(df_errors_b2[err_cols])
+    ).sum().sum() + len(df_twiss_b2)
+
 
 # Helper -----------------------------------------------------------------------
 
@@ -282,15 +306,17 @@ def test_switch_signs_for_beam4_madx_data():
 def get_twiss_and_error_df(n_index, n_kmax, n_valmax):
     twiss_cols, err_cols = get_twiss_and_error_columns(n_kmax)
     data = np.random.rand(n_index, len(twiss_cols)) * n_valmax
-    data[n_index // 2:, :] = -data[n_index // 2:, :]
+    data[n_index // 2 :, :] = -data[n_index // 2 :, :]
 
-    df_twiss = tfs.TfsDataFrame(data[:, :len(twiss_cols)],
-                                index=list(string.ascii_uppercase[:n_index]),
-                                columns=twiss_cols,
-                                headers={"Just": "Some", "really": "nice", "header": 1111})
-    df_errors = tfs.TfsDataFrame(data[:, :len(err_cols)],
-                                 index=list(string.ascii_uppercase[:n_index]),
-                                 columns=err_cols)
+    df_twiss = tfs.TfsDataFrame(
+        data[:, : len(twiss_cols)],
+        index=list(string.ascii_uppercase[:n_index]),
+        columns=twiss_cols,
+        headers={"Just": "Some", "really": "nice", "header": 1111},
+    )
+    df_errors = tfs.TfsDataFrame(
+        data[:, : len(err_cols)], index=list(string.ascii_uppercase[:n_index]), columns=err_cols
+    )
     df_twiss[S] = np.linspace(0, n_valmax, n_index)
     df_errors[S] = df_twiss[S].copy()
     return df_twiss, df_errors
@@ -299,13 +325,13 @@ def get_twiss_and_error_df(n_index, n_kmax, n_valmax):
 def phase_df(n, qx, qy):
     phx, phy = f"{PHASE_ADV}{X}", f"{PHASE_ADV}{Y}"
     df = pd.DataFrame(columns=[phx, phy])
-    df[phx] = np.linspace(0, qx, n+1)[:n]
-    df[phy] = np.linspace(0, qy, n+1)[:n]
+    df[phx] = np.linspace(0, qx, n + 1)[:n]
+    df[phy] = np.linspace(0, qy, n + 1)[:n]
     return df
 
 
 def get_twiss_and_error_columns(max_n):
-    k_cols = [f"K{n}{s}L" for n in range(max_n) for s in ('S', '')]
+    k_cols = [f"K{n}{s}L" for n in range(max_n) for s in ("S", "")]
     twiss_cols = [X, Y] + k_cols
     err_cols = [f"{DELTA_ORBIT}{X}", f"{DELTA_ORBIT}{Y}"] + k_cols
     return twiss_cols, err_cols

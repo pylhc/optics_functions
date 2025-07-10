@@ -33,15 +33,15 @@ def test_get_all_to_order():
 @pytest.mark.basic
 def test_generator():
     n = 5
-    rdt_all = generator(list(range(2, n+1)))
-    rdt_skew = generator(list(range(2, n+1)), normal=False)
-    rdt_normal = generator(list(range(2, n+1)), skew=False)
-    rdt_cc = generator(list(range(2, n+1)), complex_conj=False)
+    rdt_all = generator(list(range(2, n + 1)))
+    rdt_skew = generator(list(range(2, n + 1)), normal=False)
+    rdt_normal = generator(list(range(2, n + 1)), skew=False)
+    rdt_cc = generator(list(range(2, n + 1)), complex_conj=False)
 
     for o in rdt_all.keys():
-        assert len(rdt_all[o]) == 2*len(rdt_skew[o])
-        assert len(rdt_all[o]) == 2*len(rdt_normal[o])
-        assert len(rdt_all[o]) == 2*len(rdt_cc[o])
+        assert len(rdt_all[o]) == 2 * len(rdt_skew[o])
+        assert len(rdt_all[o]) == 2 * len(rdt_normal[o])
+        assert len(rdt_all[o]) == 2 * len(rdt_cc[o])
         assert set(rdt_all[o]) == set(rdt_skew[o] + rdt_normal[o])
         assert all(is_odd(sum(rdt[2:4])) for rdt in rdt_skew[o])
         assert all(is_even(sum(rdt[2:4])) for rdt in rdt_normal[o])
@@ -52,7 +52,7 @@ def test_generator():
 @pytest.mark.basic
 def test_generator_vs_all_to_order():
     n = 5
-    rdt_dict = generator(list(range(2, n+1)))
+    rdt_dict = generator(list(range(2, n + 1)))
     rdt_list = get_all_to_order(n)
     rdt_list2 = []
     for o, v in rdt_dict.items():
@@ -122,7 +122,7 @@ def test_missing_columns():
 @pytest.mark.basic
 def test_real_terms_and_hamiltonians():
     np.random.seed(2047294792)
-    n=12
+    n = 12
     df = get_df(n=n)
     df = prepare_twiss_dataframe(df_twiss=df)
     df.loc[:, "K2L"] = np.random.rand(n)
@@ -133,10 +133,10 @@ def test_real_terms_and_hamiltonians():
     n_rdts = len(rdts)
     assert all(np.real(df_rdts) == df_rdts)
     assert len(df_rdts.columns) == 4 * n_rdts
-    assert df_rdts.columns.str.match(f".+{REAL}$").sum() == 2*n_rdts
-    assert df_rdts.columns.str.match(f".+{IMAG}$").sum() == 2*n_rdts
-    assert df_rdts.columns.str.match("F").sum() == 2*n_rdts
-    assert df_rdts.columns.str.match("H").sum() == 2*n_rdts
+    assert df_rdts.columns.str.match(f".+{REAL}$").sum() == 2 * n_rdts
+    assert df_rdts.columns.str.match(f".+{IMAG}$").sum() == 2 * n_rdts
+    assert df_rdts.columns.str.match("F").sum() == 2 * n_rdts
+    assert df_rdts.columns.str.match("H").sum() == 2 * n_rdts
 
 
 @pytest.mark.basic
@@ -258,8 +258,8 @@ def test_rdts_normal_dodecapole_to_octupole_feeddown():
     df["X"] = 1
     df["Y"] = 0.5
     df_rdts = calculate_rdts(df, rdts=["F1003", "F0004"], feeddown=2)
-    assert all((df_rdts["F0004"] - 0.375*df_rdts_comp["F0004"]).abs() <= 1e-15)
-    assert all(df_rdts["F1003"] == 0.5*df_rdts_comp["F1003"])
+    assert all((df_rdts["F0004"] - 0.375 * df_rdts_comp["F0004"]).abs() <= 1e-15)
+    assert all(df_rdts["F1003"] == 0.5 * df_rdts_comp["F1003"])
 
 
 @pytest.mark.extended
@@ -272,7 +272,7 @@ def test_coupling_bump_sextupole_rdts():
     df_rdt = calculate_rdts(df_twiss, rdt_names)
 
     for rdt in rdt_names:
-        rdt_ptc = df_ptc_rdt[f"{rdt}{REAL}"] + 1j*df_ptc_rdt[f"{rdt}{IMAG}"]
+        rdt_ptc = df_ptc_rdt[f"{rdt}{REAL}"] + 1j * df_ptc_rdt[f"{rdt}{IMAG}"]
         assert arrays_are_close_almost_everywhere(df_rdt[rdt], rdt_ptc, rtol=1e-2, percentile=0.9)
 
 
@@ -280,18 +280,18 @@ def test_coupling_bump_sextupole_rdts():
 
 
 def get_df(n):
-    """ Fake DF with nonsense values. """
+    """Fake DF with nonsense values."""
     qx, qy = 1.31, 1.32
     phx, phy = f"{PHASE_ADV}{X}", f"{PHASE_ADV}{Y}"
     betax, betay = f"{BETA}{X}", f"{BETA}{Y}"
     df = tfs.TfsDataFrame(
         index=[str(i) for i in range(n)],
         columns=[S, X, Y, betax, betay, phx, phy],
-        headers={f"{TUNE}1": qx, f"{TUNE}2": qy}
+        headers={f"{TUNE}1": qx, f"{TUNE}2": qy},
     )
     df[S] = np.linspace(0, n, n)
-    df[phx] = np.linspace(0, qx, n+1)[:n]
-    df[phy] = np.linspace(0, qy, n+1)[:n]
+    df[phx] = np.linspace(0, qx, n + 1)[:n]
+    df[phy] = np.linspace(0, qy, n + 1)[:n]
     df[betax] = 1
     df[betay] = 1
     df[[X, Y]] = 0
@@ -300,9 +300,8 @@ def get_df(n):
 
 def get_absdiff_and_jumps(df_rdts):
     df_temp = pd.concat(
-        [pd.DataFrame(df_rdts),
-         pd.DataFrame(df_rdts.iloc[[0], :].to_numpy(), index=["temp"])],
-        axis="index"
+        [pd.DataFrame(df_rdts), pd.DataFrame(df_rdts.iloc[[0], :].to_numpy(), index=["temp"])],
+        axis="index",
     )
     df_diff = df_temp.abs().diff().shift(-1).iloc[:-1, :]
     df_jump = df_diff.abs() > 1e-15
@@ -320,5 +319,7 @@ def is_even(n: int):
 def arrays_are_close_almost_everywhere(array1, array2, rtol=1e-2, atol=None, percentile=0.9):
     if atol is None:
         atol = rtol * np.mean(np.abs(array2))
-    return sum(np.isclose(np.abs(array1), np.abs(array2), rtol=rtol, atol=0) |
-               np.isclose(np.abs(array1), np.abs(array2), rtol=0, atol=atol)) > percentile * len(array1)
+    return sum(
+        np.isclose(np.abs(array1), np.abs(array2), rtol=rtol, atol=0)
+        | np.isclose(np.abs(array1), np.abs(array2), rtol=0, atol=atol)
+    ) > percentile * len(array1)

@@ -9,7 +9,19 @@ from pandas.testing import assert_frame_equal
 from test_rdt import arrays_are_close_almost_everywhere
 
 from optics_functions.constants import (
-    ALPHA, BETA, F1001, F1010, GAMMA, IMAG, NAME, PHASE_ADV, REAL, TUNE, S, X, Y
+    ALPHA,
+    BETA,
+    F1001,
+    F1010,
+    GAMMA,
+    IMAG,
+    NAME,
+    PHASE_ADV,
+    REAL,
+    TUNE,
+    S,
+    X,
+    Y,
 )
 from optics_functions.coupling import (
     COUPLING_RDTS,
@@ -179,8 +191,19 @@ def generate_fake_data(n) -> tfs.TfsDataFrame:
     df = tfs.TfsDataFrame(
         0.0,
         index=[str(i) for i in range(n)],
-        columns=[S, f"{ALPHA}{X}", f"{ALPHA}{Y}", f"{BETA}{X}", f"{BETA}{Y}",
-                f"{PHASE_ADV}{X}", f"{PHASE_ADV}{Y}", "R11", "R12", "R21", "R22"],
+        columns=[
+            S,
+            f"{ALPHA}{X}",
+            f"{ALPHA}{Y}",
+            f"{BETA}{X}",
+            f"{BETA}{Y}",
+            f"{PHASE_ADV}{X}",
+            f"{PHASE_ADV}{Y}",
+            "R11",
+            "R12",
+            "R21",
+            "R22",
+        ],
         headers={f"{TUNE}1": qx, f"{TUNE}2": qy},
     )
 
