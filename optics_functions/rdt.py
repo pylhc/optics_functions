@@ -80,7 +80,7 @@ def calculate_rdts(
             if len(rdt) != 5 or rdt[0] != "F":
                 raise ValueError(f"'{rdt:s}' does not seem to be a valid RDT name.")
 
-            j, k, l, m = [int(i) for i in rdt[1:]]
+            j, k, l, m = [int(i) for i in rdt[1:]]  # noqa: E741
             conj_rdt = jklm2str(k, j, m, l)
 
             if conj_rdt in df_res:
