@@ -304,8 +304,9 @@ def test_switch_signs_for_beam4_madx_data():
 
 
 def get_twiss_and_error_df(n_index, n_kmax, n_valmax):
+    rng = np.random.default_rng()
     twiss_cols, err_cols = get_twiss_and_error_columns(n_kmax)
-    data = np.random.rand(n_index, len(twiss_cols)) * n_valmax
+    data = rng.random(size=(n_index, len(twiss_cols))) * n_valmax
     data[n_index // 2 :, :] = -data[n_index // 2 :, :]
 
     df_twiss = tfs.TfsDataFrame(

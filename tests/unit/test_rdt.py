@@ -121,12 +121,12 @@ def test_missing_columns():
 
 @pytest.mark.basic
 def test_real_terms_and_hamiltonians():
-    np.random.seed(2047294792)
+    rng = np.random.default_rng(2047294792)
     n = 12
     df = get_df(n=n)
     df = prepare_twiss_dataframe(df_twiss=df)
-    df.loc[:, "K2L"] = np.random.rand(n)
-    df.loc[:, "K2SL"] = np.random.rand(n)
+    df.loc[:, "K2L"] = rng.random(n)
+    df.loc[:, "K2SL"] = rng.random(n)
     rdts = ["F1002", "F2001"]
     df_rdts = calculate_rdts(df, rdts=rdts, complex_columns=False, hamiltionian_terms=True)
 
@@ -141,12 +141,12 @@ def test_real_terms_and_hamiltonians():
 
 @pytest.mark.basic
 def test_rdts_save_memory():
-    np.random.seed(2047294792)
+    rng = np.random.default_rng(2047294792)
     n = 10
     df = get_df(n=n)
     df = prepare_twiss_dataframe(df_twiss=df)
-    df.loc[:, "K2L"] = np.random.rand(n)
-    df.loc[:, "K2SL"] = np.random.rand(n)
+    df.loc[:, "K2L"] = rng.random(n)
+    df.loc[:, "K2SL"] = rng.random(n)
 
     df_save = calculate_rdts(df, rdts=["F1002", "F2001"], loop_phases=True)
     df_notsave = calculate_rdts(df, rdts=["F1002", "F2001"], loop_phases=False)
