@@ -247,7 +247,7 @@ def generator(
 # Other ------------------------------------------------------------------------
 
 
-def jklm2str(j: int, k: int, l: int, m: int) -> str:
+def jklm2str(j: int, k: int, l: int, m: int) -> str:  # noqa: E741
     return f"F{j:d}{k:d}{l:d}{m:d}"
 
 

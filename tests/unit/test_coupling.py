@@ -48,7 +48,7 @@ def test_cmatrix():
     assert not df_res.isna().any().any()
 
     # Checks based on CalagaBetatronCoupling2005
-    detC = df_res["C11"] * df_res["C22"] - df_res["C12"] * df_res["C21"]
+    detC = df_res["C11"] * df_res["C22"] - df_res["C12"] * df_res["C21"]  # noqa: N806
     fsq_diff = df_res[F1001].abs() ** 2 - df_res[F1010].abs() ** 2
     f_term = 1 / (1 + 4 * fsq_diff)
     g_sq = df_res[GAMMA] ** 2
