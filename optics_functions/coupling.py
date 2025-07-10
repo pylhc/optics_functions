@@ -370,8 +370,7 @@ def _get_weights_from_lengths(df: TfsDataFrame) -> tuple[float, np.ndarray]:
     s_periodic[0] = df[S].to_numpy()[-1] - df.headers[LENGTH]
 
     # weight ds/(2*pi*R) * N (as we take the mean afterwards)
-    weights = np.diff(s_periodic) / df.headers[LENGTH] * len(df)
-    return weights
+    return np.diff(s_periodic) / df.headers[LENGTH] * len(df)
 
 
 def check_resonance_relation(df: DataFrame, to_nan: bool = False) -> DataFrame:
