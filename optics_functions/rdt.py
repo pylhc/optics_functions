@@ -4,13 +4,14 @@ Resonance Driving Terms
 
 Functions for the calculations of Resonance Driving Terms, as well as
 getting lists of valid driving term indices for certain orders.
-
 """
+
+from __future__ import annotations
 
 import itertools
 import logging
-from collections.abc import Sequence
 from math import factorial
+from typing import TYPE_CHECKING
 
 import numpy as np
 import pandas as pd
@@ -26,6 +27,9 @@ from optics_functions.utils import (
     split_complex_columns,
     timeit,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 LOG = logging.getLogger(__name__)
 
