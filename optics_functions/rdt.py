@@ -115,9 +115,8 @@ def calculate_rdts(
                     # real(i**lm * k+ij) is equivalent to Omega-function in paper, see Eq.(A11)
                     # pd.Series is needed here, as np.real() returns numpy-array
                     k_real = pd.Series(np.real(i_pow(lm) * k_complex), index=df.index)
-                    sources = df.index[
-                        k_real != 0
-                    ]  # other elements do not contribute to integral, speedup summations
+                    # Only select elements contributing to the integral, to speedup summations
+                    sources = df.index[k_real != 0]
 
                     if not len(sources):
                         LOG.warning(f"No sources found for {rdt}. RDT will be zero.")

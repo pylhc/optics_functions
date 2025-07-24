@@ -253,9 +253,7 @@ def test_switch_signs_for_beam4():
     df_twiss_b4, df_errors_b4 = get_twiss_and_error_df(n_index, n_kmax, n_valmax)
     df_twiss_b2, df_errors_b2 = switch_signs_for_beam4(df_twiss_b4, df_errors_b4)
 
-    switch_columns = [
-        X,
-    ]  # this needs to be correct!!!
+    switch_columns = [X]  # this needs to be correct!!!
     for col in df_twiss_b4.columns:
         sign = -1 if col in switch_columns else 1
         assert df_twiss_b2[col].equals(sign * df_twiss_b4[col])
