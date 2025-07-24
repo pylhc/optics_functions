@@ -4,14 +4,15 @@ Constants
 
 Constants for the optics functions.
 """
+
 import numpy as np
 
 PI = np.pi
 PI2 = 2 * np.pi
 PI2I = 2j * np.pi
 PLANES = ("X", "Y")
-PLANE_TO_NUM = dict(X=1, Y=2)
-PLANE_TO_HV = dict(X="H", Y="V")
+PLANE_TO_NUM = {"X": 1, "Y": 2}
+PLANE_TO_HV = {"X": "H", "Y": "V"}
 
 # Columns & Headers ------------------------------------------------------------
 NAME = "NAME"

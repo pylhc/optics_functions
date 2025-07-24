@@ -7,11 +7,12 @@ functions as well as reusable utilities,
 that are needed within multiple optics calculations.
 
 """
+
 import logging
 import string
+from collections.abc import Iterable, Sequence
 from contextlib import contextmanager
 from time import time
-from typing import Iterable, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
@@ -88,7 +89,9 @@ def prepare_twiss_dataframe(
     for name, df_old in (("twiss", df_twiss), ("errors", df_errors)):
         dropped_columns = set(df_old.columns) - set(df.columns)
         if dropped_columns:
-            LOG.warning(f"The following {name}-columns were dropped on merge: {seq2str(dropped_columns)}")
+            LOG.warning(
+                f"The following {name}-columns were dropped on merge: {seq2str(dropped_columns)}"
+            )
     return df
 
 
@@ -140,7 +143,7 @@ def merge_complex_columns(
 
 def switch_signs_for_beam4(
     df_twiss: pd.DataFrame, df_errors: pd.DataFrame = None
-) -> Tuple[TfsDataFrame, TfsDataFrame]:
+) -> tuple[TfsDataFrame, TfsDataFrame]:
     """Switch the signs for Beam 4 optics.
     This is due to the switch in direction for this beam and
     (anti-) symmetry after a rotation of 180deg around the y-axis of magnets,
@@ -245,7 +248,7 @@ def dphi_at_element(df: pd.DataFrame, element: str, qx: float, qy: float) -> dic
 
 
 def add_missing_columns(df: pd.DataFrame, columns: Iterable) -> pd.DataFrame:
-    """ Check if `columns` are in `df` and add them all zero if not."""
+    """Check if `columns` are in `df` and add them all zero if not."""
     for col in columns:
         if col not in df.columns:
             LOG.debug(f"Added {col:s} with all zero to data-frame.")
@@ -278,7 +281,7 @@ def timeit(text: str = "Time used {:.3f}s", print_fun=LOG.debug):
 
 
 def get_format_keys(format_str: str) -> list:
-    """ Get keys from format string. Unnamed placeholders are returned as empty strings."""
+    """Get keys from format string. Unnamed placeholders are returned as empty strings."""
     return [t[1] for t in string.Formatter().parse(format_str) if t[1] is not None]
 
 
@@ -286,17 +289,17 @@ def get_format_keys(format_str: str) -> list:
 
 
 def seq2str(sequence: Iterable) -> str:
-    """ Converts an Iterable to string of its comma separated elements. """
+    """Converts an Iterable to string of its comma separated elements."""
     return ", ".join(str(item) for item in sequence)
 
 
 def i_pow(n: int) -> complex:
-    """ Calculates i**n in a quick and exact way. """
+    """Calculates i**n in a quick and exact way."""
     return 1j ** (n % 4)
 
 
 def set_name_index(df: pd.DataFrame, df_name="") -> pd.DataFrame:
-    """ Sets the NAME column as index if present and checks for string index. """
+    """Sets the NAME column as index if present and checks for string index."""
     if NAME in df.columns:
         df = df.set_index(NAME)
 

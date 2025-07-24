@@ -1,4 +1,3 @@
-from collections import namedtuple
 from pathlib import Path
 
 import numpy as np
@@ -9,7 +8,19 @@ from pandas.testing import assert_frame_equal
 from test_rdt import arrays_are_close_almost_everywhere
 
 from optics_functions.constants import (
-    ALPHA, BETA, F1001, F1010, GAMMA, IMAG, NAME, PHASE_ADV, REAL, TUNE, S, X, Y
+    ALPHA,
+    BETA,
+    F1001,
+    F1010,
+    GAMMA,
+    IMAG,
+    NAME,
+    PHASE_ADV,
+    REAL,
+    TUNE,
+    S,
+    X,
+    Y,
 )
 from optics_functions.coupling import (
     COUPLING_RDTS,
@@ -29,7 +40,6 @@ COUPLING_BUMP_TWISS_BEAM_1 = COUPLING_BUMP_INPUTS / "twiss.lhc.b1.coupling_bump.
 @pytest.mark.basic
 def test_cmatrix():
     n = 5
-    np.random.seed(487423872)
     df = generate_fake_data(n)
 
     df_res = coupling_via_cmatrix(df)
@@ -37,7 +47,7 @@ def test_cmatrix():
     assert not df_res.isna().any().any()
 
     # Checks based on CalagaBetatronCoupling2005
-    detC = df_res["C11"] * df_res["C22"] - df_res["C12"] * df_res["C21"]
+    detC = df_res["C11"] * df_res["C22"] - df_res["C12"] * df_res["C21"]  # noqa: N806
     fsq_diff = df_res[F1001].abs() ** 2 - df_res[F1010].abs() ** 2
     f_term = 1 / (1 + 4 * fsq_diff)
     g_sq = df_res[GAMMA] ** 2
@@ -52,10 +62,9 @@ def test_cmatrix():
 @pytest.mark.parametrize("source", ["real", "fake"])
 def test_rmatrix_to_coupling_to_rmatrix(source):
     if source == "fake":
-        np.random.seed(487423872)
         df = generate_fake_data(5)
     else:
-        df = tfs.read(INPUT / "coupling_bump" / f"twiss.lhc.b1.coupling_bump.tfs", index=NAME)
+        df = tfs.read(INPUT / "coupling_bump" / "twiss.lhc.b1.coupling_bump.tfs", index=NAME)
 
     df_coupling = coupling_via_cmatrix(df)
     for col in (f"{ALPHA}X", f"{BETA}X", f"{ALPHA}Y", f"{BETA}Y"):
@@ -71,11 +80,11 @@ def test_rmatrix_to_coupling_to_rmatrix(source):
 @pytest.mark.basic
 def test_real_output():
     n = 7
-    np.random.seed(474987942)
+    rng = np.random.default_rng(474987942)
     df = generate_fake_data(n)
     df = prepare_twiss_dataframe(df_twiss=df)
-    df.loc[:, "K1L"] = np.random.rand(n)
-    df.loc[:, "K1SL"] = np.random.rand(n)
+    df.loc[:, "K1L"] = rng.random(n)
+    df.loc[:, "K1SL"] = rng.random(n)
 
     df_cmatrix = coupling_via_cmatrix(df, complex_columns=False)
     df_rdts = coupling_via_rdts(df, qx=1.31, qy=1.32, complex_columns=False)
@@ -179,12 +188,24 @@ def generate_fake_data(n) -> tfs.TfsDataFrame:
     df = tfs.TfsDataFrame(
         0.0,
         index=[str(i) for i in range(n)],
-        columns=[S, f"{ALPHA}{X}", f"{ALPHA}{Y}", f"{BETA}{X}", f"{BETA}{Y}",
-                f"{PHASE_ADV}{X}", f"{PHASE_ADV}{Y}", "R11", "R12", "R21", "R22"],
+        columns=[
+            S,
+            f"{ALPHA}{X}",
+            f"{ALPHA}{Y}",
+            f"{BETA}{X}",
+            f"{BETA}{Y}",
+            f"{PHASE_ADV}{X}",
+            f"{PHASE_ADV}{Y}",
+            "R11",
+            "R12",
+            "R21",
+            "R22",
+        ],
         headers={f"{TUNE}1": qx, f"{TUNE}2": qy},
     )
 
-    r = np.random.rand(n)
+    rng = np.random.default_rng()
+    r = rng.random(n)
     df[S] = np.linspace(0, n, n)
     df.loc[:, "R11"] = np.sin(r)
     df.loc[:, "R22"] = r

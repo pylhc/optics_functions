@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # optics_functions documentation build configuration file, created by
 # sphinx-quickstart on Tue Feb  6 12:10:18 2018.
@@ -17,6 +16,7 @@
 import pathlib
 import sys
 import warnings
+
 warnings.filterwarnings("ignore", message="numpy.dtype size changed")
 warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 
@@ -183,7 +183,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "optics_functions.tex", u"Optics Functions Documentation", u"OMC-TEAM", "manual"),
+    (master_doc, "optics_functions.tex", "Optics Functions Documentation", "OMC-TEAM", "manual"),
 ]
 
 
@@ -191,7 +191,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "optics_functions", u"Optics Functions Documentation", [author], 1)]
+man_pages = [(master_doc, "optics_functions", "Optics Functions Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output -------------------------------------------
@@ -203,7 +203,7 @@ texinfo_documents = [
     (
         master_doc,
         "optics_functions",
-        u"Optics Functions Documentation",
+        "Optics Functions Documentation",
         author,
         "OMC-TEAM",
         "One line description of project.",
