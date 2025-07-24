@@ -6,9 +6,11 @@ Functions to estimate coupling from twiss dataframes and different methods to ca
 approach from the calculated coupling RDTs.
 """
 
+from __future__ import annotations
+
 import logging
-from collections.abc import Sequence
 from contextlib import suppress
+from typing import TYPE_CHECKING
 
 import numpy as np
 from pandas import DataFrame, Series
@@ -34,6 +36,9 @@ from optics_functions.constants import (
 )
 from optics_functions.rdt import calculate_rdts
 from optics_functions.utils import split_complex_columns, timeit
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 COUPLING_RDTS = [F1001, F1010]
 LOG = logging.getLogger(__name__)
