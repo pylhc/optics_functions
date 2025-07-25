@@ -73,6 +73,8 @@ changelog = "https://github.com/pylhc/optics_functions/blob/master/CHANGELOG.md"
 # ----- Testing ----- #
 
 [tool.pytest.ini_options]
+addopts = "--cov-report=xml --cov-report term-missing --cov-config=pyproject.toml --cov=optics_functions"
+testpaths = ["tests"]
 markers = [
     "basic: basic tests run for every commit",
     "extended: test run on PRs",
