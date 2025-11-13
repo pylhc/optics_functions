@@ -5,7 +5,6 @@ import pandas as pd
 import pytest
 import tfs
 from pandas.testing import assert_frame_equal
-from test_rdt import arrays_are_close_almost_everywhere
 
 from optics_functions.constants import (
     ALPHA,
@@ -31,6 +30,8 @@ from optics_functions.coupling import (
     rmatrix_from_coupling,
 )
 from optics_functions.utils import prepare_twiss_dataframe
+
+from .test_rdt import arrays_are_close_almost_everywhere
 
 INPUT = Path(__file__).parent.parent / "inputs"
 COUPLING_BUMP_INPUTS = INPUT / "coupling_bump"
