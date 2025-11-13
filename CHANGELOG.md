@@ -1,5 +1,9 @@
 # optics_functions Changelog
 
+## Version 0.1.5
+
+- Dropped support for `Python 3.9`.
+
 ## Version 0.1.4
 
 - Fixed invalid escape sequences in docstrings that would warn in all calling code.
