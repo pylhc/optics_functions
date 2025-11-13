@@ -1,10 +1,7 @@
 # optics_functions
 
-[![Cron Testing](https://github.com/pylhc/optics_functions/workflows/Cron%20Testing/badge.svg)](https://github.com/pylhc/optics_functions/actions?query=workflow%3A%22Cron+Testing%22)
-[![Code Climate coverage](https://img.shields.io/codeclimate/coverage/pylhc/optics_functions.svg?style=popout)](https://codeclimate.com/github/pylhc/optics_functions)
-[![Code Climate maintainability (percentage)](https://img.shields.io/codeclimate/maintainability-percentage/pylhc/optics_functions.svg?style=popout)](https://codeclimate.com/github/pylhc/optics_functions)
+[![Tests](https://github.com/pylhc/optics_functions/actions/workflows/coverage.yml/badge.svg?branch=master)](https://github.com/pylhc/optics_functions/actions/workflows/coverage.yml)
 [![GitHub last commit](https://img.shields.io/github/last-commit/pylhc/optics_functions.svg?style=popout)](https://github.com/pylhc/optics_functions)
-<!-- [![GitHub release](https://img.shields.io/github/release/pylhc/optics_functions.svg?style=popout)](https://github.com/pylhc/optics_functions) -->
 [![PyPI Version](https://img.shields.io/pypi/v/optics_functions?label=PyPI&logo=pypi)](https://pypi.org/project/optics_functions/)
 [![GitHub release](https://img.shields.io/github/v/release/pylhc/optics_functions?logo=github)](https://github.com/pylhc/optics_functions/)
 [![Conda-forge Version](https://img.shields.io/conda/vn/conda-forge/optics_functions?color=orange&logo=anaconda)](https://anaconda.org/conda-forge/optics_functions)
@@ -18,11 +15,13 @@ See the [API documentation](https://pylhc.github.io/optics_functions/) for detai
 ## Installing
 
 Installation is easily done via `pip`:
+
 ```bash
 python -m pip install optics_functions
 ```
 
 One can also install in a `conda` environment via the `conda-forge` channel with:
+
 ```bash
 conda install -c conda-forge optics_functions
 ```
@@ -32,7 +31,7 @@ conda install -c conda-forge optics_functions
 > **Warning:** In certain scenarios, e.g. in case of non-zero closed orbit, the `RDT` calculations can be unreliable for **thick** lattices.
 > Convert to a _thin_ lattice by slicing the lattice to reduce the error of the analytical approximation.
 
-#### Coupling Example:
+### Coupling Example
 
 ```python
 import logging
@@ -52,7 +51,7 @@ df_twiss = tfs.read("twiss.tfs", index="NAME")
 df_coupling = coupling_via_cmatrix(df_twiss)
 
 # Example:
-# print(df_coupling) 
+# print(df_coupling)
 #
 #                            F1001               F1010  ...       C22     GAMMA
 # NAME                                                  ...
@@ -75,7 +74,7 @@ df_dqmin = closest_tune_approach(
 )
 
 # Example:
-# print(df_dqmin) 
+# print(df_dqmin)
 #
 #                  DELTAQMIN
 # NAME
@@ -95,7 +94,7 @@ df_dqmin = closest_tune_approach(
 # (...)
 
 # write out
-# as the writer can only handle real data, 
+# as the writer can only handle real data,
 # you need to split the rdts into real and imaginary parts before writing
 tfs.write(
     "coupling.tfs",
@@ -104,7 +103,7 @@ tfs.write(
 )
 ```
 
-#### RDT Example:
+### RDT Example
 
 ```python
 import logging
@@ -123,7 +122,7 @@ df_twiss = tfs.read("twiss.tfs", index="NAME")
 # generate all valid RDT names, here for RDTs of order 2
 rdts = [jklm2str(*jklm) for jklm in generator(orders=[2])[2]]
 
-# check correct signs (i.e if beam==4), merge twiss and errors, 
+# check correct signs (i.e if beam==4), merge twiss and errors,
 # add empty K(S)L columns if needed
 df_twiss = prepare_twiss_dataframe(df_twiss=df_twiss, df_errors=None, max_order=5)
 
@@ -136,8 +135,8 @@ df_rdts = calculate_rdts(
     complex_columns=True,  # complex output
 )
 
-# Example: 
-# print(df_rdts) 
+# Example:
+# print(df_rdts)
 #                            F0002  ...               F2000
 # NAME                              ...
 # IP3           2.673376-1.045712j  ... -2.863617-0.789910j
@@ -156,7 +155,7 @@ df_rdts = calculate_rdts(
 # (...)
 
 # write out
-# as the writer can only handle real data, either set real = True above 
+# as the writer can only handle real data, either set real = True above
 # or split the rdts into real and imaginary parts before writing
 tfs.write(
     "rdts.tfs",
@@ -165,7 +164,7 @@ tfs.write(
 )
 ```
 
-#### Appending Example:
+### Appending Example
 
 ```python
 import logging
@@ -187,7 +186,7 @@ df_twiss[["F1001", "F1010"]] = coupling_via_cmatrix(df_twiss, output=['rdts'])
 
 # Example:
 # print(df_twiss)
-# 
+#
 # Headers:
 # NAME: TWISS
 # TYPE: TWISS
@@ -196,7 +195,7 @@ df_twiss[["F1001", "F1010"]] = coupling_via_cmatrix(df_twiss, output=['rdts'])
 # ORIGIN: 5.05.02 Linux 64
 # DATE: 01/02/21
 # TIME: 19.58.08
-# 
+#
 #                  KEYWORD           S  ...               F1001               F1010
 # NAME                                  ...
 # IP3               MARKER      0.0000  ... -0.000000+0.000004j -0.004026+0.003574j
@@ -211,14 +210,15 @@ df_twiss[["F1001", "F1010"]] = coupling_via_cmatrix(df_twiss, output=['rdts'])
 # BPMW.4L3.B1      MONITOR  26636.4387  ... -0.000000+0.000004j -0.004831+0.002376j
 # MCBWH.4L3.B1     HKICKER  26641.0332  ... -0.000000+0.000004j -0.004691+0.002641j
 ```
-### Modules
+
+## Modules
 
 - `coupling` - Functions to estimate coupling from twiss dataframes and
   different methods to calculate the closest tune approach from
   the calculated coupling RDTs.
   ([**coupling.py**](optics_functions/coupling.py), [**doc**](https://pylhc.github.io/optics_functions/modules/coupling.html))
 - `rdt` - Functions for the calculations of Resonance Driving Terms, as well as
-  getting lists of valid driving term indices for certain orders. 
+  getting lists of valid driving term indices for certain orders.
   ([**rdt.py**](optics_functions/rdt.py), [**doc**](https://pylhc.github.io/optics_functions/modules/rdt.html))
 - `utils` - Helper functions to prepare the twiss dataframes for use with the optics
   functions as well as reusable utilities,
