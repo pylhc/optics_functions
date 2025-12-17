@@ -1,5 +1,0 @@
-.. automodule:: optics_functions.rdt
-    :members:
-    :no-index-entry:
-
-

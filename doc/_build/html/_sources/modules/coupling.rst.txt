@@ -1,4 +1,0 @@
-.. automodule:: optics_functions.coupling
-    :members:
-    :no-index-entry:
-

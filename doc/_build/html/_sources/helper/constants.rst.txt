@@ -1,4 +1,0 @@
-.. automodule:: optics_functions.constants
-    :members:
-    :no-index-entry:
-
