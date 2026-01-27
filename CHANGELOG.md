@@ -1,5 +1,9 @@
 # optics_functions Changelog
 
+## Version 0.1.6
+
+- Added compatibility with `pandas 3.x`.
+
 ## Version 0.1.5
 
 - Dropped support for `Python 3.9`.
