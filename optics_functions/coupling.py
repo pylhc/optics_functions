@@ -70,8 +70,11 @@ def coupling_via_rdts(df: TfsDataFrame, complex_columns: bool = True, **kwargs) 
         A new ``TfsDataFrame`` with Coupling Columns.
     """
     df_res = calculate_rdts(df, rdts=COUPLING_RDTS, **kwargs)
+
+    # Change real part of the RDT for consistency with Calaga approach
+    # (see references in the function's docstring)
     for rdt in COUPLING_RDTS:
-        rdt_array = df_res[rdt].to_numpy()  # might return a copy!
+        rdt_array = df_res[rdt].to_numpy(copy=True)  # enforce copy so we can modify it
         rdt_array.real *= -1  # definition
         df_res.loc[:, rdt] = rdt_array
 
