@@ -5,17 +5,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>optics_functions.coupling &mdash; optics_functions 0.1.5 documentation</title>
+  <title>optics_functions.coupling &mdash; optics_functions 0.1.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=988d0652" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=59fadc99"></script>
-      <script src="../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/documentation_options.js?v=6e0256f3"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -152,8 +152,11 @@
 <span class="sd">        A new ``TfsDataFrame`` with Coupling Columns.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df_res</span> <span class="o">=</span> <span class="n">calculate_rdts</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">rdts</span><span class="o">=</span><span class="n">COUPLING_RDTS</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Change real part of the RDT for consistency with Calaga approach</span>
+    <span class="c1"># (see references in the function&#39;s docstring)</span>
     <span class="k">for</span> <span class="n">rdt</span> <span class="ow">in</span> <span class="n">COUPLING_RDTS</span><span class="p">:</span>
-        <span class="n">rdt_array</span> <span class="o">=</span> <span class="n">df_res</span><span class="p">[</span><span class="n">rdt</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>  <span class="c1"># might return a copy!</span>
+        <span class="n">rdt_array</span> <span class="o">=</span> <span class="n">df_res</span><span class="p">[</span><span class="n">rdt</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># enforce copy so we can modify it</span>
         <span class="n">rdt_array</span><span class="o">.</span><span class="n">real</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># definition</span>
         <span class="n">df_res</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">rdt</span><span class="p">]</span> <span class="o">=</span> <span class="n">rdt_array</span>
 
