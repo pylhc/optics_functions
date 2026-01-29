@@ -6,10 +6,10 @@
 |---------------------------------- | -------: | -------: | ------: | --------: |
 | optics\_functions/\_\_init\_\_.py |        8 |        0 |    100% |           |
 | optics\_functions/constants.py    |       28 |        0 |    100% |           |
-| optics\_functions/coupling.py     |      149 |        2 |     99% |  202, 281 |
+| optics\_functions/coupling.py     |      149 |        2 |     99% |  205, 284 |
 | optics\_functions/rdt.py          |       98 |        6 |     94% |91, 129, 195, 206, 232, 235 |
 | optics\_functions/utils.py        |      113 |        4 |     96% |92, 278, 304, 307 |
-|                         **TOTAL** |  **396** |   **12** | **97%** |           |
+| **TOTAL**                         |  **396** |   **12** | **97%** |           |
 
 
 ## Setup coverage badge
